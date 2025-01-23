@@ -4,7 +4,7 @@
 
 set(EXEC_NAME "RenderEngine")
 set(LIB_NAME ${EXEC_NAME}Lib)
-set(TEST_NAME ${EXEC_NAME}Test)
+set(TEST_NAME UnitTestTarget)
 
 cmake_minimum_required(VERSION 3.29)
 project(${EXEC_NAME} C CXX)
@@ -32,12 +32,29 @@ add_subdirectory(src)
 # Setup compile options
 # ------------------------------
 
+# ------------------------------
+# Setup compile options
+# ------------------------------
+
 string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE_UPPER)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 
     if(BUILD_TYPE_UPPER STREQUAL "DEBUG")
-        target_compile_options(${LIB_NAME} PUBLIC -g;-fsanitize=undefined;-O0;-Wall;-Wextra;-pedantic)
-        target_link_options(${LIB_NAME} PUBLIC -fsanitize=undefined)
+        target_compile_options(${LIB_NAME} PUBLIC
+                -g
+                -fsanitize=undefined
+                -fsanitize=address
+                -fsanitize=leak
+                -O0
+                -Wall
+                -Wextra
+                -pedantic
+        )
+        target_link_options(${LIB_NAME} PUBLIC
+                -fsanitize=undefined
+                -fsanitize=address
+                -fsanitize=leak
+        )
     elseif (BUILD_TYPE_UPPER STREQUAL "RELEASE")
         target_compile_options(${LIB_NAME} PUBLIC -O3;-march=native;-funroll-loops;)
     elseif(BUILD_TYPE_UPPER STREQUAL "RELWITHDEBINFO")
@@ -49,7 +66,19 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
     if(BUILD_TYPE_UPPER STREQUAL "DEBUG")
-        target_compile_options(${LIB_NAME} PUBLIC -g;-O0;)
+        target_compile_options(${LIB_NAME} PUBLIC
+                -g
+                -fsanitize=undefined
+                -fsanitize=address
+                -O0
+                -Wall
+                -Wextra
+                -pedantic
+        )
+        target_link_options(${LIB_NAME} PUBLIC
+                -fsanitize=undefined
+                -fsanitize=address
+        )
     elseif (BUILD_TYPE_UPPER STREQUAL "RELEASE")
         target_compile_options(${LIB_NAME} PUBLIC -O3;-march=native;-funroll-loops)
     elseif(BUILD_TYPE_UPPER STREQUAL "RELWITHDEBINFO")

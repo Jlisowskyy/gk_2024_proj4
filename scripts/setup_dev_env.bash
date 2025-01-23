@@ -7,6 +7,11 @@ usage() {
   cat << EOF
 Usage: ${0##*/} <platform>
 
+Description:
+  Things done by this script:
+    - Installs needed development packages
+    - Setups git hooks
+
 Where:
     <platform> is one of the following:
 EOF

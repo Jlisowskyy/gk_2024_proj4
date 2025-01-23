@@ -1,9 +1,9 @@
-name: Cppcheck
+name: Clang-tidy
 
-on: [push]
+on: [ push ]
 
 jobs:
-  cppcheck:
+  Clang-tidy:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,13 +14,13 @@ jobs:
         run: |
           sudo scripts/setup_dev_env.bash ubuntu
 
-      - name: Run cppcheck
+      - name: Run clang-tidy
         run: |
-          scripts/run_cppcheck.bash
+          scripts/run_clang_tidy.bash
 
-      - name: Upload cppcheck report
+      - name: Upload clang-tidy report
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: cppcheck-report
-          path: reports/cppcheck-output.xml
+          name: clang-tidy-report
+          path: reports/clang-tidy-report.txt

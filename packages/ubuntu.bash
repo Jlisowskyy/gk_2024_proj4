@@ -9,6 +9,7 @@ PACKAGES=(
   "make"
   "build-essential"
   "cppcheck"
+  "clang-tidy"
 
   # for glfw wayland
   "libxkbcommon-dev"

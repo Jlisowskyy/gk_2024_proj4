@@ -4,7 +4,7 @@ BUILD_AND_RUN_UNIT_TESTS_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> 
 
 BUILD_AND_RUN_UNIT_TESTS_REPO_DIR="${BUILD_AND_RUN_UNIT_TESTS_DIR}/.."
 
-TEST_TARGET_NAME="RenderEngineTest"
+TEST_TARGET_NAME="UnitTestTarget"
 
 set -euo pipefail  # Exit on error, unset variables, and pipeline failures
 
