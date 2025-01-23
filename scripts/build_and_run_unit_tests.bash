@@ -9,18 +9,23 @@ TEST_TARGET_NAME="UnitTestTarget"
 set -euo pipefail  # Exit on error, unset variables, and pipeline failures
 
 # Step 1: cd to the repo root
-cd "${BUILD_AND_RUN_UNIT_TESTS_REPO_DIR}" || exit 1
+echo "Changing directory to ${BUILD_AND_RUN_UNIT_TESTS_REPO_DIR}"
+cd "${BUILD_AND_RUN_UNIT_TESTS_REPO_DIR}"
 
 # Step 2: configure cmake
 
-mkdir -p build && cd build || exit 1
-cmake -DCMAKE_BUILD_TYPE=Debug .. || exit 1
+echo "Creating build directory and running cmake"
+mkdir -p build && cd build
+cmake -DCMAKE_BUILD_TYPE=Debug ..
 
 # Step 3: build the project (additionally verify if everything builds correctly)
-cmake --build . -- -j$(nproc) || exit 1
+echo "Building the project"
+cmake --build . -- -j$(nproc)
 
 # Step 5: find test binary
+echo "Finding test binary"
 TEST_BINARY=$(find . -name "${TEST_TARGET_NAME}" -type f)
 
 # Step 6: run tests
+echo "Running tests"
 "${TEST_BINARY}" || exit 1
