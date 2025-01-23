@@ -12,5 +12,5 @@ RUN_CPPCHECK_COMPILE_DB_DIR="${RUN_CPPCHECK_DIR}/../compile_commands.json"
 mkdir -p "${RUN_CPPCHECK_REPORTS_DIR}"
 cppcheck --enable=all --suppress=missingIncludeSystem --error-exitcode=1 \
     --checkers-report="${RUN_CPPCHECK_REPORTS_DIR}"/checkers-report.txt \
-    --output-file="${RUN_CPPCHECK_REPORTS_DIR}"/cppcheck-output.xml \
-    --output-format=xml --project="${RUN_CPPCHECK_COMPILE_DB_DIR}"
+    --output-file="${RUN_CPPCHECK_REPORTS_DIR}"/cppcheck-output.txt \
+    --project="${RUN_CPPCHECK_COMPILE_DB_DIR}"
