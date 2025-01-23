@@ -1,7 +1,7 @@
 #include <iostream>
 
-int RenderEngineMain()
+extern int RenderEngineMain()
 {
-    std::cout << "Elo Elo" << std::endl;
+    std::cout << "Elo Elo\n";
     return 0;
 }
