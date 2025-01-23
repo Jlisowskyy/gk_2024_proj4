@@ -30,3 +30,14 @@
 *.exe
 *.out
 *.app
+
+.idea
+.vscode
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.vcxproj.webinfo
+*.vcproj
+*.vcproj.*
+build/
