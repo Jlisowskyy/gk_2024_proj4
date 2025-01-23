@@ -5,6 +5,7 @@ PACKAGES=(
   "clang"
   "cmake"
   "base-devel"
+  "cppcheck"
 
   # for glfw wayland
   "wayland"

@@ -1,0 +1,27 @@
+name: Cppcheck
+
+on: [push]
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo scripts/setup_dev_env.bash ubuntu
+
+      - name: Run cppcheck
+        run: |
+          mkdir -p reports
+          cppcheck --enable=all --suppress=missingIncludeSystem --error-exitcode=1 --output-file=reports/cppcheck-report.txt src
+
+      - name: Upload cppcheck report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cppcheck-report
+          path: reports/cppcheck-report.txt

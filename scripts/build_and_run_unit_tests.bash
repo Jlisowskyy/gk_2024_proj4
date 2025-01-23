@@ -17,7 +17,7 @@ mkdir -p build && cd build || exit 1
 cmake -DCMAKE_BUILD_TYPE=Debug .. || exit 1
 
 # Step 3: build the project (additionally verify if everything builds correctly)
-cmake --build .
+cmake --build . -- -j$(nproc) || exit 1
 
 # Step 5: find test binary
 TEST_BINARY=$(find . -name "${TEST_TARGET_NAME}" -type f)

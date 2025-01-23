@@ -8,6 +8,7 @@ PACKAGES=(
   "cmake"
   "make"
   "build-essential"
+  "cppcheck"
 
   # for glfw wayland
   "libxkbcommon-dev"
