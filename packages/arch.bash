@@ -6,6 +6,7 @@ PACKAGES=(
   "cmake"
   "base-devel"
   "cppcheck"
+  "jq"
 
   # for glfw wayland
   "wayland"

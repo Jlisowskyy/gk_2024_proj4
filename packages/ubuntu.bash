@@ -10,6 +10,7 @@ PACKAGES=(
   "build-essential"
   "cppcheck"
   "clang-tidy"
+  "jq"
 
   # for glfw wayland
   "libxkbcommon-dev"
