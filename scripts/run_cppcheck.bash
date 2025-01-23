@@ -2,7 +2,6 @@
 
 RUN_CPPCHECK_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 RUN_CPPCHECK_REPORTS_DIR="${RUN_CPPCHECK_DIR}/../reports"
-RUN_CPPCHECK_SRC_DIR="${RUN_CPPCHECK_DIR}/../src"
 RUN_CPPCHECK_COMPILE_DB_DIR="${RUN_CPPCHECK_DIR}/../compile_commands.json"
 
 # Step 1: Generate compile_commands.json
