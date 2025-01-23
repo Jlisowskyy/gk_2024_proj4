@@ -17,4 +17,4 @@ jobs:
           sudo apt-get install -y cmake g++ make gcc
 
       - name: Run tests
-        run: sudo scripts/build_and_run_tests.bash
+        run: sudo scripts/build_and_run_unit_tests.bash
