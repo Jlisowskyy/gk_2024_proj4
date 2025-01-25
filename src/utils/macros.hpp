@@ -7,6 +7,8 @@
 // clang-format on
 #include <cstdlib>
 
+#include <utils/checks.hpp>
+
 /* Convert a token into a string */
 #define STRINGIFY(x) #x
 /* Apply STRINGIFY to expand macros before conversion */
@@ -15,9 +17,11 @@
 #define VERIFY_OUTPUT_GLFW(x)                                                                 \
     if (!(x)) {                                                                               \
         std::cerr << "Error: " #x " at line: " TOSTRING(__LINE__) " at file: " __FILE__ "\n"; \
-        ;                                                                                     \
         glfwTerminate();                                                                      \
-        std::exit(EXIT_FAILURE);                                                              \
+        std::abort();                                                                         \
     }
+
+#define ENSURE_SUCCESS_SHADER_OPENGL(shader_id)   CheckShaderErrorsOpenGl(shader_id, __FILE__, __LINE__)
+#define ENSURE_SUCESSS_PROGRAM_OPENGL(program_id) CheckProgramErrorsOpenGl(program_id, __FILE__, __LINE__)
 
 #endif  // UTILS_MACROS_HPP_

@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h> /* (include after glad) */
 // clang-format on
 
+#include <shaders/static_header.hpp>
 #include <utils/macros.hpp>
 
 // Function prototypes
@@ -44,13 +45,56 @@ extern int RenderEngineMain()
     // Define the viewport dimensions
     glViewport(0, 0, kWidth, kHeight);
 
+    // Load VertexShader
+    const auto vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex_shader, 1, &StaticShaders::first_vertex_shader, nullptr);
+    glCompileShader(vertex_shader);
+
+    // Check for shader compile errors
+    ENSURE_SUCCESS_SHADER_OPENGL(vertex_shader);
+
+    // Load FragmentShader
+    const auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment_shader, 1, &StaticShaders::first_fragment_shader, nullptr);
+    glCompileShader(fragment_shader);
+
+    // Check for shader compile errors
+    ENSURE_SUCCESS_SHADER_OPENGL(fragment_shader);
+
+    // create shader program
+    const auto shader_program = glCreateProgram();
+
+    glAttachShader(shader_program, vertex_shader);
+    glAttachShader(shader_program, fragment_shader);
+    glLinkProgram(shader_program);
+
+    // Check for linking errors
+    ENSURE_SUCESSS_PROGRAM_OPENGL(shader_program);
+
+    // Prepare Vertex Array Object (VAO)
+    GLuint VAO{};
+    glGenVertexArrays(1, &VAO);
+
     // Prepare Vertex Buffer Object (VBO)
     GLuint VBO{};
     glGenBuffers(1, &VBO);
+
+    // Bind VAO
+    glBindVertexArray(VAO);
+
+    // Bind VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     // Copy vertices to VBO
     glBufferData(GL_ARRAY_BUFFER, sizeof(kVertices), kVertices.data(), GL_STATIC_DRAW);
+
+    // instruct OpenGL how to interpret the vertex data
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
+    glEnableVertexAttribArray(0);
+
+    // delete shaders
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
 
     // Game loop
     while (glfwWindowShouldClose(window) == 0) {
@@ -62,6 +106,11 @@ extern int RenderEngineMain()
         // Clear the color buffer
         glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        // Draw the triangle
+        glUseProgram(shader_program);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // Swap the screen buffers
         glfwSwapBuffers(window);
