@@ -20,11 +20,20 @@ add_executable(${TEST_NAME}
 )
 
 # ------------------------------
+# Add includes
+# ------------------------------
+
+target_include_directories(${TEST_NAME} PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+# ------------------------------
 # Link with lib and gtest
 # ------------------------------
 
 target_link_libraries(
-        ${TEST_NAME} PRIVATE ${LIB_NAME} GTest::gtest_main)
+        ${TEST_NAME} PRIVATE ${LIB_NAME} GTest::gtest_main
+)
 
 include(GoogleTest)
 gtest_discover_tests(${TEST_NAME})

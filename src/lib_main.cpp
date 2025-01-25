@@ -8,6 +8,7 @@
 // clang-format on
 
 #include <libcgp/shader.hpp>
+#include <libcgp/texture.hpp>
 #include <libcgp/utils/macros.hpp>
 
 // Function prototypes
