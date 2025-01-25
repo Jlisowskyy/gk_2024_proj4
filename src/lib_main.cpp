@@ -1,4 +1,5 @@
 #include <array>
+#include <cmath>
 #include <iostream>
 
 // clang-format off
@@ -127,7 +128,15 @@ extern int RenderEngineMain()
 
         // Draw the triangle
         glUseProgram(shader_program);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        // update the uniform color
+        const float timeValue         = glfwGetTime();
+        const float greenValue        = (std::sin(timeValue) / 2.0F) + 0.5F;
+        const int vertexColorLocation = glGetUniformLocation(shader_program, "ourColor");
+        VERIFY_OUTPUT_GLFW(vertexColorLocation != -1);
+
+        glUniform4f(vertexColorLocation, 0.0F, greenValue, 0.0F, 1.0F);
+
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, sizeof(kIndices), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
