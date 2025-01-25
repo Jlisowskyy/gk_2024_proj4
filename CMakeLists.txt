@@ -23,6 +23,12 @@ set(CMAKE_C_STANDARD 17)
 add_subdirectory(deps)
 
 # ------------------------------
+# Load resources
+# ------------------------------
+
+add_subdirectory(resources)
+
+# ------------------------------
 # Load project
 # ------------------------------
 

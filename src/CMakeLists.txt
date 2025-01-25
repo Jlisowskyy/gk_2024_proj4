@@ -44,6 +44,8 @@ target_link_libraries(${LIB_NAME} PUBLIC
         glfw
         OpenGL
         glad
+        libStb
+        Resources
 )
 
 # ------------------------------
