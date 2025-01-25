@@ -27,6 +27,18 @@ target_include_directories(${LIB_NAME} PUBLIC
 )
 
 # ------------------------------
+# Lib links
+# ------------------------------
+
+find_package(OpenGL)
+
+target_link_libraries(${LIB_NAME} PRIVATE
+        glfw
+        OpenGL
+        glad
+)
+
+# ------------------------------
 # Define executable
 # ------------------------------
 
