@@ -5,6 +5,9 @@
 
 #include <libcgp/defines.hpp>
 
+#include <cassert>
+#include <type_traits>
+
 LIBGCP_DECL_START_
 // ------------------------------
 // Shader class
@@ -12,6 +15,10 @@ LIBGCP_DECL_START_
 
 class Shader
 {
+    // ------------------------------
+    // Inner types
+    // ------------------------------
+
     public:
     // ------------------------------
     // Object creation
@@ -38,6 +45,22 @@ class Shader
     WRAP_CALL void Activate() const noexcept { glUseProgram(shader_program_); }
 
     NDSCRD WRAP_CALL GLuint GetProgram() const noexcept { return shader_program_; }
+
+    FAST_CALL void SetInt(const char *name, const int value) const
+    {
+        const GLint location = glGetUniformLocation(shader_program_, name);
+        assert(location != -1);
+
+        glUniform1i(location, value);
+    }
+
+    FAST_CALL void SetFloat(const char *name, const float value) const
+    {
+        const GLint location = glGetUniformLocation(shader_program_, name);
+        assert(location != -1);
+
+        glUniform1f(location, value);
+    }
 
     // ------------------------------
     // Class fields

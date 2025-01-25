@@ -3,6 +3,8 @@
 #include <libcgp/shader.hpp>
 #include <open_gl_test.hpp>
 
+#include <utility>
+
 class ShaderTest : public OpenGLTest
 {
 };
@@ -28,5 +30,8 @@ void main()
     gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
 })";
 
-    const auto shader = LibGcp::MakeShaderFromCode(vertex_shader, frag_shader);
+    auto shader = LibGcp::MakeShaderFromCode(vertex_shader, frag_shader);
+
+    /* move shdaer */
+    const auto shader2 = std::move(shader);
 }

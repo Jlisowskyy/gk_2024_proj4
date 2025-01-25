@@ -18,7 +18,7 @@ class Texture
     // Object creation
     // ------------------------------
 
-    Texture(const unsigned char* texture_data, int width, int height) noexcept;
+    Texture(const unsigned char* texture_data, int width, int height, int channels) noexcept;
 
     ~Texture() noexcept;
 
@@ -36,6 +36,12 @@ class Texture
 
     NDSCRD FAST_CALL GLuint GetTextureId() const noexcept { return texture_id_; }
 
+    FAST_CALL void Bind(const int texture_unit) const noexcept
+    {
+        glActiveTexture(GL_TEXTURE0 + texture_unit);
+        glBindTexture(GL_TEXTURE_2D, texture_id_);
+    }
+
     // ------------------------------
     // Class fields
     // ------------------------------
@@ -48,7 +54,7 @@ class Texture
 // Factories
 // ------------------------------
 
-Texture MakeTextureFromData(const unsigned char* texture_data, int width, int height) noexcept;
+Texture MakeTextureFromData(const unsigned char* texture_data, int width, int height, int channels) noexcept;
 Texture MakeTextureFromFile(const char* file_path) noexcept;
 Texture MakeTextureFromImage(const char* image_name) noexcept;
 

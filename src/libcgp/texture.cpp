@@ -10,8 +10,10 @@
 #include <cstdlib>
 #include <string>
 
-LibGcp::Texture::Texture(const unsigned char *texture_data, const int width, const int height) noexcept
+LibGcp::Texture::Texture(const unsigned char *texture_data, const int width, const int height, int channels) noexcept
 {
+    R_ASSERT(channels == 3 || channels == 4);
+
     GLuint texture_id{};
 
     glGenTextures(1, &texture_id);
@@ -22,7 +24,9 @@ LibGcp::Texture::Texture(const unsigned char *texture_data, const int width, con
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture_data);
+    glTexImage2D(
+        GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, channels == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, texture_data
+    );
     glGenerateMipmap(GL_TEXTURE_2D);
 
     texture_id_ = texture_id;
@@ -37,10 +41,10 @@ LibGcp::Texture::~Texture() noexcept
 }
 
 LibGcp::Texture LibGcp::MakeTextureFromData(
-    const unsigned char *texture_data, const int width, const int height
+    const unsigned char *texture_data, const int width, const int height, int channels
 ) noexcept
 {
-    return {texture_data, width, height};
+    return {texture_data, width, height, channels};
 }
 
 LibGcp::Texture LibGcp::MakeTextureFromFile(const char *file_path) noexcept
@@ -49,10 +53,11 @@ LibGcp::Texture LibGcp::MakeTextureFromFile(const char *file_path) noexcept
     int height{};
     int channels{};
 
+    stbi_set_flip_vertically_on_load(true);
     unsigned char *data = stbi_load(file_path, &width, &height, &channels, 0);
     R_ASSERT(data != nullptr);
 
-    Texture texture{data, width, height};
+    Texture texture{data, width, height, channels};
     stbi_image_free(data);
 
     return texture;
@@ -68,10 +73,11 @@ LibGcp::Texture LibGcp::MakeTextureFromImage(const char *image_name) noexcept
     const auto &image       = StaticImages::g_KnownImages.at(std::string(image_name));
     const size_t image_size = StaticImages::g_ImageSizes.at(std::string(image_name));
 
+    stbi_set_flip_vertically_on_load(true);
     unsigned char *data = stbi_load_from_memory(image, static_cast<int>(image_size), &width, &height, &channels, 0);
     R_ASSERT(data != nullptr);
 
-    Texture texture{data, width, height};
+    Texture texture{data, width, height, channels};
     stbi_image_free(data);
 
     return texture;

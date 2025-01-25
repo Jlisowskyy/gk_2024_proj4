@@ -21,10 +21,11 @@ static constexpr GLuint kWidth  = 800;
 static constexpr GLuint kHeight = 600;
 
 static constexpr std::array kVertices{
-    0.5F,  0.5F,  0.0F, 1.0F,  0.0F, 0.0F,   // top right
-    0.5F,  -0.5F, 0.0F, 0.0F,  1.0F, 0.0F,   // bottom right
-    -0.5F, -0.5F, 0.0F, 0.0F,  0.0F, 1.0F,   // bottom left
-    -0.5F, 0.5F,  0.0F, 0.25F, 0.5F, 0.75F,  // top left
+    // positions // colors // texture coords
+    0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // top right
+    0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom left
+    -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f   // top left
 };
 
 static constexpr std::array kIndices{
@@ -69,7 +70,12 @@ extern int RenderEngineMain()
     GLuint EBO{};
     glGenBuffers(1, &EBO);
 
+    /* load shader */
     auto shader_program = LibGcp::MakeShaderFromName("first_vertex_shader", "first_fragment_shader");
+
+    /* load texture */
+    auto box_texture  = LibGcp::MakeTextureFromImage("container");
+    auto face_texture = LibGcp::MakeTextureFromImage("awesomeface");
 
     // Bind VAO
     glBindVertexArray(VAO);
@@ -85,11 +91,18 @@ extern int RenderEngineMain()
     glBufferData(GL_ARRAY_BUFFER, sizeof(kVertices), kVertices.data(), GL_STATIC_DRAW);
 
     // instruct OpenGL how to interpret the vertex data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), nullptr);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void *>(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    shader_program.Activate();
+    shader_program.SetInt("texture1", 0);
+    shader_program.SetInt("texture2", 1);
 
     // Game loop
     while (glfwWindowShouldClose(window) == 0) {
@@ -105,6 +118,8 @@ extern int RenderEngineMain()
         // Draw the triangle
         shader_program.Activate();
 
+        box_texture.Bind(0);
+        face_texture.Bind(1);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, sizeof(kIndices), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
