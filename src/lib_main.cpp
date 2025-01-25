@@ -7,8 +7,8 @@
 #include <GLFW/glfw3.h> /* (include after glad) */
 // clang-format on
 
-#include <shaders/static_header.hpp>
-#include <utils/macros.hpp>
+#include <libcgp/shader.hpp>
+#include <libcgp/utils/macros.hpp>
 
 // Function prototypes
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
@@ -41,7 +41,7 @@ extern int RenderEngineMain()
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
     GLFWwindow *window = glfwCreateWindow(kWidth, kHeight, "RenderEngine", nullptr, nullptr);
-    VERIFY_OUTPUT_GLFW(window != nullptr);
+    R_ASSERT(window != nullptr);
 
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, key_callback);
@@ -49,38 +49,12 @@ extern int RenderEngineMain()
 
     // Load OpenGL functions, gladLoadGL returns the loaded version, 0 on error.
     const auto version = gladLoadGL(glfwGetProcAddress);
-    VERIFY_OUTPUT_GLFW(version);
+    R_ASSERT(version);
 
     std::cout << "Loaded OpenGL " << GLAD_VERSION_MAJOR(version) << "." << GLAD_VERSION_MINOR(version) << std::endl;
 
     // Define the viewport dimensions
     glViewport(0, 0, kWidth, kHeight);
-
-    // Load VertexShader
-    const auto vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &StaticShaders::first_vertex_shader, nullptr);
-    glCompileShader(vertex_shader);
-
-    // Check for shader compile errors
-    ENSURE_SUCCESS_SHADER_OPENGL(vertex_shader);
-
-    // Load FragmentShader
-    const auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &StaticShaders::first_fragment_shader, nullptr);
-    glCompileShader(fragment_shader);
-
-    // Check for shader compile errors
-    ENSURE_SUCCESS_SHADER_OPENGL(fragment_shader);
-
-    // create shader program
-    const auto shader_program = glCreateProgram();
-
-    glAttachShader(shader_program, vertex_shader);
-    glAttachShader(shader_program, fragment_shader);
-    glLinkProgram(shader_program);
-
-    // Check for linking errors
-    ENSURE_SUCESSS_PROGRAM_OPENGL(shader_program);
 
     // Prepare Vertex Array Object (VAO)
     GLuint VAO{};
@@ -93,6 +67,8 @@ extern int RenderEngineMain()
     // Prepare Element Buffer Object (EBO)
     GLuint EBO{};
     glGenBuffers(1, &EBO);
+
+    auto shader_program = LibGcp::MakeShaderFromName("first_vertex_shader", "first_fragment_shader");
 
     // Bind VAO
     glBindVertexArray(VAO);
@@ -114,10 +90,6 @@ extern int RenderEngineMain()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // delete shaders
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
-
     // Game loop
     while (glfwWindowShouldClose(window) == 0) {
         // Check if any events have been activated (key pressed, mouse moved etc.) and call corresponding response
@@ -130,7 +102,7 @@ extern int RenderEngineMain()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Draw the triangle
-        glUseProgram(shader_program);
+        shader_program.Activate();
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, sizeof(kIndices), GL_UNSIGNED_INT, nullptr);

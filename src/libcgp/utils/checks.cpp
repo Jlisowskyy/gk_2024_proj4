@@ -1,4 +1,4 @@
-#include <utils/checks.hpp>
+#include <libcgp/utils/checks.hpp>
 
 // clang-format off
 #include <glad/gl.h>
@@ -29,7 +29,7 @@ void CheckShaderErrorsOpenGl(const GLuint shader_id, const char *file, const int
     std::abort();
 }
 
-void CheckProgramErrorsOpenGl(GLuint program_id, const char *file, int line)
+void CheckProgramErrorsOpenGl(const GLuint program_id, const char *file, const int line)
 {
     int success{};
 

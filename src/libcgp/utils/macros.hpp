@@ -6,15 +6,16 @@
 #include <GLFW/glfw3.h> /* (include after glad) */
 // clang-format on
 #include <cstdlib>
+#include <iostream>
 
-#include <utils/checks.hpp>
+#include <libcgp/utils/checks.hpp>
 
 /* Convert a token into a string */
 #define STRINGIFY(x) #x
 /* Apply STRINGIFY to expand macros before conversion */
 #define TOSTRING(x) STRINGIFY(x)
 
-#define VERIFY_OUTPUT_GLFW(x)                                                                 \
+#define R_ASSERT(x)                                                                 \
     if (!(x)) {                                                                               \
         std::cerr << "Error: " #x " at line: " TOSTRING(__LINE__) " at file: " __FILE__ "\n"; \
         glfwTerminate();                                                                      \

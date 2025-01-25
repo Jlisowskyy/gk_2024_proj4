@@ -13,6 +13,8 @@ file(GLOB_RECURSE LIB_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/*.c"
 )
 
+message(STATUS "Files: ${LIB_SOURCES}")
+
 # Ensure main.cpp removed from lib sources
 list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
 
@@ -38,7 +40,7 @@ target_include_directories(${LIB_NAME} PUBLIC
 
 find_package(OpenGL)
 
-target_link_libraries(${LIB_NAME} PRIVATE
+target_link_libraries(${LIB_NAME} PUBLIC
         glfw
         OpenGL
         glad
