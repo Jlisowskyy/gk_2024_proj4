@@ -46,6 +46,7 @@ target_link_libraries(${LIB_NAME} PUBLIC
         glad
         libStb
         Resources
+        glm-header-only
 )
 
 # ------------------------------

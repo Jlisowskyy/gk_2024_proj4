@@ -101,8 +101,8 @@ extern int RenderEngineMain()
     glEnableVertexAttribArray(2);
 
     shader_program.Activate();
-    shader_program.SetInt("texture1", 0);
-    shader_program.SetInt("texture2", 1);
+    shader_program.SetGLint("texture1", 0);
+    shader_program.SetGLint("texture2", 1);
 
     // Game loop
     while (glfwWindowShouldClose(window) == 0) {

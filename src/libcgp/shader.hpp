@@ -2,11 +2,29 @@
 #define LIBGCP_SHADER_HPP_
 
 #include <glad/gl.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <libcgp/defines.hpp>
 
 #include <cassert>
-#include <type_traits>
+
+#define GENERATE_UNIFORM_SETTER_(TypeName, UniformFunc)                     \
+    void Set##TypeName(const char *name, const TypeName &value) const       \
+    {                                                                       \
+        const GLint location = glGetUniformLocation(shader_program_, name); \
+        assert(location != -1);                                             \
+        UniformFunc(location, value);                                       \
+    }
+
+#define GENERATE_VECTOR_UNIFORM_SETTER_(funcName, TypeName, UniformFunc)                  \
+    void Set##funcName(const char *name, const TypeName &values, GLsizei count = 1) const \
+    {                                                                                     \
+        const GLint location = glGetUniformLocation(shader_program_, name);               \
+        assert(location != -1);                                                           \
+        UniformFunc(location, count, GL_FALSE, glm::value_ptr(values));                   \
+    }
 
 LIBGCP_DECL_START_
 // ------------------------------
@@ -46,21 +64,15 @@ class Shader
 
     NDSCRD WRAP_CALL GLuint GetProgram() const noexcept { return shader_program_; }
 
-    FAST_CALL void SetInt(const char *name, const int value) const
-    {
-        const GLint location = glGetUniformLocation(shader_program_, name);
-        assert(location != -1);
+    /* simple uniform setters */
+    GENERATE_UNIFORM_SETTER_(GLint, glUniform1i)
+    GENERATE_UNIFORM_SETTER_(GLfloat, glUniform1f)
+    GENERATE_UNIFORM_SETTER_(GLuint, glUniform1ui)
 
-        glUniform1i(location, value);
-    }
-
-    FAST_CALL void SetFloat(const char *name, const float value) const
-    {
-        const GLint location = glGetUniformLocation(shader_program_, name);
-        assert(location != -1);
-
-        glUniform1f(location, value);
-    }
+    /* matrix uniform setters */
+    GENERATE_VECTOR_UNIFORM_SETTER_(Mat2, glm::mat2, glUniformMatrix2fv)
+    GENERATE_VECTOR_UNIFORM_SETTER_(Mat3, glm::mat3, glUniformMatrix3fv)
+    GENERATE_VECTOR_UNIFORM_SETTER_(Mat4, glm::mat4, glUniformMatrix4fv)
 
     // ------------------------------
     // Class fields
