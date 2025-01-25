@@ -5,6 +5,10 @@ file(GLOB_RECURSE SHADER_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/*.glsl"
 )
 
+foreach(SHADER_FILE ${SHADER_FILES})
+    configure_file(${SHADER_FILE} ${SHADER_FILE} COPYONLY)
+endforeach()
+
 # Generate header file
 file(WRITE ${HEADER_OUTPUT}
         "#ifndef SHADERS_STATIC_SHADERS_HPP_\n"

@@ -20,10 +20,10 @@ static constexpr GLuint kWidth  = 800;
 static constexpr GLuint kHeight = 600;
 
 static constexpr std::array kVertices{
-    0.5F,  0.5F,  0.0F,  // top right
-    0.5F,  -0.5F, 0.0F,  // bottom right
-    -0.5F, -0.5F, 0.0F,  // bottom left
-    -0.5F, 0.5F,  0.0F,  // top left
+    0.5F,  0.5F,  0.0F, 1.0F,  0.0F, 0.0F,   // top right
+    0.5F,  -0.5F, 0.0F, 0.0F,  1.0F, 0.0F,   // bottom right
+    -0.5F, -0.5F, 0.0F, 0.0F,  0.0F, 1.0F,   // bottom left
+    -0.5F, 0.5F,  0.0F, 0.25F, 0.5F, 0.75F,  // top left
 };
 
 static constexpr std::array kIndices{
@@ -108,8 +108,11 @@ extern int RenderEngineMain()
     glBufferData(GL_ARRAY_BUFFER, sizeof(kVertices), kVertices.data(), GL_STATIC_DRAW);
 
     // instruct OpenGL how to interpret the vertex data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), nullptr);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // delete shaders
     glDeleteShader(vertex_shader);
@@ -128,14 +131,6 @@ extern int RenderEngineMain()
 
         // Draw the triangle
         glUseProgram(shader_program);
-
-        // update the uniform color
-        const float timeValue         = glfwGetTime();
-        const float greenValue        = (std::sin(timeValue) / 2.0F) + 0.5F;
-        const int vertexColorLocation = glGetUniformLocation(shader_program, "ourColor");
-        VERIFY_OUTPUT_GLFW(vertexColorLocation != -1);
-
-        glUniform4f(vertexColorLocation, 0.0F, greenValue, 0.0F, 1.0F);
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, sizeof(kIndices), GL_UNSIGNED_INT, nullptr);
