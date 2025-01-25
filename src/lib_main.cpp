@@ -18,7 +18,17 @@ static void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 static constexpr GLuint kWidth  = 800;
 static constexpr GLuint kHeight = 600;
 
-static constexpr std::array kVertices{-0.5F, -0.5F, 0.0F, 0.5F, -0.5F, 0.0F, 0.0F, 0.5F, 0.0F};
+static constexpr std::array kVertices{
+    0.5F,  0.5F,  0.0F,  // top right
+    0.5F,  -0.5F, 0.0F,  // bottom right
+    -0.5F, -0.5F, 0.0F,  // bottom left
+    -0.5F, 0.5F,  0.0F,  // top left
+};
+
+static constexpr std::array kIndices{
+    0U, 1U, 3U,  // first triangle
+    1U, 2U, 3U,  // second triangle
+};
 
 extern int RenderEngineMain()
 {
@@ -79,11 +89,19 @@ extern int RenderEngineMain()
     GLuint VBO{};
     glGenBuffers(1, &VBO);
 
+    // Prepare Element Buffer Object (EBO)
+    GLuint EBO{};
+    glGenBuffers(1, &EBO);
+
     // Bind VAO
     glBindVertexArray(VAO);
 
     // Bind VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    // Bind EBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(kIndices), kIndices.data(), GL_STATIC_DRAW);
 
     // Copy vertices to VBO
     glBufferData(GL_ARRAY_BUFFER, sizeof(kVertices), kVertices.data(), GL_STATIC_DRAW);
@@ -109,8 +127,10 @@ extern int RenderEngineMain()
 
         // Draw the triangle
         glUseProgram(shader_program);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, sizeof(kIndices), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(0);
 
         // Swap the screen buffers
         glfwSwapBuffers(window);
