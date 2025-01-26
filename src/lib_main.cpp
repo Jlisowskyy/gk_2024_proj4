@@ -7,6 +7,10 @@
 #include <GLFW/glfw3.h> /* (include after glad) */
 // clang-format on
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <libcgp/shader.hpp>
 #include <libcgp/texture.hpp>
 #include <libcgp/utils/macros.hpp>
@@ -20,18 +24,24 @@ static void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 static constexpr GLuint kWidth  = 800;
 static constexpr GLuint kHeight = 600;
 
-static constexpr std::array kVertices{
-    // positions // colors // texture coords
-    0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // top right
-    0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom left
-    -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f   // top left
-};
+std::array kVertices{-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 0.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,
+                     0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+                     -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, 0.5f,  -0.5f, 0.5f,  1.0f, 0.0f, 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+                     0.5f,  0.5f,  0.5f,  1.0f, 1.0f, -0.5f, 0.5f,  0.5f,  0.0f, 1.0f, -0.5f, -0.5f, 0.5f,  0.0f, 0.0f,
+                     -0.5f, 0.5f,  0.5f,  1.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 1.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+                     -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, -0.5f, 0.5f,  0.5f,  1.0f, 0.0f,
+                     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 0.5f,  -0.5f, -0.5f, 0.0f, 1.0f,
+                     0.5f,  -0.5f, -0.5f, 0.0f, 1.0f, 0.5f,  -0.5f, 0.5f,  0.0f, 0.0f, 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                     -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 1.0f, 0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,
+                     0.5f,  -0.5f, 0.5f,  1.0f, 0.0f, -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+                     -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -0.5f, 0.5f,  0.5f,  0.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f};
 
-static constexpr std::array kIndices{
-    0U, 1U, 3U,  // first triangle
-    1U, 2U, 3U,  // second triangle
-};
+std::array kCubePositions{glm::vec3(0.0f, 0.0f, 0.0f),    glm::vec3(2.0f, 5.0f, -15.0f),
+                          glm::vec3(-1.5f, -2.2f, -2.5f), glm::vec3(-3.8f, -2.0f, -12.3f),
+                          glm::vec3(2.4f, -0.4f, -3.5f),  glm::vec3(-1.7f, 3.0f, -7.5f),
+                          glm::vec3(1.3f, -2.0f, -2.5f),  glm::vec3(1.5f, 2.0f, -2.5f),
+                          glm::vec3(1.5f, 0.2f, -1.5f),   glm::vec3(-1.3f, 1.0f, -1.5f)};
 
 extern int RenderEngineMain()
 {
@@ -58,6 +68,8 @@ extern int RenderEngineMain()
     // Define the viewport dimensions
     glViewport(0, 0, kWidth, kHeight);
 
+    glEnable(GL_DEPTH_TEST);
+
     // Prepare Vertex Array Object (VAO)
     GLuint VAO{};
     glGenVertexArrays(1, &VAO);
@@ -67,8 +79,8 @@ extern int RenderEngineMain()
     glGenBuffers(1, &VBO);
 
     // Prepare Element Buffer Object (EBO)
-    GLuint EBO{};
-    glGenBuffers(1, &EBO);
+    // GLuint EBO{};
+    // glGenBuffers(1, &EBO);
 
     /* load shader */
     auto shader_program = LibGcp::MakeShaderFromName("first_vertex_shader", "first_fragment_shader");
@@ -83,26 +95,36 @@ extern int RenderEngineMain()
     // Bind VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-    // Bind EBO
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(kIndices), kIndices.data(), GL_STATIC_DRAW);
+    // // Bind EBO
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(kIndices), kIndices.data(), GL_STATIC_DRAW);
 
     // Copy vertices to VBO
     glBufferData(GL_ARRAY_BUFFER, sizeof(kVertices), kVertices.data(), GL_STATIC_DRAW);
 
     // instruct OpenGL how to interpret the vertex data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), nullptr);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void *>(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
 
     shader_program.Activate();
     shader_program.SetGLint("texture1", 0);
     shader_program.SetGLint("texture2", 1);
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model           = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    glm::mat4 view = glm::mat4(1.0f);
+    view           = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+    shader_program.SetMat4("model", model);
+    shader_program.SetMat4("view", view);
+    shader_program.SetMat4("projection", projection);
 
     // Game loop
     while (glfwWindowShouldClose(window) == 0) {
@@ -113,7 +135,7 @@ extern int RenderEngineMain()
         // Render
         // Clear the color buffer
         glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw the triangle
         shader_program.Activate();
@@ -121,7 +143,17 @@ extern int RenderEngineMain()
         box_texture.Bind(0);
         face_texture.Bind(1);
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, sizeof(kIndices), GL_UNSIGNED_INT, nullptr);
+
+        glBindVertexArray(VAO);
+        for (unsigned int i = 0; i < 10; i++) {
+            model             = glm::translate(glm::mat4(1.0f), kCubePositions[i]);
+            const float angle = 20.0f * i;
+            model             = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            shader_program.SetMat4("model", model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
         glBindVertexArray(0);
 
         // Swap the screen buffers
