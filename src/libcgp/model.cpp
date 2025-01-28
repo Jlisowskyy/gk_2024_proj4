@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <filesystem>
 #include <string>
 #include <utility>
 #include <vector>
@@ -118,10 +119,13 @@ void LibGcp::ModelSerializer::LoadMaterialTextures_(
     const Texture::Type texture_type
 )
 {
+    const std::filesystem::path dir_path{directory_};
+
     for (size_t idx = 0; idx < material->GetTextureCount(type); ++idx) {
         aiString str;
         material->GetTexture(type, idx, &str);
 
-        const auto full_path = textures.emplace_back(std::move(MakeTextureFromFile(, texture_type)));
+        const std::string texture_path = (dir_path / str.C_Str()).string();
+        textures.emplace_back(std::move(MakeTextureFromFile(texture_path.c_str(), texture_type)));
     }
 }
