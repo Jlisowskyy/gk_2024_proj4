@@ -8,6 +8,9 @@ PACKAGES=(
   "cppcheck"
   "jq"
 
+  # for glad:
+  "python-jinja"
+
   # for glfw wayland
   "wayland"
 
