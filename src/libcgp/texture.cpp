@@ -10,9 +10,13 @@
 #include <cstdlib>
 #include <string>
 
-LibGcp::Texture::Texture(const unsigned char *texture_data, const int width, const int height, int channels) noexcept
+LibGcp::Texture::Texture(
+    const unsigned char *texture_data, const int width, const int height, const int channels, const Type type
+) noexcept
+    : type_(type)
 {
     R_ASSERT(channels == 3 || channels == 4);
+    R_ASSERT(type != Type::kLast);
 
     GLuint texture_id{};
 

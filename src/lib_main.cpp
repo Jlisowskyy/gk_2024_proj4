@@ -11,6 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <libcgp/mesh.hpp>
 #include <libcgp/shader.hpp>
 #include <libcgp/texture.hpp>
 #include <libcgp/utils/macros.hpp>
