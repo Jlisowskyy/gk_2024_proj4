@@ -36,7 +36,7 @@ LibGcp::Shader::Shader(const char *vertex_shader_code, const char *fragment_shad
     glLinkProgram(shader_program);
 
     // Check for linking errors
-    ENSURE_SUCESSS_PROGRAM_OPENGL(shader_program);
+    ENSURE_SUCCESSS_PROGRAM_OPENGL(shader_program);
 
     // delete shaders
     glDeleteShader(vertex_shader);

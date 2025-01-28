@@ -70,11 +70,13 @@ class Texture
 // Factories
 // ------------------------------
 
-Texture MakeTextureFromData(const unsigned char *texture_data, int width, int height, int channels) noexcept;
+Texture MakeTextureFromData(
+    const unsigned char *texture_data, int width, int height, int channels, Texture::Type type
+) noexcept;
 
-Texture MakeTextureFromFile(const char *file_path) noexcept;
+Texture MakeTextureFromFile(const char *file_path, Texture::Type type) noexcept;
 
-Texture MakeTextureFromImage(const char *image_name) noexcept;
+Texture MakeTextureFromImage(const char *image_name, Texture::Type type) noexcept;
 
 LIBGCP_DECL_END_
 

@@ -29,19 +29,18 @@ void LibGcp::Mesh::Draw(Shader &shader) const
         "material.texture_specular\0\0",
     };  // leave space for numbers
 
-    std::array counters = {static_cast<uint8_t>(1), static_cast<uint8_t>(1)};
+    std::array counters = {static_cast<uint8_t>(0), static_cast<uint8_t>(0)};
 
     for (size_t idx = 0; idx < textures_.size(); ++idx) {
-        glActiveTexture(GL_TEXTURE0 + idx);
-
         const size_t type_idx = static_cast<size_t>(textures_[idx].GetType());
+        const uint8_t counter = ++counters[type_idx];
         std::string &name     = texture_names[type_idx];
-        uint8_t &counter      = counters[type_idx];
 
         name[name.size() - 2] = '0' + counter / 10;
         name[name.size() - 1] = '0' + counter % 10;
 
-        shader.Set
+        shader.SetGLfloatUnsafe(name.c_str(), static_cast<GLfloat>(idx));
+        textures_[idx].Bind(idx);
     }
     glActiveTexture(GL_TEXTURE0);
 

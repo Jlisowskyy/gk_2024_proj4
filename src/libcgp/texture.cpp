@@ -45,13 +45,13 @@ LibGcp::Texture::~Texture() noexcept
 }
 
 LibGcp::Texture LibGcp::MakeTextureFromData(
-    const unsigned char *texture_data, const int width, const int height, int channels
+    const unsigned char *texture_data, const int width, const int height, int channels, const Texture::Type type
 ) noexcept
 {
-    return {texture_data, width, height, channels};
+    return {texture_data, width, height, channels, type};
 }
 
-LibGcp::Texture LibGcp::MakeTextureFromFile(const char *file_path) noexcept
+LibGcp::Texture LibGcp::MakeTextureFromFile(const char *file_path, const Texture::Type type) noexcept
 {
     int width{};
     int height{};
@@ -61,13 +61,13 @@ LibGcp::Texture LibGcp::MakeTextureFromFile(const char *file_path) noexcept
     unsigned char *data = stbi_load(file_path, &width, &height, &channels, 0);
     R_ASSERT(data != nullptr);
 
-    Texture texture{data, width, height, channels};
+    Texture texture{data, width, height, channels, type};
     stbi_image_free(data);
 
     return texture;
 }
 
-LibGcp::Texture LibGcp::MakeTextureFromImage(const char *image_name) noexcept
+LibGcp::Texture LibGcp::MakeTextureFromImage(const char *image_name, const Texture::Type type) noexcept
 {
     R_ASSERT(StaticImages::g_KnownImages.contains(std::string(image_name)));
 
@@ -81,7 +81,7 @@ LibGcp::Texture LibGcp::MakeTextureFromImage(const char *image_name) noexcept
     unsigned char *data = stbi_load_from_memory(image, static_cast<int>(image_size), &width, &height, &channels, 0);
     R_ASSERT(data != nullptr);
 
-    Texture texture{data, width, height, channels};
+    Texture texture{data, width, height, channels, type};
     stbi_image_free(data);
 
     return texture;

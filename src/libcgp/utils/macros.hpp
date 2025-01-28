@@ -15,14 +15,19 @@
 /* Apply STRINGIFY to expand macros before conversion */
 #define TOSTRING(x) STRINGIFY(x)
 
-#define R_ASSERT(x)                                                                 \
+#define R_ASSERT(x)                                                                           \
     if (!(x)) {                                                                               \
         std::cerr << "Error: " #x " at line: " TOSTRING(__LINE__) " at file: " __FILE__ "\n"; \
         glfwTerminate();                                                                      \
         std::abort();                                                                         \
     }
 
-#define ENSURE_SUCCESS_SHADER_OPENGL(shader_id)   CheckShaderErrorsOpenGl(shader_id, __FILE__, __LINE__)
-#define ENSURE_SUCESSS_PROGRAM_OPENGL(program_id) CheckProgramErrorsOpenGl(program_id, __FILE__, __LINE__)
+#define ENSURE_SUCCESS_SHADER_OPENGL(shader_id)    CheckShaderErrorsOpenGl(shader_id, __FILE__, __LINE__)
+#define ENSURE_SUCCESSS_PROGRAM_OPENGL(program_id) CheckProgramErrorsOpenGl(program_id, __FILE__, __LINE__)
+#define NOT_IMPLEMENTED                                                  \
+    {                                                                    \
+        std::cerr << "Function: " << __func__ << " is not implemented!"; \
+        std::abort();                                                    \
+    }
 
 #endif  // UTILS_MACROS_HPP_

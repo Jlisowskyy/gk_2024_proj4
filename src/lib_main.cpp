@@ -12,6 +12,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <libcgp/mesh.hpp>
+#include <libcgp/model.hpp>
 #include <libcgp/shader.hpp>
 #include <libcgp/texture.hpp>
 #include <libcgp/utils/macros.hpp>
@@ -87,8 +88,8 @@ extern int RenderEngineMain()
     auto shader_program = LibGcp::MakeShaderFromName("first_vertex_shader", "first_fragment_shader");
 
     /* load texture */
-    auto box_texture  = LibGcp::MakeTextureFromImage("container");
-    auto face_texture = LibGcp::MakeTextureFromImage("awesomeface");
+    auto box_texture  = LibGcp::MakeTextureFromImage("container", LibGcp::Texture::Type::kDiffuse);
+    auto face_texture = LibGcp::MakeTextureFromImage("awesomeface", LibGcp::Texture::Type::kSpecular);
 
     // Bind VAO
     glBindVertexArray(VAO);

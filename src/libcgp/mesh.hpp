@@ -24,7 +24,7 @@ class Mesh
     // Inner types
     // ------------------------------
 
-    struct alignas(sizeof(32)) Vertex {
+    struct alignas(32) Vertex {
         glm::vec3 position;
         glm::vec3 normal;
         glm::vec2 tex_coords;
@@ -34,7 +34,17 @@ class Mesh
     // Object creation
     // ------------------------------
 
+    Mesh() = delete;
+
+    ~Mesh() = default;
+
     Mesh(std::vector<Vertex> &&vertices, std::vector<GLuint> &&indices, std::vector<Texture> &&textures);
+
+    Mesh(const Mesh &)            = delete;
+    Mesh &operator=(const Mesh &) = delete;
+
+    Mesh(Mesh &&) noexcept            = default;
+    Mesh &operator=(Mesh &&) noexcept = default;
 
     // ------------------------------
     // Class interaction
