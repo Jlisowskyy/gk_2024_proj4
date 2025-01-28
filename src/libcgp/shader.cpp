@@ -61,11 +61,12 @@ LibGcp::Shader LibGcp::MakeShaderFromCode(const char *vertex_shader_code, const 
 
 LibGcp::Shader LibGcp::MakeShaderFromName(const char *vertex_shader_name, const char *fragment_shader_name) noexcept
 {
-    R_ASSERT(StaticShaders::g_KnownShaders.contains(vertex_shader_name));
-    R_ASSERT(StaticShaders::g_KnownShaders.contains(fragment_shader_name));
+    R_ASSERT(StaticShaders::g_KnownVertexShaders.contains(vertex_shader_name));
+    R_ASSERT(StaticShaders::g_KnownFragmentShaders.contains(fragment_shader_name));
 
     return {
-        StaticShaders::g_KnownShaders.at(vertex_shader_name), StaticShaders::g_KnownShaders.at(fragment_shader_name)
+        StaticShaders::g_KnownVertexShaders.at(vertex_shader_name),
+        StaticShaders::g_KnownFragmentShaders.at(fragment_shader_name)
     };
 }
 
