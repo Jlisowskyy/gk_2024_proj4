@@ -3,12 +3,22 @@
 
 #include <libcgp/defines.hpp>
 #include <libcgp/mesh.hpp>
+#include <libcgp/texture.hpp>
 
 #include <memory>
 #include <string>
 #include <vector>
 
+#include <assimp/material.h>
+
+/* Forward declarations */
+struct aiNode;
+struct aiScene;
+struct aiMesh;
+struct aiMaterial;
+
 LIBGCP_DECL_START_
+
 /* Forward declarations */
 class Shader;
 
@@ -83,11 +93,18 @@ class ModelSerializer
     // ----------------------------------
 
     protected:
+    void ProcessNode_(const aiNode *node, const aiScene *scene);
+    std::shared_ptr<Mesh> ProcessMesh_(const aiMesh *mesh, const aiScene *scene);
+    void LoadMaterialTextures_(
+        std::vector<Texture> &textures, const aiMaterial *material, aiTextureType type, Texture::Type texture_type
+    );
+
     // ------------------------------
     // Class fields
     // ------------------------------
 
-    std::string directory_;
+    std::vector<std::shared_ptr<Mesh> > meshes_{};
+    std::string directory_{};
 };
 
 LIBGCP_DECL_END_

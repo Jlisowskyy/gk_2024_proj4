@@ -22,6 +22,8 @@
         std::abort();                                                                         \
     }
 
+#define VALIDATE_STATE(x, msg) R_ASSERT((x) && (msg))
+
 #define ENSURE_SUCCESS_SHADER_OPENGL(shader_id)    CheckShaderErrorsOpenGl(shader_id, __FILE__, __LINE__)
 #define ENSURE_SUCCESSS_PROGRAM_OPENGL(program_id) CheckProgramErrorsOpenGl(program_id, __FILE__, __LINE__)
 #define NOT_IMPLEMENTED                                                  \

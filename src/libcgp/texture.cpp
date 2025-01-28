@@ -59,7 +59,7 @@ LibGcp::Texture LibGcp::MakeTextureFromFile(const char *file_path, const Texture
 
     stbi_set_flip_vertically_on_load(true);
     unsigned char *data = stbi_load(file_path, &width, &height, &channels, 0);
-    R_ASSERT(data != nullptr);
+    VALIDATE_STATE(data != nullptr, "Failed to load texture");
 
     Texture texture{data, width, height, channels, type};
     stbi_image_free(data);

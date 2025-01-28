@@ -41,6 +41,10 @@ void LibGcp::Mesh::Draw(Shader &shader) const
 
         shader.SetGLfloatUnsafe(name.c_str(), static_cast<GLfloat>(idx));
         textures_[idx].Bind(idx);
+
+        if (idx >= kMaxTextures) {
+            break;
+        }
     }
     glActiveTexture(GL_TEXTURE0);
 
