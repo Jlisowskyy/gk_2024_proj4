@@ -1,6 +1,5 @@
 #include <libcgp/texture.hpp>
 #include <libcgp/utils/macros.hpp>
-#include <static_images.hpp>
 
 #include <glad/gl.h>
 
@@ -67,22 +66,22 @@ LibGcp::Texture LibGcp::MakeTextureFromFile(const char *file_path, const Texture
     return texture;
 }
 
-LibGcp::Texture LibGcp::MakeTextureFromImage(const char *image_name, const Texture::Type type) noexcept
-{
-    R_ASSERT(StaticImages::g_KnownImages.contains(std::string(image_name)));
-
-    int width{};
-    int height{};
-    int channels{};
-    const auto &image       = StaticImages::g_KnownImages.at(std::string(image_name));
-    const size_t image_size = StaticImages::g_ImageSizes.at(std::string(image_name));
-
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char *data = stbi_load_from_memory(image, static_cast<int>(image_size), &width, &height, &channels, 0);
-    R_ASSERT(data != nullptr);
-
-    Texture texture{data, width, height, channels, type};
-    stbi_image_free(data);
-
-    return texture;
-}
+// LibGcp::Texture LibGcp::MakeTextureFromImage(const char *image_name, const Texture::Type type) noexcept
+// {
+//     R_ASSERT(StaticImages::g_KnownImages.contains(std::string(image_name)));
+//
+//     int width{};
+//     int height{};
+//     int channels{};
+//     const auto &image       = StaticImages::g_KnownImages.at(std::string(image_name));
+//     const size_t image_size = StaticImages::g_ImageSizes.at(std::string(image_name));
+//
+//     stbi_set_flip_vertically_on_load(true);
+//     unsigned char *data = stbi_load_from_memory(image, static_cast<int>(image_size), &width, &height, &channels, 0);
+//     R_ASSERT(data != nullptr);
+//
+//     Texture texture{data, width, height, channels, type};
+//     stbi_image_free(data);
+//
+//     return texture;
+// }

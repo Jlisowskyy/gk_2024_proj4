@@ -17,10 +17,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 17)
 
 # ------------------------------
-# Load all deps
+# Setup options
 # ------------------------------
 
-add_subdirectory(deps)
+set(USE_TRACE ON)
 
 # ------------------------------
 # Load resources
@@ -29,14 +29,22 @@ add_subdirectory(deps)
 add_subdirectory(resources)
 
 # ------------------------------
+# Load all deps
+# ------------------------------
+
+add_subdirectory(deps)
+
+# ------------------------------
+# Load models
+# ------------------------------
+
+add_subdirectory(models)
+
+# ------------------------------
 # Load project
 # ------------------------------
 
 add_subdirectory(src)
-
-# ------------------------------
-# Setup compile options
-# ------------------------------
 
 # ------------------------------
 # Setup compile options

@@ -26,4 +26,10 @@
 
 #define NDSCRD [[nodiscard]]
 
+#ifdef USE_TRACES_
+#define TRACE(stream) std::cout << stream << std::endl
+#else
+#define TRACE(stream)
+#endif  // USE_TRACES_
+
 #endif  // LIBGCP_DEFINES_HPP_

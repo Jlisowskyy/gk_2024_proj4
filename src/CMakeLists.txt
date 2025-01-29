@@ -45,7 +45,6 @@ target_link_libraries(${LIB_NAME} PUBLIC
         OpenGL
         glad
         libStb
-        Resources
         glm-header-only
         assimp::assimp
 )
@@ -63,3 +62,12 @@ add_executable(${EXEC_NAME}
 # ------------------------------
 
 target_link_libraries(${EXEC_NAME} ${LIB_NAME})
+
+# ------------------------------
+# Add compile options
+# ------------------------------
+
+if (DEFINED USE_TRACE AND USE_TRACE)
+    message(STATUS "Enabling traces...")
+    target_compile_definitions(${LIB_NAME} PUBLIC USE_TRACES_=1)
+endif ()

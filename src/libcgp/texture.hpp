@@ -76,7 +76,7 @@ Texture MakeTextureFromData(
 
 Texture MakeTextureFromFile(const char *file_path, Texture::Type type) noexcept;
 
-Texture MakeTextureFromImage(const char *image_name, Texture::Type type) noexcept;
+// Texture MakeTextureFromImage(const char *image_name, Texture::Type type) noexcept;
 
 LIBGCP_DECL_END_
 

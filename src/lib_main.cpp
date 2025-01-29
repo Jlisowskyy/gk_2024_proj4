@@ -26,25 +26,6 @@ static void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 static constexpr GLuint kWidth  = 800;
 static constexpr GLuint kHeight = 600;
 
-std::array kVertices{-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 0.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,
-                     0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-                     -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, 0.5f,  -0.5f, 0.5f,  1.0f, 0.0f, 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-                     0.5f,  0.5f,  0.5f,  1.0f, 1.0f, -0.5f, 0.5f,  0.5f,  0.0f, 1.0f, -0.5f, -0.5f, 0.5f,  0.0f, 0.0f,
-                     -0.5f, 0.5f,  0.5f,  1.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 1.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-                     -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, -0.5f, 0.5f,  0.5f,  1.0f, 0.0f,
-                     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 0.5f,  -0.5f, -0.5f, 0.0f, 1.0f,
-                     0.5f,  -0.5f, -0.5f, 0.0f, 1.0f, 0.5f,  -0.5f, 0.5f,  0.0f, 0.0f, 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                     -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 1.0f, 0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,
-                     0.5f,  -0.5f, 0.5f,  1.0f, 0.0f, -0.5f, -0.5f, 0.5f,  0.0f, 0.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-                     -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-                     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -0.5f, 0.5f,  0.5f,  0.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f};
-
-std::array kCubePositions{glm::vec3(0.0f, 0.0f, 0.0f),    glm::vec3(2.0f, 5.0f, -15.0f),
-                          glm::vec3(-1.5f, -2.2f, -2.5f), glm::vec3(-3.8f, -2.0f, -12.3f),
-                          glm::vec3(2.4f, -0.4f, -3.5f),  glm::vec3(-1.7f, 3.0f, -7.5f),
-                          glm::vec3(1.3f, -2.0f, -2.5f),  glm::vec3(1.5f, 2.0f, -2.5f),
-                          glm::vec3(1.5f, 0.2f, -1.5f),   glm::vec3(-1.3f, 1.0f, -1.5f)};
-
 extern int RenderEngineMain()
 {
     glfwInit();
@@ -72,48 +53,13 @@ extern int RenderEngineMain()
 
     glEnable(GL_DEPTH_TEST);
 
-    // Prepare Vertex Array Object (VAO)
-    GLuint VAO{};
-    glGenVertexArrays(1, &VAO);
-
-    // Prepare Vertex Buffer Object (VBO)
-    GLuint VBO{};
-    glGenBuffers(1, &VBO);
-
-    // Prepare Element Buffer Object (EBO)
-    // GLuint EBO{};
-    // glGenBuffers(1, &EBO);
-
     /* load shader */
     auto shader_program = LibGcp::MakeShaderFromName("first_vertex_shader", "first_fragment_shader");
-
-    /* load texture */
-    auto box_texture  = LibGcp::MakeTextureFromImage("container", LibGcp::Texture::Type::kDiffuse);
-    auto face_texture = LibGcp::MakeTextureFromImage("awesomeface", LibGcp::Texture::Type::kSpecular);
-
-    // Bind VAO
-    glBindVertexArray(VAO);
-
-    // Bind VBO
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    // // Bind EBO
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(kIndices), kIndices.data(), GL_STATIC_DRAW);
-
-    // Copy vertices to VBO
-    glBufferData(GL_ARRAY_BUFFER, sizeof(kVertices), kVertices.data(), GL_STATIC_DRAW);
-
-    // instruct OpenGL how to interpret the vertex data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), nullptr);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
     shader_program.Activate();
-    shader_program.SetGLint("texture1", 0);
-    shader_program.SetGLint("texture2", 1);
+
+    /* load model */
+    LibGcp::ModelSerializer model_serializer;
+    auto modell = model_serializer.LoadModelFromExternalFormat("./models/backpack.zip");
 
     glm::mat4 model = glm::mat4(1.0f);
     model           = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -138,25 +84,6 @@ extern int RenderEngineMain()
         // Clear the color buffer
         glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // Draw the triangle
-        shader_program.Activate();
-
-        box_texture.Bind(0);
-        face_texture.Bind(1);
-        glBindVertexArray(VAO);
-
-        glBindVertexArray(VAO);
-        for (unsigned int i = 0; i < 10; i++) {
-            model             = glm::translate(glm::mat4(1.0f), kCubePositions[i]);
-            const float angle = 20.0f * i;
-            model             = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            shader_program.SetMat4("model", model);
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-
-        glBindVertexArray(0);
 
         // Swap the screen buffers
         glfwSwapBuffers(window);
