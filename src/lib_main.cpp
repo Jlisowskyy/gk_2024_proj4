@@ -6,14 +6,13 @@
 #include <libcgp/mgr/settings_mgr.hpp>
 #include <libcgp/window/window.hpp>
 
-int LibGcp::RenderEngineMain(const SettingsMgr::setting_t &settings)
+int LibGcp::RenderEngineMain(const SettingsMgr::setting_t &settings, const ResourceMgr::resource_t &resources)
 {
     /* initialize components */
     SettingsMgr::InitInstance(settings);
-    ResourceMgr::InitInstance();
-    ObjectMgr::InitInstance();
-
     Window::InitInstance().Init();
+    ResourceMgr::InitInstance().Init(resources);
+    ObjectMgr::InitInstance();
 
     /* render loop */
     Window::GetInstance().RunLoop(ProcessLoopApp);

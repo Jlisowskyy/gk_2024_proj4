@@ -10,6 +10,11 @@
 
 #include <cassert>
 
+/**
+ * TODO:
+ * - separate compilation from constructor and add return code
+ */
+
 // ------------------------------
 // Helper macros
 // ------------------------------
@@ -105,16 +110,6 @@ class Shader
     protected:
     GLuint shader_program_{};
 };
-
-// ------------------------------
-// Factories
-// ------------------------------
-
-Shader MakeShaderFromCode(const char *vertex_shader_code, const char *fragment_shader_code) noexcept;
-
-Shader MakeShaderFromName(const char *vertex_shader_name, const char *fragment_shader_name) noexcept;
-
-Shader MakeShaderFromFile(const char *vertex_shader_file, const char *fragment_shader_file);
 
 LIBGCP_DECL_END_
 

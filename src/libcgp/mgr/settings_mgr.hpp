@@ -49,7 +49,7 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
         }
 
         template <typename T>
-        FAST_CALL T GetSetting(const Setting setting) const noexcept
+        NDSCRD FAST_CALL T GetSetting(const Setting setting) const noexcept
         {
             static_assert(sizeof(T) <= sizeof(uint64_t), "Setting value is too large");
             static_assert(std::is_trivially_copyable<T>::value, "Setting type must be trivially copyable");
@@ -57,7 +57,7 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
             return *reinterpret_cast<T *>(&data_);
         }
 
-        FAST_CALL uint64_t GetRaw() const noexcept { return data_; }
+        NDSCRD FAST_CALL uint64_t GetRaw() const noexcept { return data_; }
 
         protected:
         uint64_t data_{};
@@ -102,7 +102,7 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
     }
 
     template <typename T>
-    FAST_CALL T GetSetting(const Setting setting) const noexcept
+    NDSCRD FAST_CALL T GetSetting(const Setting setting) const noexcept
     {
         return settings_[static_cast<size_t>(setting)].GetSetting<T>(setting);
     }

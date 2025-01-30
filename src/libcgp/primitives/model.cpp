@@ -1,3 +1,4 @@
+#include <libcgp/mgr/resource_mgr.hpp>
 #include <libcgp/primitives/mesh.hpp>
 #include <libcgp/primitives/model.hpp>
 #include <libcgp/utils/macros.hpp>
@@ -36,10 +37,10 @@ std::shared_ptr<LibGcp::Model> LibGcp::ModelSerializer::LoadModelFromExternalFor
                   aiProcess_ImproveCacheLocality | aiProcess_RemoveRedundantMaterials | aiProcess_OptimizeMeshes
     );
 
-    VALIDATE_STATE(
-        scene != nullptr && !(scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) && scene->mRootNode != nullptr,
-        importer.GetErrorString()
-    );
+    if (scene == nullptr || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || scene->mRootNode == nullptr) {
+        TRACE(importer.GetErrorString());
+        return nullptr;
+    }
 
     directory_ = path.substr(0, path.find_last_of('/'));
 
@@ -132,6 +133,11 @@ void LibGcp::ModelSerializer::LoadMaterialTextures_(
         material->GetTexture(type, idx, &str);
 
         const std::filesystem::path texture_full_path = weakly_canonical(dir_path / str.C_Str());
-        textures.push_back(MakeTextureFromFile(texture_full_path.c_str(), texture_type));
+
+        auto texture =
+            ResourceMgr::GetInstance().GetTexture(texture_full_path.string(), ResourceMgr::LoadType::kExternal);
+        texture->SetType(texture_type);
+
+        textures.push_back(texture);
     }
 }

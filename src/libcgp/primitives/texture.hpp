@@ -54,17 +54,13 @@ class Texture
 
     NDSCRD FAST_CALL Type GetType() const noexcept { return type_; }
 
+    FAST_CALL void SetType(const Type type) noexcept { type_ = type; }
+
     FAST_CALL void Bind(const int texture_unit) const noexcept
     {
         glActiveTexture(GL_TEXTURE0 + texture_unit);
         glBindTexture(GL_TEXTURE_2D, texture_id_);
     }
-
-    // ------------------------------
-    // Static fields
-    // ------------------------------
-
-    static std::unordered_map<std::string, std::shared_ptr<Texture>> g_TextureRegistry;
 
     // ------------------------------
     // Class fields
@@ -74,18 +70,6 @@ class Texture
     GLuint texture_id_{};
     Type type_{};
 };
-
-// ------------------------------
-// Factories
-// ------------------------------
-
-std::shared_ptr<Texture> MakeTextureFromData(
-    const unsigned char *texture_data, int width, int height, int channels, Texture::Type type
-) noexcept;
-
-std::shared_ptr<Texture> MakeTextureFromFile(const char *file_path, Texture::Type type) noexcept;
-
-// Texture MakeTextureFromImage(const char *image_name, Texture::Type type) noexcept;
 
 LIBGCP_DECL_END_
 
