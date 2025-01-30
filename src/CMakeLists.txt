@@ -71,3 +71,8 @@ if (DEFINED USE_TRACE AND USE_TRACE)
     message(STATUS "Enabling traces...")
     target_compile_definitions(${LIB_NAME} PUBLIC USE_TRACES_=1)
 endif ()
+
+if (DEFINED USE_TIMERS AND USE_TIMERS)
+    message(STATUS "Enabling timers...")
+    target_compile_definitions(${LIB_NAME} PUBLIC USE_TIMERS_=1)
+endif ()

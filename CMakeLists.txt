@@ -21,6 +21,7 @@ set(CMAKE_C_STANDARD 17)
 # ------------------------------
 
 set(USE_TRACE ON)
+set(USE_TIMERS ON)
 
 # ------------------------------
 # Load resources

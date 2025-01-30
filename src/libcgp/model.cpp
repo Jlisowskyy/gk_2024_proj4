@@ -1,6 +1,7 @@
 #include <libcgp/mesh.hpp>
 #include <libcgp/model.hpp>
 #include <libcgp/utils/macros.hpp>
+#include <libcgp/utils/timer.hpp>
 
 #include <cassert>
 #include <cstddef>
@@ -24,6 +25,9 @@ void LibGcp::Model::Draw(Shader &shader) const
 
 std::shared_ptr<LibGcp::Model> LibGcp::ModelSerializer::LoadModelFromExternalFormat(const std::string &path)
 {
+    Timer timer{};
+    timer.Start(0);
+
     meshes_.clear();
     Assimp::Importer importer{};
 
@@ -40,6 +44,8 @@ std::shared_ptr<LibGcp::Model> LibGcp::ModelSerializer::LoadModelFromExternalFor
     directory_ = path.substr(0, path.find_last_of('/'));
 
     ProcessNode_(scene->mRootNode, scene);
+    timer.StopAndPrint(0);
+
     return std::make_shared<Model>(std::move(meshes_));
 }
 
