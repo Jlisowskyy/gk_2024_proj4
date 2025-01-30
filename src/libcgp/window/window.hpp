@@ -36,7 +36,7 @@ class Window : public CxxUtils::Singleton<Window>
 
     void Init();
 
-    void RunLoop();
+    void RunLoop(void (*process_progress)());
 
     // ----------------------------------
     // Class implementation methods

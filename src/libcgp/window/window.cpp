@@ -52,7 +52,7 @@ void LibGcp::Window::Init()
     window_ = window;
 }
 
-void LibGcp::Window::RunLoop()
+void LibGcp::Window::RunLoop(void (*const process_progress)())
 {
     // Game loop
     while (glfwWindowShouldClose(window_) == 0) {
@@ -60,10 +60,8 @@ void LibGcp::Window::RunLoop()
         // functions
         glfwPollEvents();
 
-        // Render
-        // Clear the color buffer
-        glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // call the process_progress function
+        process_progress();
 
         // Swap the screen buffers
         glfwSwapBuffers(window_);
