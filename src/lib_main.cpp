@@ -1,27 +1,29 @@
+#include <libcgp/main.hpp>
+
 #include <libcgp/engine/process_loop.hpp>
 #include <libcgp/mgr/object_mgr.hpp>
 #include <libcgp/mgr/resource_mgr.hpp>
 #include <libcgp/mgr/settings_mgr.hpp>
 #include <libcgp/window/window.hpp>
 
-extern int RenderEngineMain()
+int LibGcp::RenderEngineMain(const SettingsMgr::setting_t &settings)
 {
     /* initialize components */
-    LibGcp::ResourceMgr::InitInstance();
-    LibGcp::SettingsMgr::InitInstance();
-    LibGcp::ObjectMgr::InitInstance();
+    SettingsMgr::InitInstance(settings);
+    ResourceMgr::InitInstance();
+    ObjectMgr::InitInstance();
 
-    LibGcp::Window::InitInstance().Init();
+    Window::InitInstance().Init();
 
     /* render loop */
-    LibGcp::Window::GetInstance().RunLoop(ProcessLoopApp);
+    Window::GetInstance().RunLoop(ProcessLoopApp);
 
     /* cleanup */
-    LibGcp::Window::DeleteInstance();
+    Window::DeleteInstance();
 
-    LibGcp::ObjectMgr::DeleteInstance();
-    LibGcp::ResourceMgr::DeleteInstance();
-    LibGcp::SettingsMgr::DeleteInstance();
+    ObjectMgr::DeleteInstance();
+    ResourceMgr::DeleteInstance();
+    SettingsMgr::DeleteInstance();
 
     return 0;
 }

@@ -1,3 +1,3 @@
-extern int RenderEngineMain();
+#include <libcgp/main.hpp>
 
-int main() { return RenderEngineMain(); }
+int main() { return LibGcp::RenderEngineMain({}); }

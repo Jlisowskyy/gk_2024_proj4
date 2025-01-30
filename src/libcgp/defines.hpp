@@ -1,6 +1,8 @@
 #ifndef LIBGCP_DEFINES_HPP_
 #define LIBGCP_DEFINES_HPP_
 
+#include <iostream>
+
 #ifdef __GNUC__
 #define FORCE_INLINE_ __attribute__((always_inline))
 #elif defined(_MSC_VER)
