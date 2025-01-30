@@ -47,6 +47,7 @@ target_link_libraries(${LIB_NAME} PUBLIC
         libStb
         glm-header-only
         assimp::assimp
+        CxxUtilsLib
 )
 
 # ------------------------------
