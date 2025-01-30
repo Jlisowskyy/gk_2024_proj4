@@ -6,7 +6,10 @@
 
 #include <cassert>
 
-struct GLFWwindow;
+// clang-format off
+#include <glad/gl.h>
+#include <GLFW/glfw3.h> /* (include after glad) */
+// clang-format on
 
 LIBGCP_DECL_START_
 
@@ -36,8 +39,22 @@ class Window : public CxxUtils::Singleton<Window>
 
     void Init();
 
-    void RunLoop(void (*process_progress)());
+    template <class FuncT>
+    FAST_CALL void RunLoop(FuncT &&process_progress)
+    {
+        // Game loop
+        while (glfwWindowShouldClose(window_) == 0) {
+            // Check if any events have been activated (key pressed, mouse moved etc.) and call corresponding response
+            // functions
+            glfwPollEvents();
 
+            // call the process_progress function
+            process_progress();
+
+            // Swap the screen buffers
+            glfwSwapBuffers(window_);
+        }
+    }
     // ----------------------------------
     // Class implementation methods
     // ----------------------------------

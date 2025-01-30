@@ -1,10 +1,5 @@
 #include <libcgp/window/window.hpp>
 
-// clang-format off
-#include <glad/gl.h>
-#include <GLFW/glfw3.h> /* (include after glad) */
-// clang-format on
-
 #include <libcgp/utils/macros.hpp>
 
 #include <iostream>
@@ -50,22 +45,6 @@ void LibGcp::Window::Init()
 
     glEnable(GL_DEPTH_TEST);
     window_ = window;
-}
-
-void LibGcp::Window::RunLoop(void (*const process_progress)())
-{
-    // Game loop
-    while (glfwWindowShouldClose(window_) == 0) {
-        // Check if any events have been activated (key pressed, mouse moved etc.) and call corresponding response
-        // functions
-        glfwPollEvents();
-
-        // call the process_progress function
-        process_progress();
-
-        // Swap the screen buffers
-        glfwSwapBuffers(window_);
-    }
 }
 
 // Is called whenever a key is pressed/released via GLFW
