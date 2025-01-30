@@ -1,5 +1,5 @@
-#include <libcgp/mesh.hpp>
-#include <libcgp/model.hpp>
+#include <libcgp/primitives/mesh.hpp>
+#include <libcgp/primitives/model.hpp>
 #include <libcgp/utils/macros.hpp>
 #include <libcgp/utils/timer.hpp>
 

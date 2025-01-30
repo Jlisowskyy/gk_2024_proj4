@@ -1,4 +1,4 @@
-#include <libcgp/texture.hpp>
+#include <libcgp/primitives/texture.hpp>
 #include <libcgp/utils/macros.hpp>
 
 #include <glad/gl.h>

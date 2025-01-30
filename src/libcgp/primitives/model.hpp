@@ -2,8 +2,8 @@
 #define LIBGCP_MODEL_HPP_
 
 #include <libcgp/defines.hpp>
-#include <libcgp/mesh.hpp>
-#include <libcgp/texture.hpp>
+#include <libcgp/primitives/mesh.hpp>
+#include <libcgp/primitives/texture.hpp>
 
 #include <memory>
 #include <string>

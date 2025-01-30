@@ -1,6 +1,6 @@
 #include <glad/gl.h>
 
-#include <libcgp/shader.hpp>
+#include <libcgp/primitives/shader.hpp>
 #include <libcgp/utils/macros.hpp>
 #include <shaders/static_header.hpp>
 
