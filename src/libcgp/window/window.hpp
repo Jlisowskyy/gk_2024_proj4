@@ -5,6 +5,7 @@
 #include <libcgp/defines.hpp>
 
 #include <cassert>
+#include <tuple>
 
 // clang-format off
 #include <glad/gl.h>
@@ -12,7 +13,6 @@
 // clang-format on
 
 LIBGCP_DECL_START_
-
 class Window : public CxxUtils::Singleton<Window>
 {
     protected:
@@ -55,6 +55,20 @@ class Window : public CxxUtils::Singleton<Window>
             glfwSwapBuffers(window_);
         }
     }
+
+    NDSCRD FAST_CALL float GetAspectRatio() const
+    {
+        const auto [width, height] = GetWindowSize();
+        return static_cast<float>(width) / static_cast<float>(height);
+    }
+
+    NDSCRD FAST_CALL std::tuple<int, int> GetWindowSize() const
+    {
+        std::tuple<int, int> size{};
+        glfwGetWindowSize(window_, &std::get<0>(size), &std::get<1>(size));
+        return size;
+    }
+
     // ----------------------------------
     // Class implementation methods
     // ----------------------------------

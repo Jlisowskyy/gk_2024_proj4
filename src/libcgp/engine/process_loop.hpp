@@ -3,8 +3,10 @@
 
 #include <libcgp/defines.hpp>
 
+#include <string>
+
 LIBGCP_DECL_START_
-void ProcessLoopApp();
+void ProcessLoopApp(const std::string& default_shader_name);
 
 LIBGCP_DECL_END_
 

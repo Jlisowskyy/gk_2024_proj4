@@ -27,8 +27,8 @@ void LibGcp::Mesh::Draw(Shader &shader) const
     static constexpr uint8_t kMaxTextures = 16;
 
     std::array<std::string, static_cast<size_t>(Texture::Type::kLast)> texture_names = {
-        "material.texture_diffuse\0\0",
-        "material.texture_specular\0\0",
+        "texture_diffuse00",
+        "texture_specular00",
     };  // leave space for numbers
 
     std::array counters = {static_cast<uint8_t>(0), static_cast<uint8_t>(0)};

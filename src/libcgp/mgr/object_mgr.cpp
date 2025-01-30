@@ -1,3 +1,4 @@
+#include <libcgp/engine/engine.hpp>
 #include <libcgp/mgr/object_mgr.hpp>
 #include <libcgp/mgr/resource_mgr.hpp>
 #include <libcgp/primitives/shader.hpp>
@@ -20,10 +21,15 @@ void LibGcp::ObjectMgr::Init(
 
 void LibGcp::ObjectMgr::DrawStaticObjects(Shader &shader)
 {
+    Engine::GetInstance().GetView().PrepareViewMatrices(shader);
+
     for (const auto &object : static_objects_) {
+        Engine::GetInstance().GetView().PrepareModelMatrices(shader, object.GetPosition());
         object.Draw(shader);
     }
 }
+
+void LibGcp::ObjectMgr::ProcessProgress(long delta_time_micros) {}
 
 void LibGcp::ObjectMgr::CreateStaticObject_(const StaticObjectSpec &spec)
 {

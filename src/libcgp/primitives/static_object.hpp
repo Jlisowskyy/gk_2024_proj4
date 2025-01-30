@@ -12,6 +12,17 @@
 #include <memory>
 
 LIBGCP_DECL_START_
+struct ObjectPosition {
+    glm::vec3 position;
+    glm::vec3 rotation;
+    glm::vec3 scale;
+};
+
+struct StaticObjectSpec {
+    ObjectPosition position;
+    std::string name;
+};
+
 class StaticObject
 {
     public:
@@ -23,9 +34,13 @@ class StaticObject
 
     ~StaticObject() = default;
 
-    StaticObject(const glm::vec3 &position, const std::shared_ptr<Model> &model) : position_(position), model_(model)
+    StaticObject(const ObjectPosition &position, const std::shared_ptr<Model> &model)
+        : position_(position), model_(model)
     {
-        TRACE("Created static object at: " << position.x << " " << position.y << " " << position.z);
+        TRACE(
+            "Created static object at: " << position.position.x << " " << position.position.y << " "
+                                         << position.position.z
+        );
     }
 
     // ------------------------------
@@ -34,12 +49,14 @@ class StaticObject
 
     FAST_CALL void Draw(Shader &shader) const { model_->Draw(shader); }
 
+    const ObjectPosition &GetPosition() const { return position_; }
+
     // ------------------------------
     // Class fields
     // ------------------------------
 
     protected:
-    glm::vec3 position_;
+    ObjectPosition position_;
     std::shared_ptr<Model> model_;
 };
 

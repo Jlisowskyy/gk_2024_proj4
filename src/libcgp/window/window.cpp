@@ -9,6 +9,8 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 
 static void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
+static void window_size_callback(GLFWwindow *window, int width, int height);
+
 // Window dimensions
 static constexpr GLuint kWidth  = 800;
 static constexpr GLuint kHeight = 600;
@@ -32,8 +34,11 @@ void LibGcp::Window::Init()
     R_ASSERT(window != nullptr);
 
     glfwMakeContextCurrent(window);
+
+    // Set the required callback functions
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetWindowSizeCallback(window, window_size_callback);
 
     // Load OpenGL functions, gladLoadGL returns the loaded version, 0 on error.
     const auto version = gladLoadGL(glfwGetProcAddress);
@@ -52,6 +57,8 @@ void key_callback(
     GLFWwindow *window, const int key, [[maybe_unused]] int scancode, const int action, [[maybe_unused]] int mode
 )
 {
+    TRACE("Key pressed");
+
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
@@ -59,5 +66,14 @@ void key_callback(
 
 void framebuffer_size_callback([[maybe_unused]] GLFWwindow *window, const int width, const int height)
 {
+    TRACE("framebuffer_size_callback");
+
+    glViewport(0, 0, width, height);
+}
+
+void window_size_callback([[maybe_unused]] GLFWwindow *window, const int width, const int height)
+{
+    TRACE("window_size_callback");
+
     glViewport(0, 0, width, height);
 }

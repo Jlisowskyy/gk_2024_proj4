@@ -26,11 +26,6 @@ class ObjectMgr : public CxxUtils::Singleton<ObjectMgr>
     static constexpr size_t kDefaultStorageSize = static_cast<size_t>(2 * 16384);
 
     public:
-    struct StaticObjectSpec {
-        glm::vec3 position;
-        std::string name;
-    };
-
     struct DynamicObjectSpec {
         int xd;
     };
@@ -63,6 +58,8 @@ class ObjectMgr : public CxxUtils::Singleton<ObjectMgr>
     void Init(const static_objects_t& static_objects, const dynamic_objects_t& dynamic_objects);
 
     void DrawStaticObjects(Shader& shader);
+
+    void ProcessProgress(long delta_time_micros);
 
     // ---------------------------------
     // Class implementation methods
