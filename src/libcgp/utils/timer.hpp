@@ -59,7 +59,7 @@ class Timer
 
         const auto end_time   = std::chrono::high_resolution_clock::now();
         const auto start_time = start_times_[desc];
-        const auto duration   = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+        const auto duration   = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
         start_times_.erase(desc);
 
         return duration;
@@ -68,7 +68,7 @@ class Timer
     void StopAndPrint_(const int desc)
     {
         const auto duration = Stop_(desc);
-        std::cout << "Timer " << desc << " took " << duration << " microseconds" << std::endl;
+        std::cout << "Timer " << desc << " took " << duration << " milliseconds" << std::endl;
     }
 
     // ------------------------------

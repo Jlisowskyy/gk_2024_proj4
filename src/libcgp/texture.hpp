@@ -4,6 +4,9 @@
 #include <glad/gl.h>
 
 #include <cstdint>
+#include <memory>
+#include <string>
+#include <unordered_map>
 
 #include <libcgp/defines.hpp>
 
@@ -58,6 +61,12 @@ class Texture
     }
 
     // ------------------------------
+    // Static fields
+    // ------------------------------
+
+    static std::unordered_map<std::string, std::shared_ptr<Texture>> g_TextureRegistry;
+
+    // ------------------------------
     // Class fields
     // ------------------------------
 
@@ -70,11 +79,11 @@ class Texture
 // Factories
 // ------------------------------
 
-Texture MakeTextureFromData(
+std::shared_ptr<Texture> MakeTextureFromData(
     const unsigned char *texture_data, int width, int height, int channels, Texture::Type type
 ) noexcept;
 
-Texture MakeTextureFromFile(const char *file_path, Texture::Type type) noexcept;
+std::shared_ptr<Texture> MakeTextureFromFile(const char *file_path, Texture::Type type) noexcept;
 
 // Texture MakeTextureFromImage(const char *image_name, Texture::Type type) noexcept;
 

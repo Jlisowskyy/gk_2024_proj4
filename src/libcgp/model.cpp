@@ -14,7 +14,7 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 
-LibGcp::Model::Model(std::vector<std::shared_ptr<Mesh> > &&meshes) : meshes_(std::move(meshes)) {}
+LibGcp::Model::Model(std::vector<std::shared_ptr<Mesh>> &&meshes) : meshes_(std::move(meshes)) {}
 
 void LibGcp::Model::Draw(Shader &shader) const
 {
@@ -37,7 +37,7 @@ std::shared_ptr<LibGcp::Model> LibGcp::ModelSerializer::LoadModelFromExternalFor
     );
 
     VALIDATE_STATE(
-        scene != nullptr && scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE && scene->mRootNode != nullptr,
+        scene != nullptr && !(scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) && scene->mRootNode != nullptr,
         importer.GetErrorString()
     );
 
@@ -79,7 +79,7 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
 
     std::vector<Mesh::Vertex> vertices{};
     std::vector<GLuint> indices{};
-    std::vector<Texture> textures{};
+    std::vector<std::shared_ptr<Texture>> textures{};
 
     // process vertices
     vertices.reserve(mesh->mNumVertices);
@@ -121,17 +121,17 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
 }
 
 void LibGcp::ModelSerializer::LoadMaterialTextures_(
-    std::vector<Texture> &textures, const aiMaterial *material, const aiTextureType type,
+    std::vector<std::shared_ptr<Texture>> &textures, const aiMaterial *material, const aiTextureType type,
     const Texture::Type texture_type
 )
 {
-    const std::filesystem::path dir_path{directory_};
+    const std::filesystem::path dir_path = std::filesystem::absolute(directory_);
 
     for (size_t idx = 0; idx < material->GetTextureCount(type); ++idx) {
         aiString str;
         material->GetTexture(type, idx, &str);
 
-        const std::string texture_path = (dir_path / str.C_Str()).string();
-        textures.emplace_back(std::move(MakeTextureFromFile(texture_path.c_str(), texture_type)));
+        const std::filesystem::path texture_full_path = weakly_canonical(dir_path / str.C_Str());
+        textures.push_back(MakeTextureFromFile(texture_full_path.c_str(), texture_type));
     }
 }

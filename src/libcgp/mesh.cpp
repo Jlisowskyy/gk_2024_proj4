@@ -11,7 +11,9 @@
 #include <utility>
 #include <vector>
 
-LibGcp::Mesh::Mesh(std::vector<Vertex> &&vertices, std::vector<GLuint> &&indices, std::vector<Texture> &&textures)
+LibGcp::Mesh::Mesh(
+    std::vector<Vertex> &&vertices, std::vector<GLuint> &&indices, std::vector<std::shared_ptr<Texture>> &&textures
+)
     : vertices_(std::move(vertices)), indices_(std::move(indices)), textures_(std::move(textures))
 {
     R_ASSERT(vertices_.size() > 0);
@@ -32,7 +34,7 @@ void LibGcp::Mesh::Draw(Shader &shader) const
     std::array counters = {static_cast<uint8_t>(0), static_cast<uint8_t>(0)};
 
     for (size_t idx = 0; idx < textures_.size(); ++idx) {
-        const size_t type_idx = static_cast<size_t>(textures_[idx].GetType());
+        const size_t type_idx = static_cast<size_t>(textures_[idx]->GetType());
         const uint8_t counter = ++counters[type_idx];
         std::string &name     = texture_names[type_idx];
 
@@ -40,7 +42,7 @@ void LibGcp::Mesh::Draw(Shader &shader) const
         name[name.size() - 1] = '0' + counter % 10;
 
         shader.SetGLfloatUnsafe(name.c_str(), static_cast<GLfloat>(idx));
-        textures_[idx].Bind(idx);
+        textures_[idx]->Bind(idx);
 
         if (idx >= kMaxTextures) {
             break;

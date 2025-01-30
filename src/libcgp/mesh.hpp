@@ -1,6 +1,7 @@
 #ifndef LIBGCP_MESH_HPP_
 #define LIBGCP_MESH_HPP_
 
+#include <memory>
 #include <vector>
 
 #include <libcgp/defines.hpp>
@@ -38,7 +39,9 @@ class Mesh
 
     ~Mesh() = default;
 
-    Mesh(std::vector<Vertex> &&vertices, std::vector<GLuint> &&indices, std::vector<Texture> &&textures);
+    Mesh(
+        std::vector<Vertex> &&vertices, std::vector<GLuint> &&indices, std::vector<std::shared_ptr<Texture>> &&textures
+    );
 
     Mesh(const Mesh &)            = delete;
     Mesh &operator=(const Mesh &) = delete;
@@ -65,7 +68,7 @@ class Mesh
 
     std::vector<Vertex> vertices_;
     std::vector<GLuint> indices_;
-    std::vector<Texture> textures_;
+    std::vector<std::shared_ptr<Texture>> textures_;
 
     GLuint VAO_{};
     GLuint VBO_{};

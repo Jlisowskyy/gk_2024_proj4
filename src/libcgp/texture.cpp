@@ -9,6 +9,8 @@
 #include <cstdlib>
 #include <string>
 
+std::unordered_map<std::string, std::shared_ptr<LibGcp::Texture> > LibGcp::Texture::g_TextureRegistry{};
+
 LibGcp::Texture::Texture(
     const unsigned char *texture_data, const int width, const int height, const int channels, const Type type
 ) noexcept
@@ -43,15 +45,21 @@ LibGcp::Texture::~Texture() noexcept
     }
 }
 
-LibGcp::Texture LibGcp::MakeTextureFromData(
+std::shared_ptr<LibGcp::Texture> LibGcp::MakeTextureFromData(
     const unsigned char *texture_data, const int width, const int height, int channels, const Texture::Type type
 ) noexcept
 {
-    return {texture_data, width, height, channels, type};
+    return std::make_shared<Texture>(texture_data, width, height, channels, type);
 }
 
-LibGcp::Texture LibGcp::MakeTextureFromFile(const char *file_path, const Texture::Type type) noexcept
+std::shared_ptr<LibGcp::Texture> LibGcp::MakeTextureFromFile(const char *file_path, const Texture::Type type) noexcept
 {
+    const std::string file_path_str{file_path};
+
+    if (Texture::g_TextureRegistry.contains(file_path_str)) {
+        return Texture::g_TextureRegistry.at(file_path_str);
+    }
+
     int width{};
     int height{};
     int channels{};
@@ -60,9 +68,10 @@ LibGcp::Texture LibGcp::MakeTextureFromFile(const char *file_path, const Texture
     unsigned char *data = stbi_load(file_path, &width, &height, &channels, 0);
     VALIDATE_STATE(data != nullptr, "Failed to load texture");
 
-    Texture texture{data, width, height, channels, type};
+    auto texture = MakeTextureFromData(data, width, height, channels, type);
     stbi_image_free(data);
 
+    Texture::g_TextureRegistry[file_path_str] = texture;
     return texture;
 }
 
