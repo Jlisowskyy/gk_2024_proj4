@@ -32,7 +32,7 @@ void LibGcp::ProcessLoopApp(const std::string& default_shader_name)
             std::chrono::duration_cast<std::chrono::microseconds>(new_frame - last_frame).count();
         last_frame = new_frame;
 
-        TRACE("Time spent for last frame: " << delta_time_ms / 1000 << " ms");
+        // TRACE("Time spent for last frame: " << delta_time_ms / 1000 << " ms");
         Engine::GetInstance().ProcessProgress(delta_time_ms);
     });
 }

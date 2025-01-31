@@ -5,16 +5,28 @@
 
 #include <iostream>
 
-// Function prototypes
-static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
+// ------------------------------
+// Window Callbacks
+// ------------------------------
 
-static void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
 
-static void window_size_callback(GLFWwindow *window, int width, int height);
+static void FrameBufferSizeCallback(GLFWwindow *window, int width, int height);
 
-// Window dimensions
+static void WindowSizeCallback(GLFWwindow *window, int width, int height);
+
+static void MouseCallback(GLFWwindow *window, double xpos, double ypos);
+
+// ------------------------------
+// Constants
+// ------------------------------
+
 static constexpr GLuint kWidth  = 800;
 static constexpr GLuint kHeight = 600;
+
+// ------------------------------
+// Class implementation
+// ------------------------------
 
 LibGcp::Window::~Window()
 {
@@ -26,22 +38,27 @@ void LibGcp::Window::Init()
 {
     glfwInit();
 
+    /* setup initial config */
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
+    /* create window */
     GLFWwindow *window = glfwCreateWindow(kWidth, kHeight, "RenderEngine", nullptr, nullptr);
     R_ASSERT(window != nullptr);
 
     glfwMakeContextCurrent(window);
 
-    // Set the required callback functions
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetWindowSizeCallback(window, window_size_callback);
+    /* setup window options */
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    // Load OpenGL functions, gladLoadGL returns the loaded version, 0 on error.
+    /* setup callbacks */
+    glfwSetKeyCallback(window, KeyCallback);
+    glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
+    glfwSetWindowSizeCallback(window, WindowSizeCallback);
+    glfwSetCursorPosCallback(window, MouseCallback);
+
     const auto version = gladLoadGL(glfwGetProcAddress);
     R_ASSERT(version);
     TRACE("Loaded OpenGL " << GLAD_VERSION_MAJOR(version) << "." << GLAD_VERSION_MINOR(version));
@@ -53,31 +70,37 @@ void LibGcp::Window::Init()
     window_ = window;
 }
 
-// Is called whenever a key is pressed/released via GLFW
-void key_callback(
+// ------------------------------
+// Callback implementation
+// ------------------------------
+
+void KeyCallback(
     GLFWwindow *window, const int key, [[maybe_unused]] int scancode, const int action, [[maybe_unused]] int mode
 )
 {
-    TRACE("Key pressed");
+    TRACE("Key pressed " << key << " scancode " << scancode << " mode " << mode);
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
         return;
     }
 
-    LibGcp::Engine::GetInstance().ButtonPressed(key);
+    if (key != GLFW_DONT_CARE) {
+        LibGcp::Engine::GetInstance().ButtonPressed(key);
+    }
 }
 
-void framebuffer_size_callback([[maybe_unused]] GLFWwindow *window, const int width, const int height)
+void FrameBufferSizeCallback([[maybe_unused]] GLFWwindow *window, const int width, const int height)
 {
     TRACE("framebuffer_size_callback");
 
     glViewport(0, 0, width, height);
 }
 
-void window_size_callback([[maybe_unused]] GLFWwindow *window, const int width, const int height)
+void WindowSizeCallback([[maybe_unused]] GLFWwindow *window, const int width, const int height)
 {
     TRACE("window_size_callback");
 
     glViewport(0, 0, width, height);
 }
+void MouseCallback(GLFWwindow *window, double xpos, double ypos) {}

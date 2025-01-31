@@ -4,7 +4,25 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <libcgp/utils/macros.hpp>
+
+void LibGcp::CameraInfo::MoveFreeCamera(const float distance, const buttons_t &buttons)
+{
+    if (buttons[GLFW_KEY_W]) {
+        position += distance * front;
+    }
+
+    if (buttons[GLFW_KEY_S]) {
+        position -= distance * front;
+    }
+
+    if (buttons[GLFW_KEY_A]) {
+        position -= distance * glm::normalize(glm::cross(front, up));
+    }
+
+    if (buttons[GLFW_KEY_D]) {
+        position += distance * glm::normalize(glm::cross(front, up));
+    }
+}
 
 LibGcp::View::View()
     : projection_matrix_(glm::perspective(glm::radians(45.0F), Window::GetInstance().GetAspectRatio(), 0.1F, 100.0F))
@@ -24,8 +42,9 @@ void LibGcp::View::ChangeCameraType(const CameraType type)
 
     camera_type_ = type;
     if (camera_type_ == CameraType::kStatic) {
-        camera_position_ = glm::vec3(0.0F, 0.0F, 10.0F);
-        camera_front_    = glm::vec3(0.0F, 0.0F, -1.0F);
+        camera_info_.position = glm::vec3(0.0f, 0.0f, 30.0f);
+        camera_info_.front    = glm::vec3(0.0f, 0.0f, -1.0f);
+        camera_info_.up       = glm::vec3(0.0f, 1.0f, 0.0f);
         UpdateViewMatrix_();
     }
 }
@@ -49,24 +68,8 @@ void LibGcp::View::PrepareModelMatrices(Shader &shader, const ObjectPosition &po
 
 void LibGcp::View::UpdateCameraPosition()
 {
-    switch (camera_type_) {
-        case CameraType::kStatic:
-            break;
-        case CameraType::kFollow:
-        [[fallthrough]]
-        case CameraType::kFree:
-        [[fallthrough]]
-        case CameraType::kFirstPerson: {
-            assert(camera_object_position_ && camera_object_front_ && "Updated camera without binding object!");
-
-            camera_position_ = *camera_object_position_;
-            camera_front_    = *camera_object_front_;
-        } break;
-        case CameraType::kThirdPerson:
-            NOT_IMPLEMENTED;
-            break;
-        default:
-            R_ASSERT(false && "Unknown camera type");
+    if (camera_type_ != CameraType::kStatic) {
+        camera_info_ = *camera_object_info_;
     }
 
     UpdateViewMatrix_();
@@ -74,5 +77,5 @@ void LibGcp::View::UpdateCameraPosition()
 
 void LibGcp::View::UpdateViewMatrix_()
 {
-    view_matrix_ = glm::lookAt(camera_position_, camera_front_, glm::vec3(0.0F, 1.0F, 0.0F));
+    view_matrix_ = glm::lookAt(camera_info_.position, camera_info_.position + camera_info_.front, camera_info_.up);
 }

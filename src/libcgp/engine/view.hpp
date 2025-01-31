@@ -1,6 +1,11 @@
 #ifndef ENGINE_VIEW_HPP_
 #define ENGINE_VIEW_HPP_
 
+// clang-format off
+#include <glad/gl.h>
+#include <GLFW/glfw3.h> /* (include after glad) */
+// clang-format on
+
 #include <libcgp/defines.hpp>
 
 #include <libcgp/mgr/object_mgr.hpp>
@@ -11,7 +16,19 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <array>
+
 LIBGCP_DECL_START_
+
+struct CameraInfo {
+    glm::vec3 position;
+    glm::vec3 front;
+    glm::vec3 up;
+
+    using buttons_t = std::array<int, GLFW_KEY_LAST>;
+    void MoveFreeCamera(float distance, const buttons_t& buttons);
+};
+
 class View
 {
     // ------------------------------
@@ -36,11 +53,7 @@ class View
 
     void PrepareModelMatrices(Shader& shader, const ObjectPosition& position);
 
-    FAST_CALL void BindCameraWithObjet(const glm::vec3* position, const glm::vec3* front)
-    {
-        camera_object_position_ = position;
-        camera_object_front_    = front;
-    }
+    FAST_CALL void BindCameraWithObjet(const CameraInfo* camera_info) { camera_object_info_ = camera_info; }
 
     NDSCRD FAST_CALL CameraType GetCameraType() const noexcept { return camera_type_; }
 
@@ -57,11 +70,8 @@ class View
     // Class fields
     // ------------------------------
 
-    const glm::vec3* camera_object_position_{};
-    const glm::vec3* camera_object_front_{};
-
-    glm::vec3 camera_position_{};
-    glm::vec3 camera_front_{};
+    const CameraInfo* camera_object_info_;
+    CameraInfo camera_info_;
 
     glm::mat4 view_matrix_{};
     glm::mat4 projection_matrix_{};

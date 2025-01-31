@@ -3,6 +3,7 @@
 
 #include <CxxUtils/singleton.hpp>
 #include <libcgp/defines.hpp>
+#include <libcgp/window/mouse.hpp>
 
 #include <cassert>
 #include <tuple>

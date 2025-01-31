@@ -14,9 +14,18 @@ void LibGcp::Engine::Init() noexcept
 
     /* Adjust camera type based on default settings */
     OnCameraTypeChanged_(SettingsMgr::GetInstance().GetSetting<uint64_t>(SettingsMgr::Setting::kCameraType));
+
+    /* init flowing TEMP object */
+    flowing_camera_.position = glm::vec3{};
+    flowing_camera_.front    = glm::vec3(0.0f, 0.0f, -1.0f);
+    flowing_camera_.up       = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    /* init free camera */
+    free_camera_.position = glm::vec3{0.0f, 0.0f, 3.0f};
+    free_camera_.front    = glm::vec3(0.0f, 0.0f, -1.0f);
+    free_camera_.up       = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
-using key_action_t = void (LibGcp::Engine::*)(const int);
 void LibGcp::Engine::ProcessProgress(const long delta)
 {
     ProcessInput_(delta);
@@ -54,8 +63,9 @@ void LibGcp::Engine::ProcessUserMovement_(const long delta)
         const float radius = 30.0f;
         const float camX   = sin(glfwGetTime()) * radius;
         const float camZ   = cos(glfwGetTime()) * radius;
-        flow_position_     = glm::vec3(camX, 0.0f, camZ);
 
+        flowing_camera_.position = glm::vec3(camX, 0.0f, camZ);
+        flowing_camera_.front    = -flowing_camera_.position;
         return;
     }
 
@@ -65,7 +75,13 @@ void LibGcp::Engine::ProcessUserMovement_(const long delta)
     }
 }
 
-void LibGcp::Engine::ProcessFreeCameraMovement_(const long delta) {}
+void LibGcp::Engine::ProcessFreeCameraMovement_(const long delta)
+{
+    static constexpr double kFreeCamSpeed = 2.0;
+
+    const double distance = kFreeCamSpeed * static_cast<double>(delta) / 1e+6;
+    free_camera_.MoveFreeCamera(static_cast<float>(distance), keys_);
+}
 
 void LibGcp::Engine::ProcessDynamicObjects_(const long delta) {}
 
@@ -78,15 +94,13 @@ void LibGcp::Engine::OnCameraTypeChanged_(const uint64_t new_value)
     /* TODO: Bind proper object here */
     switch (static_cast<CameraType>(new_value)) {
         case CameraType::kStatic: {
-            GetInstance().view_.BindCameraWithObjet(nullptr, nullptr);
+            GetInstance().view_.BindCameraWithObjet(nullptr);
         } break;
         case CameraType::kFollow: {
-            GetInstance().view_.BindCameraWithObjet(&GetInstance().flow_position_, &GetInstance().flow_direction_);
+            GetInstance().view_.BindCameraWithObjet(&GetInstance().flowing_camera_);
         } break;
         case CameraType::kFree: {
-            GetInstance().view_.BindCameraWithObjet(
-                &GetInstance().free_camera_position_, &GetInstance().free_camera_front_
-            );
+            GetInstance().view_.BindCameraWithObjet(&GetInstance().free_camera_);
         } break;
         case CameraType::kFirstPerson:
             NOT_IMPLEMENTED;
