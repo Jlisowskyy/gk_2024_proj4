@@ -56,10 +56,12 @@ void LibGcp::View::UpdateCameraPosition()
         [[fallthrough]]
         case CameraType::kFree:
         [[fallthrough]]
-        case CameraType::kFirstPerson:
-            camera_position_ = camera_object_position_;
-            camera_front_    = camera_object_front_;
-            break;
+        case CameraType::kFirstPerson: {
+            assert(camera_object_position_ && camera_object_front_ && "Updated camera without binding object!");
+
+            camera_position_ = *camera_object_position_;
+            camera_front_    = *camera_object_front_;
+        } break;
         case CameraType::kThirdPerson:
             NOT_IMPLEMENTED;
             break;

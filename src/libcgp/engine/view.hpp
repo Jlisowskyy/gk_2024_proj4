@@ -36,9 +36,11 @@ class View
 
     void PrepareModelMatrices(Shader& shader, const ObjectPosition& position);
 
-    void SetCameraPosition(const glm::vec3& position) { camera_object_position_ = position; }
-
-    void SetCameraFront(const glm::vec3& front) { camera_object_front_ = front; }
+    FAST_CALL void BindCameraWithObjet(const glm::vec3* position, const glm::vec3* front)
+    {
+        camera_object_position_ = position;
+        camera_object_front_    = front;
+    }
 
     NDSCRD FAST_CALL CameraType GetCameraType() const noexcept { return camera_type_; }
 
@@ -55,8 +57,8 @@ class View
     // Class fields
     // ------------------------------
 
-    glm::vec3 camera_object_position_{};
-    glm::vec3 camera_object_front_{};
+    const glm::vec3* camera_object_position_{};
+    const glm::vec3* camera_object_front_{};
 
     glm::vec3 camera_position_{};
     glm::vec3 camera_front_{};

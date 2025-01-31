@@ -1,6 +1,7 @@
 #include <libcgp/engine/engine.hpp>
 
 #include <libcgp/mgr/settings_mgr.hpp>
+#include <libcgp/utils/macros.hpp>
 
 LibGcp::Engine::~Engine() { TRACE("Engine::~Engine()"); }
 
@@ -53,7 +54,7 @@ void LibGcp::Engine::ProcessUserMovement_(const long delta)
         const float radius = 30.0f;
         const float camX   = sin(glfwGetTime()) * radius;
         const float camZ   = cos(glfwGetTime()) * radius;
-        view_.SetCameraPosition(glm::vec3(camX, 0.0f, camZ));
+        flow_position_     = glm::vec3(camX, 0.0f, camZ);
 
         return;
     }
@@ -76,17 +77,24 @@ void LibGcp::Engine::OnCameraTypeChanged_(const uint64_t new_value)
 
     /* TODO: Bind proper object here */
     switch (static_cast<CameraType>(new_value)) {
-        case CameraType::kStatic:
-            break;
-        case CameraType::kFollow:
-            break;
-        case CameraType::kFree:
-            break;
+        case CameraType::kStatic: {
+            GetInstance().view_.BindCameraWithObjet(nullptr, nullptr);
+        } break;
+        case CameraType::kFollow: {
+            GetInstance().view_.BindCameraWithObjet(&GetInstance().flow_position_, &GetInstance().flow_direction_);
+        } break;
+        case CameraType::kFree: {
+            GetInstance().view_.BindCameraWithObjet(
+                &GetInstance().free_camera_position_, &GetInstance().free_camera_front_
+            );
+        } break;
         case CameraType::kFirstPerson:
+            NOT_IMPLEMENTED;
             break;
         case CameraType::kThirdPerson:
+            NOT_IMPLEMENTED;
             break;
-        case CameraType::kLast:
-            break;
+        default:
+            R_ASSERT(false && "Unknown camera type")
     }
 }

@@ -70,8 +70,9 @@ class Engine final : public CxxUtils::Singleton<Engine>
     // Class fields
     // ------------------------------
 
-    const glm::vec3 *camera_position_{};
-    const glm::vec3 *camera_front_{};
+    // TODO: temp object
+    glm::vec3 flow_position_{};
+    glm::vec3 flow_direction_{};
 
     glm::vec3 free_camera_position_{};
     glm::vec3 free_camera_front_{};
