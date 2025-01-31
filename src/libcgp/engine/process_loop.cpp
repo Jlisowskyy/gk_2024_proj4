@@ -13,6 +13,7 @@
 void LibGcp::ProcessLoopApp(const std::string& default_shader_name)
 {
     auto shader = ResourceMgr::GetInstance().GetShader(default_shader_name, ResourceMgr::LoadType::kMemory);
+    shader->Activate();
 
     auto last_frame = std::chrono::steady_clock::now();
     Window::GetInstance().RunLoop([&] {
