@@ -7,6 +7,7 @@ LibGcp::SettingsMgr::SettingsMgr(const std::vector<std::tuple<Setting, SettingCo
 
     /* load default settings */
     SetSetting(Setting::kCameraType, CameraType::kStatic);
+    SetSetting<double>(Setting::kMouseSensitivity, 0.1);
 
     /* load adjusted settings */
     for (const auto &[setting, container] : settings) {

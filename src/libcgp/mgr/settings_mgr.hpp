@@ -26,6 +26,7 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
     public:
     enum class Setting : std::uint16_t {
         kCameraType,
+        kMouseSensitivity,
         kLast,
     };
 

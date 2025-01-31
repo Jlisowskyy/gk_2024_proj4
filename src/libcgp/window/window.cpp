@@ -6,18 +6,6 @@
 #include <iostream>
 
 // ------------------------------
-// Window Callbacks
-// ------------------------------
-
-static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
-
-static void FrameBufferSizeCallback(GLFWwindow *window, int width, int height);
-
-static void WindowSizeCallback(GLFWwindow *window, int width, int height);
-
-static void MouseCallback(GLFWwindow *window, double xpos, double ypos);
-
-// ------------------------------
 // Constants
 // ------------------------------
 
@@ -56,7 +44,6 @@ void LibGcp::Window::Init()
     /* setup callbacks */
     glfwSetKeyCallback(window, KeyCallback);
     glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
-    glfwSetWindowSizeCallback(window, WindowSizeCallback);
     glfwSetCursorPosCallback(window, MouseCallback);
 
     const auto version = gladLoadGL(glfwGetProcAddress);
@@ -68,13 +55,25 @@ void LibGcp::Window::Init()
 
     glEnable(GL_DEPTH_TEST);
     window_ = window;
+
+    SyncMousePositionWithWindow_();
 }
 
 // ------------------------------
 // Callback implementation
 // ------------------------------
 
-void KeyCallback(
+void LibGcp::Window::SyncMousePositionWithWindow_()
+{
+    double x_pos;
+    double y_pos;
+
+    glfwGetCursorPos(window_, &x_pos, &y_pos);
+
+    mouse_.Reset(x_pos, y_pos);
+}
+
+void LibGcp::Window::KeyCallback(
     GLFWwindow *window, const int key, [[maybe_unused]] int scancode, const int action, [[maybe_unused]] int mode
 )
 {
@@ -86,21 +85,21 @@ void KeyCallback(
     }
 
     if (key != GLFW_DONT_CARE) {
-        LibGcp::Engine::GetInstance().ButtonPressed(key);
+        Engine::GetInstance().ButtonPressed(key);
     }
 }
 
-void FrameBufferSizeCallback([[maybe_unused]] GLFWwindow *window, const int width, const int height)
+void LibGcp::Window::FrameBufferSizeCallback([[maybe_unused]] GLFWwindow *window, const int width, const int height)
 {
     TRACE("framebuffer_size_callback");
 
     glViewport(0, 0, width, height);
+    GetInstance().SyncMousePositionWithWindow_();
 }
 
-void WindowSizeCallback([[maybe_unused]] GLFWwindow *window, const int width, const int height)
+void LibGcp::Window::MouseCallback([[maybe_unused]] GLFWwindow *window, const double xpos, const double ypos)
 {
-    TRACE("window_size_callback");
+    TRACE("Mouse moved to " << xpos << " " << ypos);
 
-    glViewport(0, 0, width, height);
+    GetInstance().mouse_.Move(xpos, ypos);
 }
-void MouseCallback(GLFWwindow *window, double xpos, double ypos) {}

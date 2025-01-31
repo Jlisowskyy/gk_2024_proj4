@@ -35,18 +35,7 @@ LibGcp::View::View()
 void LibGcp::View::ChangeCameraType(const CameraType type)
 {
     assert(type != CameraType::kLast);
-
-    if (camera_type_ == type) {
-        return;
-    }
-
     camera_type_ = type;
-    if (camera_type_ == CameraType::kStatic) {
-        camera_info_.position = glm::vec3(0.0f, 0.0f, 30.0f);
-        camera_info_.front    = glm::vec3(0.0f, 0.0f, -1.0f);
-        camera_info_.up       = glm::vec3(0.0f, 1.0f, 0.0f);
-        UpdateViewMatrix_();
-    }
 }
 
 void LibGcp::View::PrepareViewMatrices(Shader &shader)
@@ -68,14 +57,10 @@ void LibGcp::View::PrepareModelMatrices(Shader &shader, const ObjectPosition &po
 
 void LibGcp::View::UpdateCameraPosition()
 {
-    if (camera_type_ != CameraType::kStatic) {
-        camera_info_ = *camera_object_info_;
-    }
+    assert(camera_object_info_ != nullptr && "Camera info is not set");
 
-    UpdateViewMatrix_();
-}
-
-void LibGcp::View::UpdateViewMatrix_()
-{
-    view_matrix_ = glm::lookAt(camera_info_.position, camera_info_.position + camera_info_.front, camera_info_.up);
+    const auto pos    = camera_object_info_->position;
+    const auto center = pos + camera_object_info_->front;
+    const auto up     = camera_object_info_->up;
+    view_matrix_      = glm::lookAt(pos, center, up);
 }

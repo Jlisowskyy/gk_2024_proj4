@@ -4,7 +4,6 @@
 #include <libcgp/defines.hpp>
 
 #include <CxxUtils/singleton.hpp>
-#include <libcgp/settings.hpp>
 
 #include <libcgp/engine/view.hpp>
 
@@ -60,8 +59,11 @@ class Engine final : public CxxUtils::Singleton<Engine>
 
     protected:
     void ProcessInput_(long delta);
+
     void ProcessUserMovement_(long delta);
+
     void ProcessFreeCameraMovement_(long delta);
+
     void ProcessDynamicObjects_(long delta);
 
     static void OnCameraTypeChanged_(uint64_t new_value);
@@ -73,6 +75,11 @@ class Engine final : public CxxUtils::Singleton<Engine>
     // TODO: temp object
     CameraInfo flowing_camera_{};
     CameraInfo free_camera_{};
+    const CameraInfo static_camera_{
+        .position = glm::vec3{0.0f, 0.0f, 3.0f},
+        .front    = glm::vec3(0.0f, 0.0f, -1.0f),
+        .up       = glm::vec3(0.0f, 1.0f, 0.0f),
+    };
 
     std::array<int, GLFW_KEY_LAST> keys_{};
     View view_{};

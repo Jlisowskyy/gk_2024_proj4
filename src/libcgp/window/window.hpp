@@ -70,15 +70,30 @@ class Window : public CxxUtils::Singleton<Window>
         return size;
     }
 
+    NDSCRD FAST_CALL const Mouse &GetMouse() const noexcept { return mouse_; }
+
     // ----------------------------------
     // Class implementation methods
     // ----------------------------------
 
     protected:
+    void SyncMousePositionWithWindow_();
+
+    // ------------------------------
+    // Window Callbacks
+    // ------------------------------
+
+    static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
+
+    static void FrameBufferSizeCallback(GLFWwindow *window, int width, int height);
+
+    static void MouseCallback(GLFWwindow *window, double xpos, double ypos);
+
     // ------------------------------
     // Class fields
     // ------------------------------
 
+    Mouse mouse_{};
     GLFWwindow *window_{};
 };
 

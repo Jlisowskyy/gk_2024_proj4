@@ -55,6 +55,8 @@ class View
 
     FAST_CALL void BindCameraWithObjet(const CameraInfo* camera_info) { camera_object_info_ = camera_info; }
 
+    FAST_CALL const CameraInfo& GetBindObject() const noexcept { return *camera_object_info_; }
+
     NDSCRD FAST_CALL CameraType GetCameraType() const noexcept { return camera_type_; }
 
     void UpdateCameraPosition();
@@ -64,14 +66,11 @@ class View
     // ---------------------------------
 
     protected:
-    void UpdateViewMatrix_();
-
     // ------------------------------
     // Class fields
     // ------------------------------
 
     const CameraInfo* camera_object_info_;
-    CameraInfo camera_info_;
 
     glm::mat4 view_matrix_{};
     glm::mat4 projection_matrix_{};

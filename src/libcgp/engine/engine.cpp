@@ -2,6 +2,7 @@
 
 #include <libcgp/mgr/settings_mgr.hpp>
 #include <libcgp/utils/macros.hpp>
+#include <libcgp/window/window.hpp>
 
 LibGcp::Engine::~Engine() { TRACE("Engine::~Engine()"); }
 
@@ -19,11 +20,6 @@ void LibGcp::Engine::Init() noexcept
     flowing_camera_.position = glm::vec3{};
     flowing_camera_.front    = glm::vec3(0.0f, 0.0f, -1.0f);
     flowing_camera_.up       = glm::vec3(0.0f, 1.0f, 0.0f);
-
-    /* init free camera */
-    free_camera_.position = glm::vec3{0.0f, 0.0f, 3.0f};
-    free_camera_.front    = glm::vec3(0.0f, 0.0f, -1.0f);
-    free_camera_.up       = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
 void LibGcp::Engine::ProcessProgress(const long delta)
@@ -80,6 +76,7 @@ void LibGcp::Engine::ProcessFreeCameraMovement_(const long delta)
     static constexpr double kFreeCamSpeed = 2.0;
 
     const double distance = kFreeCamSpeed * static_cast<double>(delta) / 1e+6;
+    // free_camera_.front = Window::GetInstance().GetMouse().GetFront();
     free_camera_.MoveFreeCamera(static_cast<float>(distance), keys_);
 }
 
@@ -94,12 +91,13 @@ void LibGcp::Engine::OnCameraTypeChanged_(const uint64_t new_value)
     /* TODO: Bind proper object here */
     switch (static_cast<CameraType>(new_value)) {
         case CameraType::kStatic: {
-            GetInstance().view_.BindCameraWithObjet(nullptr);
+            GetInstance().view_.BindCameraWithObjet(&GetInstance().static_camera_);
         } break;
         case CameraType::kFollow: {
             GetInstance().view_.BindCameraWithObjet(&GetInstance().flowing_camera_);
         } break;
         case CameraType::kFree: {
+            GetInstance().free_camera_ = GetInstance().view_.GetBindObject();
             GetInstance().view_.BindCameraWithObjet(&GetInstance().free_camera_);
         } break;
         case CameraType::kFirstPerson:
