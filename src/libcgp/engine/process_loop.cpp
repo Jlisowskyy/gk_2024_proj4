@@ -1,3 +1,4 @@
+#include <libcgp/engine/engine.hpp>
 #include <libcgp/engine/process_loop.hpp>
 #include <libcgp/mgr/object_mgr.hpp>
 #include <libcgp/window/window.hpp>
@@ -31,6 +32,7 @@ void LibGcp::ProcessLoopApp(const std::string& default_shader_name)
             std::chrono::duration_cast<std::chrono::microseconds>(new_frame - last_frame).count();
         last_frame = new_frame;
 
-        ObjectMgr::GetInstance().ProcessProgress(delta_time_ms);
+        TRACE("Time spent for last frame: " << delta_time_ms / 1000 << " ms");
+        Engine::GetInstance().ProcessProgress(delta_time_ms);
     });
 }

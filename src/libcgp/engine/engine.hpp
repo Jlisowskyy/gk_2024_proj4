@@ -8,8 +8,14 @@
 
 #include <libcgp/engine/view.hpp>
 
+#include <array>
 #include <cassert>
 #include <cstdint>
+
+// clang-format off
+#include <glad/gl.h>
+#include <GLFW/glfw3.h> /* (include after glad) */
+// clang-format on
 
 LIBGCP_DECL_START_
 class Engine final : public CxxUtils::Singleton<Engine>
@@ -44,17 +50,33 @@ class Engine final : public CxxUtils::Singleton<Engine>
 
     FAST_CALL View &GetView() noexcept { return view_; }
 
+    void ProcessProgress(long delta);
+
+    FAST_CALL void ButtonPressed(const int key) { ++keys_[key]; }
+
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------
 
     protected:
-    static void OnCameraTypeChanged(uint64_t new_value);
+    void ProcessInput_(long delta);
+    void ProcessUserMovement_(long delta);
+    void ProcessFreeCameraMovement_(long delta);
+    void ProcessDynamicObjects_(long delta);
+
+    static void OnCameraTypeChanged_(uint64_t new_value);
 
     // ------------------------------
     // Class fields
     // ------------------------------
 
+    const glm::vec3 *camera_position_{};
+    const glm::vec3 *camera_front_{};
+
+    glm::vec3 free_camera_position_{};
+    glm::vec3 free_camera_front_{};
+
+    std::array<int, GLFW_KEY_LAST> keys_{};
     View view_{};
 };
 

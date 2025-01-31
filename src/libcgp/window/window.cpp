@@ -1,3 +1,4 @@
+#include <libcgp/engine/engine.hpp>
 #include <libcgp/window/window.hpp>
 
 #include <libcgp/utils/macros.hpp>
@@ -28,7 +29,7 @@ void LibGcp::Window::Init()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
     GLFWwindow *window = glfwCreateWindow(kWidth, kHeight, "RenderEngine", nullptr, nullptr);
     R_ASSERT(window != nullptr);
@@ -61,7 +62,10 @@ void key_callback(
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
+        return;
     }
+
+    LibGcp::Engine::GetInstance().ButtonPressed(key);
 }
 
 void framebuffer_size_callback([[maybe_unused]] GLFWwindow *window, const int width, const int height)

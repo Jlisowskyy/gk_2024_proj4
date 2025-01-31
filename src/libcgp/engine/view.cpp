@@ -4,14 +4,31 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <libcgp/utils/macros.hpp>
 
 LibGcp::View::View()
-    : view_matrix_(glm::translate(glm::mat4(1.0F), glm::vec3(0.0F, 0.0F, -10.0F))),
-      projection_matrix_(glm::perspective(glm::radians(45.0F), Window::GetInstance().GetAspectRatio(), 0.1F, 100.0F))
+    : projection_matrix_(glm::perspective(glm::radians(45.0F), Window::GetInstance().GetAspectRatio(), 0.1F, 100.0F))
 {
+    /* ensure that camera is initialized */
+    camera_type_ = CameraType::kLast;
+    ChangeCameraType(CameraType::kStatic);
 }
 
-void LibGcp::View::ChangeCameraType(const CameraType type) {}
+void LibGcp::View::ChangeCameraType(const CameraType type)
+{
+    assert(type != CameraType::kLast);
+
+    if (camera_type_ == type) {
+        return;
+    }
+
+    camera_type_ = type;
+    if (camera_type_ == CameraType::kStatic) {
+        camera_position_ = glm::vec3(0.0F, 0.0F, 10.0F);
+        camera_front_    = glm::vec3(0.0F, 0.0F, -1.0F);
+        UpdateViewMatrix_();
+    }
+}
 
 void LibGcp::View::PrepareViewMatrices(Shader &shader)
 {
@@ -28,4 +45,32 @@ void LibGcp::View::PrepareModelMatrices(Shader &shader, const ObjectPosition &po
     model_matrix           = glm::rotate(model_matrix, position.rotation.z, glm::vec3(0.0F, 0.0F, 1.0F));
 
     shader.SetMat4("model", model_matrix);
+}
+
+void LibGcp::View::UpdateCameraPosition()
+{
+    switch (camera_type_) {
+        case CameraType::kStatic:
+            break;
+        case CameraType::kFollow:
+        [[fallthrough]]
+        case CameraType::kFree:
+        [[fallthrough]]
+        case CameraType::kFirstPerson:
+            camera_position_ = camera_object_position_;
+            camera_front_    = camera_object_front_;
+            break;
+        case CameraType::kThirdPerson:
+            NOT_IMPLEMENTED;
+            break;
+        default:
+            R_ASSERT(false && "Unknown camera type");
+    }
+
+    UpdateViewMatrix_();
+}
+
+void LibGcp::View::UpdateViewMatrix_()
+{
+    view_matrix_ = glm::lookAt(camera_position_, camera_front_, glm::vec3(0.0F, 1.0F, 0.0F));
 }

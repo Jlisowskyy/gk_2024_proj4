@@ -20,7 +20,7 @@ int LibGcp::RenderEngineMain(
     Window::InitInstance().Init();
     ResourceMgr::InitInstance().Init(resources);
     ObjectMgr::InitInstance().Init(static_objects, dynamic_objects);
-    Engine::InitInstance();
+    Engine::InitInstance().Init();
 
     /* render loop */
     ProcessLoopApp(default_shader_name);

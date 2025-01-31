@@ -54,7 +54,7 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
             static_assert(sizeof(T) <= sizeof(uint64_t), "Setting value is too large");
             static_assert(std::is_trivially_copyable<T>::value, "Setting type must be trivially copyable");
 
-            return *reinterpret_cast<T *>(&data_);
+            return *reinterpret_cast<const T *>(&data_);
         }
 
         NDSCRD FAST_CALL uint64_t GetRaw() const noexcept { return data_; }
