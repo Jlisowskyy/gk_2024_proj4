@@ -3,6 +3,7 @@
 
 #include <glad/gl.h>
 
+#include <array>
 #include <cstdlib>
 #include <string>
 #include <utility>
@@ -12,7 +13,11 @@ LibGcp::Texture::Texture(
 ) noexcept
     : type_(type)
 {
-    R_ASSERT(channels == 3 || channels == 4);
+    R_ASSERT(channels == 3 || channels == 4 || channels == 2);
+
+    static constexpr std::array kDescTable = {
+        0, GL_RED, GL_RG, GL_RGB, GL_RGBA,
+    };
 
     GLuint texture_id{};
 
@@ -24,9 +29,7 @@ LibGcp::Texture::Texture(
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(
-        GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, channels == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, texture_data
-    );
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, kDescTable[channels], GL_UNSIGNED_BYTE, texture_data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     texture_id_ = texture_id;

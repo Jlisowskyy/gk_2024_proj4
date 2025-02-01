@@ -145,7 +145,7 @@ void LibGcp::ModelSerializer::LoadMaterialTextures_(
         } else {
             const std::string full_path = full_path_ + "/" + str.C_Str();
 
-            texture = ResourceMgr::GetInstance().GetTextureExternalSource(
+            texture = ResourceMgr::GetInstance().GetTextureExternalSourceRaw(
                 full_path,
                 {
                     .texture_data = reinterpret_cast<unsigned char *>(ai_texture->pcData),

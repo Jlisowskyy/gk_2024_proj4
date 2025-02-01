@@ -116,7 +116,7 @@ std::shared_ptr<LibGcp::Model> LibGcp::ResourceMgr::GetModel(const std::string &
     return models_.at(model_name);
 }
 
-std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTextureExternalSource(
+std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTextureExternalSourceRaw(
     const std::string &path, const TextureSpec &spec
 )
 {
@@ -129,10 +129,18 @@ std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTextureExternalSource(
 
     TRACE(path + " texture not loaded");
 
-    auto texture =
-        std::make_shared<Texture>(spec.texture_data, spec.width, spec.height, spec.channels, Texture::Type::kLast);
-    textures_[path] = texture;
+    std::shared_ptr<Texture> texture;
+    if (spec.height == 0) {
+        TRACE("Received compressed texture");
 
+        texture = LoadTextureFromMemory_(spec.texture_data, spec.width);
+    } else {
+        TRACE("Received raw texture");
+        texture =
+            std::make_shared<Texture>(spec.texture_data, spec.width, spec.height, spec.channels, Texture::Type::kLast);
+    }
+
+    textures_[path] = texture;
     TRACE("Loaded texture: " + path);
 
     return texture;
@@ -200,6 +208,17 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadTextureFromExternal_(const std::string &text
     textures_[texture_name] = texture;
 
     return Rc::kSuccess;
+}
+
+std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::LoadTextureFromMemory_(const unsigned char *data, const int len)
+{
+    int width;
+    int height;
+    int channels;
+
+    unsigned char *imageData = stbi_load_from_memory(data, len, &width, &height, &channels, 0);
+
+    return std::make_shared<Texture>(imageData, width, height, channels, Texture::Type::kLast);
 }
 
 LibGcp::Rc LibGcp::ResourceMgr::LoadShaderFromMemory_(const std::string &vert, const std::string &frag)
