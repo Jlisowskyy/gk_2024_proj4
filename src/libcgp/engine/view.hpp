@@ -25,8 +25,13 @@ struct CameraInfo {
     glm::vec3 front;
     glm::vec3 up;
 
+    double yaw   = -90.0;
+    double pitch = 0.0;
+
     using buttons_t = std::array<int, GLFW_KEY_LAST>;
     void MoveFreeCamera(float distance, const buttons_t& buttons);
+    void ConvertYawPitchToVector();
+    void ConvertVectorToYawPitch();
 };
 
 class View

@@ -70,7 +70,7 @@ class Window : public CxxUtils::Singleton<Window>
         return size;
     }
 
-    NDSCRD FAST_CALL const Mouse &GetMouse() const noexcept { return mouse_; }
+    NDSCRD FAST_CALL Mouse &GetMouse() noexcept { return mouse_; }
 
     // ----------------------------------
     // Class implementation methods

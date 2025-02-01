@@ -2,6 +2,7 @@
 #define WINDOW_MOUSE_HPP_
 
 #include <libcgp/defines.hpp>
+#include <libcgp/engine/view.hpp>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -35,7 +36,7 @@ class Mouse
         last_y_ = y_pos;
     }
 
-    NDSCRD FAST_CALL const glm::vec3 &GetFront() const noexcept { return front_; }
+    FAST_CALL void BindCamera(CameraInfo* camera_info) noexcept { camera_info_ = camera_info; }
 
     // ---------------------------------
     // Class implementation methods
@@ -46,13 +47,10 @@ class Mouse
     // Class fields
     // ------------------------------
 
-    double yaw_   = -90.0;
-    double pitch_ = 0.0;
-
     double last_x_{};
     double last_y_{};
 
-    glm::vec3 front_{};
+    CameraInfo* camera_info_{};
 };
 
 LIBGCP_DECL_END_

@@ -24,6 +24,20 @@ void LibGcp::CameraInfo::MoveFreeCamera(const float distance, const buttons_t &b
     }
 }
 
+void LibGcp::CameraInfo::ConvertYawPitchToVector()
+{
+    front = glm::normalize(glm::vec3(
+        cos(glm::radians(yaw)) * cos(glm::radians(pitch)), sin(glm::radians(pitch)),
+        sin(glm::radians(yaw)) * cos(glm::radians(pitch))
+    ));
+}
+
+void LibGcp::CameraInfo::ConvertVectorToYawPitch()
+{
+    yaw   = glm::degrees(atan2(front.z, front.x));
+    pitch = glm::degrees(asin(front.y));
+}
+
 LibGcp::View::View()
     : projection_matrix_(glm::perspective(glm::radians(45.0F), Window::GetInstance().GetAspectRatio(), 0.1F, 100.0F))
 {

@@ -11,18 +11,21 @@ void LibGcp::Mouse::Move(const double x_pos, const double y_pos) noexcept
     const double x_offset = (x_pos - last_x_) * sensitivity;
     const double y_offset = (last_y_ - y_pos) * sensitivity;
 
-    /* update yaw and pith */
-    yaw_ += x_offset;
+    /* save last position */
     last_x_ = x_pos;
-    pitch_ += y_offset;
     last_y_ = y_pos;
 
+    if (camera_info_ == nullptr) {
+        return;
+    }
+
+    /* update yaw and pith */
+    camera_info_->yaw += x_offset;
+    camera_info_->pitch += y_offset;
+
     /* clamp pitch */
-    pitch_ = std::clamp(pitch_, -89.0, 89.0);
+    camera_info_->pitch = std::clamp(camera_info_->pitch, -89.0, 89.0);
 
     /* set front */
-    front_ = glm::normalize(glm::vec3(
-        cos(glm::radians(yaw_)) * cos(glm::radians(pitch_)), sin(glm::radians(pitch_)),
-        sin(glm::radians(yaw_)) * cos(glm::radians(pitch_))
-    ));
+    camera_info_->ConvertYawPitchToVector();
 }

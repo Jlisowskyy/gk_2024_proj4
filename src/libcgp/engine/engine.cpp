@@ -97,7 +97,16 @@ void LibGcp::Engine::OnCameraTypeChanged_(const uint64_t new_value)
             GetInstance().view_.BindCameraWithObjet(&GetInstance().flowing_camera_);
         } break;
         case CameraType::kFree: {
+            /* preserve old camera */
             GetInstance().free_camera_ = GetInstance().view_.GetBindObject();
+
+            /* ensure yaw pitch is set and ready */
+            GetInstance().free_camera_.ConvertVectorToYawPitch();
+
+            /* bind camera to mouse */
+            Window::GetInstance().GetMouse().BindCamera(&GetInstance().free_camera_);
+
+            /* bind camera to view */
             GetInstance().view_.BindCameraWithObjet(&GetInstance().free_camera_);
         } break;
         case CameraType::kFirstPerson:
