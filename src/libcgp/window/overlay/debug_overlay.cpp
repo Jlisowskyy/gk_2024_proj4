@@ -1,4 +1,5 @@
 #include <libcgp/mgr/object_mgr.hpp>
+#include <libcgp/mgr/resource_mgr.hpp>
 #include <libcgp/mgr/settings_mgr.hpp>
 #include <libcgp/window/overlay/debug_overlay.hpp>
 
@@ -68,6 +69,9 @@ void LibGcp::DebugOverlay::DestroyOverlay()
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
+    static_object_names_.clear();
+    static_object_ = nullptr;
+
     window_ = nullptr;
 }
 
@@ -78,10 +82,16 @@ void LibGcp::DebugOverlay::EnableOverlay(GLFWwindow *window)
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
+
+    auto objects = ObjectMgr::GetInstance().GetStaticObjects();
+
+    for (const auto &object : objects) {
+        static_object_names_.push_back("Object " + std::to_string(object.GetId()));
+    }
+    selected_static_object_idx_ = -1;
 
     window_ = window;
 }
@@ -118,15 +128,57 @@ void LibGcp::DebugOverlay::DrawSettings_()
 
 void LibGcp::DebugOverlay::DrawObjects_()
 {
-    ImGui::Begin("Debug overlay");
+    ShowStatics_();
+    ShowDynamics_();
+    ShowSelectedObjects_();
+}
 
-    const char *items[] = {"Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
+void LibGcp::DebugOverlay::ShowStatics_()
+{
+    ImGui::Begin("Static objects:");
+
+    if (ImGui::BeginListBox("##listbox")) {
+        for (int i = 0; i < static_cast<int>(static_object_names_.size()); i++) {
+            const bool is_selected = (selected_static_object_idx_ == i);
+            if (ImGui::Selectable(static_object_names_[i].c_str(), is_selected)) {
+                selected_static_object_idx_ = i;
+                static_object_              = &ObjectMgr::GetInstance().GetStaticObjects()[i];
+            }
+            if (is_selected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndListBox();
+    }
 
     ImGui::Separator();
-    ImGui::Text("Static objects:");
 
-    static int listbox_item = 0;
-    ImGui::ListBox("List", &listbox_item, items, IM_ARRAYSIZE(items));
+    if (selected_static_object_idx_ == -1) {
+        ImGui::Text("No object selected...");
+    } else {
+        ImGui::Text(
+            "Selected object data:\n"
+            "Position: (%.2f, %.2f, %.2f)\n"
+            "Rotation: (%.2f, %.2f, %.2f)\n",
+            static_object_->GetPosition().position.x, static_object_->GetPosition().position.y,
+            static_object_->GetPosition().position.z, static_object_->GetPosition().rotation.x,
+            static_object_->GetPosition().rotation.y, static_object_->GetPosition().rotation.z
+        );
+    }
 
     ImGui::End();
+}
+
+void LibGcp::DebugOverlay::ShowDynamics_() {}
+
+void LibGcp::DebugOverlay::ShowSelectedObjects_()
+{
+    if (selected_static_object_idx_ == -1) {
+        return;
+    }
+
+    auto shader = ResourceMgr::GetInstance().GetShader("contours//contours", ResourceMgr::LoadType::kMemory);
+    if (selected_static_object_idx_ != -1) {
+        static_object_->Draw(*shader);
+    }
 }

@@ -45,10 +45,17 @@ class DebugOverlay
     protected:
     void DrawSettings_();
     void DrawObjects_();
+    void ShowStatics_();
+    void ShowDynamics_();
+    void ShowSelectedObjects_();
 
     // ------------------------------
     // Class fields
     // ------------------------------
+
+    std::vector<std::string> static_object_names_{};
+    const StaticObject *static_object_{};
+    int selected_static_object_idx_{-1};
 
     GLFWwindow *window_{};
 };

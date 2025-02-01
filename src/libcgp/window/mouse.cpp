@@ -20,7 +20,6 @@ void LibGcp::Mouse::Move(const double x_pos, const double y_pos) noexcept
     last_y_ = y_pos;
 
     if (camera_info_ == nullptr) {
-        TRACE("camer not obund");
         return;
     }
 

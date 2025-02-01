@@ -50,8 +50,8 @@ function(AddShaders prefix files)
     endforeach()
 endfunction()
 
-AddShaders("frag" ${FRAG_SHADER_FILES})
-AddShaders("vert" ${VERT_SHADER_FILES})
+AddShaders("frag" "${FRAG_SHADER_FILES}")
+AddShaders("vert" "${VERT_SHADER_FILES}")
 
 function(AddMap map_name files prefix)
     file(APPEND ${SOURCE_OUTPUT}
@@ -70,8 +70,8 @@ function(AddMap map_name files prefix)
     )
 endfunction()
 
-AddMap(g_KnownFragmentShaders ${FRAG_SHADER_FILES} frag)
-AddMap(g_KnownVertexShaders ${VERT_SHADER_FILES} vert)
+AddMap(g_KnownFragmentShaders "${FRAG_SHADER_FILES}" frag)
+AddMap(g_KnownVertexShaders "${VERT_SHADER_FILES}" vert)
 
 file(APPEND ${SOURCE_OUTPUT}
         "}\n"

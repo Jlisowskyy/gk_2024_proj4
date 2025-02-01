@@ -10,12 +10,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <atomic>
 #include <memory>
 
 LIBGCP_DECL_START_
-
 class StaticObject
 {
+    static std::atomic<uint64_t> id_counter_;
+
     public:
     // ------------------------------
     // Object creation
@@ -26,7 +28,7 @@ class StaticObject
     ~StaticObject() = default;
 
     StaticObject(const ObjectPosition &position, const std::shared_ptr<Model> &model)
-        : position_(position), model_(model)
+        : id_(id_counter_.fetch_add(1)), position_(position), model_(model)
     {
         TRACE(
             "Created static object at: " << position.position.x << " " << position.position.y << " "
@@ -42,11 +44,14 @@ class StaticObject
 
     const ObjectPosition &GetPosition() const { return position_; }
 
+    FAST_CALL uint64_t GetId() const { return id_; }
+
     // ------------------------------
     // Class fields
     // ------------------------------
 
     protected:
+    const uint64_t id_;
     ObjectPosition position_;
     std::shared_ptr<Model> model_;
 };
