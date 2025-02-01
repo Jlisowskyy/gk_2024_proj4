@@ -48,6 +48,7 @@ target_link_libraries(${LIB_NAME} PUBLIC
         glm-header-only
         assimp::assimp
         CxxUtilsLib
+        imgui
 )
 
 # ------------------------------

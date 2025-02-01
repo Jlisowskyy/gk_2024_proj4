@@ -34,12 +34,13 @@ void LibGcp::Window::Init()
 
     /* create window */
     GLFWwindow *window = glfwCreateWindow(kWidth, kHeight, "RenderEngine", nullptr, nullptr);
+    window_            = window;
     R_ASSERT(window != nullptr);
 
     glfwMakeContextCurrent(window);
 
     /* setup window options */
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    SwitchMouseLock(true);
 
     /* setup callbacks */
     glfwSetKeyCallback(window, KeyCallback);
@@ -54,7 +55,6 @@ void LibGcp::Window::Init()
     glViewport(0, 0, kWidth, kHeight);
 
     glEnable(GL_DEPTH_TEST);
-    window_ = window;
 
     SyncMousePositionWithWindow_();
 }
@@ -84,7 +84,7 @@ void LibGcp::Window::KeyCallback(
         return;
     }
 
-    if (key != GLFW_DONT_CARE) {
+    if (key != GLFW_DONT_CARE && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         Engine::GetInstance().ButtonPressed(key);
     }
 }
@@ -99,7 +99,5 @@ void LibGcp::Window::FrameBufferSizeCallback([[maybe_unused]] GLFWwindow *window
 
 void LibGcp::Window::MouseCallback([[maybe_unused]] GLFWwindow *window, const double xpos, const double ypos)
 {
-    TRACE("Mouse moved to " << xpos << " " << ypos);
-
     GetInstance().mouse_.Move(xpos, ypos);
 }

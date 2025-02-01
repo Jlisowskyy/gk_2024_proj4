@@ -7,6 +7,10 @@ void LibGcp::Mouse::Move(const double x_pos, const double y_pos) noexcept
 {
     const double sensitivity = SettingsMgr::GetInstance().GetSetting<double>(SettingsMgr::Setting::kMouseSensitivity);
 
+    if (!is_enabled_) {
+        return;
+    }
+
     /* calculate offset */
     const double x_offset = (x_pos - last_x_) * sensitivity;
     const double y_offset = (last_y_ - y_pos) * sensitivity;

@@ -28,6 +28,8 @@ class Mouse
     // Class interaction
     // ------------------------------
 
+    FAST_CALL void SetEnabled(const bool is_enabled) noexcept { is_enabled_ = is_enabled; }
+
     void Move(double x_pos, double y_pos) noexcept;
 
     FAST_CALL void Reset(const double x_pos, const double y_pos) noexcept
@@ -46,6 +48,8 @@ class Mouse
     // ------------------------------
     // Class fields
     // ------------------------------
+
+    bool is_enabled_{};
 
     double last_x_{};
     double last_y_{};

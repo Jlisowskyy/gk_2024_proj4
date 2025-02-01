@@ -94,6 +94,10 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
     template <typename T>
     FAST_CALL SettingsMgr &SetSetting(const Setting setting, const T value) noexcept
     {
+        if (settings_[static_cast<size_t>(setting)].GetSetting<T>(setting) == value) {
+            return *this;
+        }
+
         const uint64_t new_value = settings_[static_cast<size_t>(setting)].SetSetting(value);
         for (const auto &listener : listeners_[static_cast<size_t>(setting)]) {
             listener(new_value);
