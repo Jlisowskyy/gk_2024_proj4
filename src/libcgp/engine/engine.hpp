@@ -74,6 +74,8 @@ class Engine final : public CxxUtils::Singleton<Engine>
 
     // TODO: temp object
     CameraInfo flowing_camera_{};
+    double flow_count_{};
+
     CameraInfo free_camera_{};
     const CameraInfo static_camera_{
         .position = glm::vec3{0.0f, 0.0f, 3.0f},

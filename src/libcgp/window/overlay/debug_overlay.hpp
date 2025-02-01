@@ -43,6 +43,9 @@ class DebugOverlay
     // ------------------------------
 
     protected:
+    void DrawSettings_();
+    void DrawObjects_();
+
     // ------------------------------
     // Class fields
     // ------------------------------

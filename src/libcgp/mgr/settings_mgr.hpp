@@ -27,7 +27,14 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
     enum class Setting : std::uint16_t {
         kCameraType,
         kMouseSensitivity,
+        kClockTicking,
         kLast,
+    };
+
+    static constexpr std::array kDescriptions{
+        "Camera type",
+        "Mouse sensitivity",
+        "Is clock enabled",
     };
 
     struct SettingContainer {

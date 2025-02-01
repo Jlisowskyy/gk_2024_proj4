@@ -26,9 +26,19 @@ void LibGcp::Engine::ProcessProgress(const long delta)
 {
     ProcessInput_(delta);
 
-    ProcessDynamicObjects_(delta);
+    if (SettingsMgr::GetInstance().GetSetting<long>(SettingsMgr::Setting::kClockTicking)) {
+        ProcessDynamicObjects_(delta);
+    }
+
+    if (SettingsMgr::GetInstance().GetSetting<CameraType>(SettingsMgr::Setting::kCameraType) == CameraType::kFree) {
+        TRACE("LOL");
+        ProcessFreeCameraMovement_(delta);
+    }
 
     view_.UpdateCameraPosition();
+
+    /* Reset keys input for next frame */
+    keys_.fill(0);
 }
 
 void LibGcp::Engine::ProcessInput_(const long delta)
@@ -52,29 +62,11 @@ void LibGcp::Engine::ProcessInput_(const long delta)
     }
 
     /* process movement */
-    ProcessUserMovement_(delta);
-
-    keys_.fill(0);
+    const long is_clock_enabled = SettingsMgr::GetInstance().GetSetting<long>(SettingsMgr::Setting::kClockTicking);
+    ProcessUserMovement_(is_clock_enabled * delta);
 }
 
-void LibGcp::Engine::ProcessUserMovement_(const long delta)
-{
-    /* TODO: temporary, bind object movement to camera movement later */
-    if (view_.GetCameraType() == CameraType::kFollow) {
-        const float radius = 30.0f;
-        const float camX   = sin(glfwGetTime()) * radius;
-        const float camZ   = cos(glfwGetTime()) * radius;
-
-        flowing_camera_.position = glm::vec3(camX, 0.0f, camZ);
-        flowing_camera_.front    = -flowing_camera_.position;
-        return;
-    }
-
-    if (view_.GetCameraType() == CameraType::kFree) {
-        ProcessFreeCameraMovement_(delta);
-        return;
-    }
-}
+void LibGcp::Engine::ProcessUserMovement_(const long delta) {}
 
 void LibGcp::Engine::ProcessFreeCameraMovement_(const long delta)
 {
@@ -85,20 +77,30 @@ void LibGcp::Engine::ProcessFreeCameraMovement_(const long delta)
     free_camera_.MoveFreeCamera(static_cast<float>(distance), keys_);
 }
 
-void LibGcp::Engine::ProcessDynamicObjects_(const long delta) {}
+void LibGcp::Engine::ProcessDynamicObjects_(const long delta)
+{
+    /* TODO: temporary, bind object movement to camera movement later */
+    const double radius = 30.0f;
+    flow_count_ += static_cast<double>(delta) / 1e+6;
+    const float camX = sin(flow_count_) * radius;
+    const float camZ = cos(flow_count_) * radius;
+
+    flowing_camera_.position = glm::vec3(camX, 0.0f, camZ);
+    flowing_camera_.front    = -flowing_camera_.position;
+}
 
 void LibGcp::Engine::OnCameraTypeChanged_(const uint64_t new_value)
 {
     TRACE("Camera type changed to " << new_value);
 
-    GetInstance().view_.ChangeCameraType(static_cast<CameraType>(new_value));
-
     /* TODO: Bind proper object here */
     switch (static_cast<CameraType>(new_value)) {
         case CameraType::kStatic: {
+            Window::GetInstance().GetMouse().BindCamera(nullptr);
             GetInstance().view_.BindCameraWithObjet(&GetInstance().static_camera_);
         } break;
         case CameraType::kFollow: {
+            Window::GetInstance().GetMouse().BindCamera(nullptr);
             GetInstance().view_.BindCameraWithObjet(&GetInstance().flowing_camera_);
         } break;
         case CameraType::kFree: {

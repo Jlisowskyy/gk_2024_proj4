@@ -61,6 +61,8 @@ class ObjectMgr : public CxxUtils::Singleton<ObjectMgr>
 
     void ProcessProgress(long delta_time_micros);
 
+    NDSCRD FAST_CALL const std::vector<StaticObject>& GetStaticObjects() const { return static_objects_; }
+
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------

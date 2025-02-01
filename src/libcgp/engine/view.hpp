@@ -39,8 +39,6 @@ class View
     // Class interaction
     // ------------------------------
 
-    void ChangeCameraType(CameraType type);
-
     void PrepareViewMatrices(Shader& shader);
 
     void PrepareModelMatrices(Shader& shader, const ObjectPosition& position);
@@ -48,8 +46,6 @@ class View
     FAST_CALL void BindCameraWithObjet(const CameraInfo* camera_info) { camera_object_info_ = camera_info; }
 
     FAST_CALL const CameraInfo& GetBindObject() const noexcept { return *camera_object_info_; }
-
-    NDSCRD FAST_CALL CameraType GetCameraType() const noexcept { return camera_type_; }
 
     void UpdateCameraPosition();
 
@@ -66,8 +62,6 @@ class View
 
     glm::mat4 view_matrix_{};
     glm::mat4 projection_matrix_{};
-
-    CameraType camera_type_{};
 };
 
 LIBGCP_DECL_END_

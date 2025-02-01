@@ -41,15 +41,6 @@ void LibGcp::CameraInfo::ConvertVectorToYawPitch()
 LibGcp::View::View()
     : projection_matrix_(glm::perspective(glm::radians(45.0F), Window::GetInstance().GetAspectRatio(), 0.1F, 10000.0F))
 {
-    /* ensure that camera is initialized */
-    camera_type_ = CameraType::kLast;
-    ChangeCameraType(CameraType::kStatic);
-}
-
-void LibGcp::View::ChangeCameraType(const CameraType type)
-{
-    assert(type != CameraType::kLast);
-    camera_type_ = type;
 }
 
 void LibGcp::View::PrepareViewMatrices(Shader &shader)
