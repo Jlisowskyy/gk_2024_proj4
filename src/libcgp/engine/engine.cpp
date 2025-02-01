@@ -31,7 +31,6 @@ void LibGcp::Engine::ProcessProgress(const long delta)
     }
 
     if (SettingsMgr::GetInstance().GetSetting<CameraType>(SettingsMgr::Setting::kCameraType) == CameraType::kFree) {
-        TRACE("LOL");
         ProcessFreeCameraMovement_(delta);
     }
 

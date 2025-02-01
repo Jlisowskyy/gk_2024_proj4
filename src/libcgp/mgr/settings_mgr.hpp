@@ -5,6 +5,7 @@
 #include <libcgp/settings.hpp>
 
 #include <CxxUtils/singleton.hpp>
+#include <CxxUtils/type_list.hpp>
 
 #include <array>
 #include <cassert>
@@ -30,6 +31,9 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
         kClockTicking,
         kLast,
     };
+
+    template <size_t N>
+    using SettingTypes = CxxUtils::TypeList<N, CameraType, double, bool>;
 
     static constexpr std::array kDescriptions{
         "Camera type",

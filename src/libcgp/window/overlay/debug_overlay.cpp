@@ -2,6 +2,8 @@
 #include <libcgp/mgr/settings_mgr.hpp>
 #include <libcgp/window/overlay/debug_overlay.hpp>
 
+#include <CxxUtils/type_list.hpp>
+
 // clang-format off
 #include <glad/gl.h>
 #include <GLFW/glfw3.h> /* (include after glad) */
@@ -12,32 +14,40 @@
 #include <imgui_impl_opengl3.h>
 
 #include <cassert>
+#include <type_traits>
 
 // ------------------------------------
 // Static helpers implementations
 // ------------------------------------
 
-template <typename T>
-static void DisplayFloatSetting(const LibGcp::SettingsMgr::Setting setting)
+template <size_t N, class T>
+static void DisplaySetting()
 {
-    double sensitivity = static_cast<double>(LibGcp::SettingsMgr::GetInstance().GetSetting<T>(setting));
-    const char *desc   = LibGcp::SettingsMgr::kDescriptions[static_cast<size_t>(setting)];
+    const char *desc = LibGcp::SettingsMgr::kDescriptions[N];
+    int value =
+        static_cast<int>(LibGcp::SettingsMgr::GetInstance().GetSetting<T>(static_cast<LibGcp::SettingsMgr::Setting>(N))
+        );
 
-    if (ImGui::InputDouble(desc, &sensitivity, 0.1, 1.0, "%.5f")) {
-        LibGcp::SettingsMgr::GetInstance().SetSetting<T>(
-            LibGcp::SettingsMgr::Setting::kMouseSensitivity, static_cast<T>(sensitivity)
+    if (ImGui::InputInt(desc, &value)) {
+        LibGcp::SettingsMgr::GetInstance().SetSetting(
+            static_cast<LibGcp::SettingsMgr::Setting>(N), static_cast<T>(value)
         );
     }
 }
 
-template <typename T>
-static void DisplayIntSetting(const LibGcp::SettingsMgr::Setting setting)
+template <size_t N, class T>
+    requires std::is_floating_point_v<T>
+static void DisplaySetting()
 {
-    int value        = static_cast<int>(LibGcp::SettingsMgr::GetInstance().GetSetting<T>(setting));
-    const char *desc = LibGcp::SettingsMgr::kDescriptions[static_cast<size_t>(setting)];
+    double value = static_cast<double>(
+        LibGcp::SettingsMgr::GetInstance().GetSetting<T>(static_cast<LibGcp::SettingsMgr::Setting>(N))
+    );
+    const char *desc = LibGcp::SettingsMgr::kDescriptions[N];
 
-    if (ImGui::InputInt(desc, &value)) {
-        LibGcp::SettingsMgr::GetInstance().SetSetting<T>(setting, static_cast<T>(value));
+    if (ImGui::InputDouble(desc, &value, 0.1, 1.0, "%.5f")) {
+        LibGcp::SettingsMgr::GetInstance().SetSetting(
+            static_cast<LibGcp::SettingsMgr::Setting>(N), static_cast<T>(value)
+        );
     }
 }
 
@@ -97,9 +107,11 @@ void LibGcp::DebugOverlay::DrawSettings_()
 {
     ImGui::Begin("Settings Editor");
 
-    DisplayIntSetting<CameraType>(SettingsMgr::Setting::kCameraType);
-    DisplayFloatSetting<double>(SettingsMgr::Setting::kMouseSensitivity);
-    DisplayIntSetting<bool>(SettingsMgr::Setting::kClockTicking);
+    CxxUtils::IterateTypeList<static_cast<size_t>(SettingsMgr::Setting::kLast) - 1, SettingsMgr::SettingTypes>::Apply(
+        []<size_t N, class T>() {
+            DisplaySetting<N, T>();
+        }
+    );
 
     ImGui::End();
 }
