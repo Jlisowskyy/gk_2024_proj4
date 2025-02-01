@@ -111,6 +111,8 @@ void LibGcp::DebugOverlay::Draw()
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    ShowSelectedObjects_();
 }
 
 void LibGcp::DebugOverlay::DrawSettings_()
@@ -130,7 +132,6 @@ void LibGcp::DebugOverlay::DrawObjects_()
 {
     ShowStatics_();
     ShowDynamics_();
-    ShowSelectedObjects_();
 }
 
 void LibGcp::DebugOverlay::ShowStatics_()
@@ -175,10 +176,5 @@ void LibGcp::DebugOverlay::ShowSelectedObjects_()
 {
     if (selected_static_object_idx_ == -1) {
         return;
-    }
-
-    auto shader = ResourceMgr::GetInstance().GetShader("contours//contours", ResourceMgr::LoadType::kMemory);
-    if (selected_static_object_idx_ != -1) {
-        static_object_->Draw(*shader);
     }
 }
