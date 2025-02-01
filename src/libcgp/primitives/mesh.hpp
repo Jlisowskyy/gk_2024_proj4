@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <libcgp/defines.hpp>
+#include <libcgp/intf.hpp>
 
 #include <glad/gl.h>
 #include <glm/glm.hpp>
@@ -24,12 +25,6 @@ class Mesh
     // ------------------------------
     // Inner types
     // ------------------------------
-
-    struct alignas(32) Vertex {
-        glm::vec3 position;
-        glm::vec3 normal;
-        glm::vec2 tex_coords;
-    };
 
     // ------------------------------
     // Object creation

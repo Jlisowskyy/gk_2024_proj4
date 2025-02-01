@@ -76,7 +76,6 @@ void LibGcp::Engine::ProcessFreeCameraMovement_(const long delta)
     static constexpr double kFreeCamSpeed = 2.0;
 
     const double distance = kFreeCamSpeed * static_cast<double>(delta) / 1e+6;
-    // free_camera_.front = Window::GetInstance().GetMouse().GetFront();
     free_camera_.MoveFreeCamera(static_cast<float>(distance), keys_);
 }
 

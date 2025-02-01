@@ -90,6 +90,8 @@ class ResourceMgr final : public CxxUtils::Singleton<ResourceMgr>
     std::shared_ptr<Shader> GetShader(const std::string &shader_name, LoadType load_type);
     std::shared_ptr<Model> GetModel(const std::string &model_name, LoadType load_type);
 
+    std::shared_ptr<Texture> GetTextureExternalSource(const std::string &path, const TextureSpec &spec);
+
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------

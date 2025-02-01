@@ -2,6 +2,7 @@
 #define PRIMITIVES_STATIC_OBJECT_HPP_
 
 #include <libcgp/defines.hpp>
+#include <libcgp/intf.hpp>
 #include <libcgp/mgr/resource_mgr.hpp>
 #include <libcgp/primitives/model.hpp>
 
@@ -12,16 +13,6 @@
 #include <memory>
 
 LIBGCP_DECL_START_
-struct ObjectPosition {
-    glm::vec3 position;
-    glm::vec3 rotation;
-    glm::vec3 scale;
-};
-
-struct StaticObjectSpec {
-    ObjectPosition position;
-    std::string name;
-};
 
 class StaticObject
 {

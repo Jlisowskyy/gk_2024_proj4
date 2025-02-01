@@ -15,7 +15,7 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 
-LibGcp::Model::Model(std::vector<std::shared_ptr<Mesh>> &&meshes) : meshes_(std::move(meshes)) {}
+LibGcp::Model::Model(std::vector<std::shared_ptr<Mesh> > &&meshes) : meshes_(std::move(meshes)) {}
 
 void LibGcp::Model::Draw(Shader &shader) const
 {
@@ -42,6 +42,7 @@ std::shared_ptr<LibGcp::Model> LibGcp::ModelSerializer::LoadModelFromExternalFor
         return nullptr;
     }
 
+    full_path_ = path;
     directory_ = path.substr(0, path.find_last_of('/'));
 
     ProcessNode_(scene->mRootNode, scene);
@@ -78,9 +79,9 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
     assert(mesh != nullptr);
     assert(scene != nullptr);
 
-    std::vector<Mesh::Vertex> vertices{};
+    std::vector<Vertex> vertices{};
     std::vector<GLuint> indices{};
-    std::vector<std::shared_ptr<Texture>> textures{};
+    std::vector<std::shared_ptr<Texture> > textures{};
 
     // process vertices
     vertices.reserve(mesh->mNumVertices);
@@ -115,15 +116,15 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
 
     // process textures
     textures.reserve(num_textures);
-    LoadMaterialTextures_(textures, material, aiTextureType_DIFFUSE, Texture::Type::kDiffuse);
-    LoadMaterialTextures_(textures, material, aiTextureType_SPECULAR, Texture::Type::kSpecular);
+    LoadMaterialTextures_(textures, scene, material, aiTextureType_DIFFUSE, Texture::Type::kDiffuse);
+    LoadMaterialTextures_(textures, scene, material, aiTextureType_SPECULAR, Texture::Type::kSpecular);
 
     return std::make_shared<Mesh>(std::move(vertices), std::move(indices), std::move(textures));
 }
 
 void LibGcp::ModelSerializer::LoadMaterialTextures_(
-    std::vector<std::shared_ptr<Texture>> &textures, const aiMaterial *material, const aiTextureType type,
-    const Texture::Type texture_type
+    std::vector<std::shared_ptr<Texture> > &textures, const aiScene *scene, const aiMaterial *material,
+    const aiTextureType type, const Texture::Type texture_type
 )
 {
     const std::filesystem::path dir_path = std::filesystem::absolute(directory_);
@@ -132,12 +133,30 @@ void LibGcp::ModelSerializer::LoadMaterialTextures_(
         aiString str;
         material->GetTexture(type, idx, &str);
 
-        const std::filesystem::path texture_full_path = weakly_canonical(dir_path / str.C_Str());
+        /* check texture type */
+        const aiTexture *ai_texture = scene->GetEmbeddedTexture(str.C_Str());
 
-        auto texture =
-            ResourceMgr::GetInstance().GetTexture(texture_full_path.string(), ResourceMgr::LoadType::kExternal);
+        std::shared_ptr<Texture> texture;
+        if (ai_texture == nullptr) {
+            const std::filesystem::path texture_full_path = weakly_canonical(dir_path / str.C_Str());
+
+            texture =
+                ResourceMgr::GetInstance().GetTexture(texture_full_path.string(), ResourceMgr::LoadType::kExternal);
+        } else {
+            const std::string full_path = full_path_ + "/" + str.C_Str();
+
+            texture = ResourceMgr::GetInstance().GetTextureExternalSource(
+                full_path,
+                {
+                    .texture_data = reinterpret_cast<unsigned char *>(ai_texture->pcData),
+                    .width        = static_cast<int>(ai_texture->mWidth),
+                    .height       = static_cast<int>(ai_texture->mHeight),
+                    .channels     = 4,
+                }
+            );
+        }
+
         texture->SetType(texture_type);
-
         textures.push_back(texture);
     }
 }

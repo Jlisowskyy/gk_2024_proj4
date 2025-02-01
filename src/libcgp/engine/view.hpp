@@ -8,6 +8,7 @@
 
 #include <libcgp/defines.hpp>
 
+#include <libcgp/intf.hpp>
 #include <libcgp/mgr/object_mgr.hpp>
 #include <libcgp/primitives/shader.hpp>
 #include <libcgp/settings.hpp>
@@ -19,20 +20,6 @@
 #include <array>
 
 LIBGCP_DECL_START_
-
-struct CameraInfo {
-    glm::vec3 position;
-    glm::vec3 front;
-    glm::vec3 up;
-
-    double yaw   = -90.0;
-    double pitch = 0.0;
-
-    using buttons_t = std::array<int, GLFW_KEY_LAST>;
-    void MoveFreeCamera(float distance, const buttons_t& buttons);
-    void ConvertYawPitchToVector();
-    void ConvertVectorToYawPitch();
-};
 
 class View
 {

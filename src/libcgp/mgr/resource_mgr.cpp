@@ -116,6 +116,28 @@ std::shared_ptr<LibGcp::Model> LibGcp::ResourceMgr::GetModel(const std::string &
     return models_.at(model_name);
 }
 
+std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTextureExternalSource(
+    const std::string &path, const TextureSpec &spec
+)
+{
+    const std::lock_guard lock(texture_mutex_);
+
+    if (textures_.contains(path)) {
+        TRACE(path + " texture already loaded");
+        return textures_.at(path);
+    }
+
+    TRACE(path + " texture not loaded");
+
+    auto texture =
+        std::make_shared<Texture>(spec.texture_data, spec.width, spec.height, spec.channels, Texture::Type::kLast);
+    textures_[path] = texture;
+
+    TRACE("Loaded texture: " + path);
+
+    return texture;
+}
+
 LibGcp::Rc LibGcp::ResourceMgr::LoadTextureUnlocked_(const ResourceSpec &resource)
 {
     switch (resource.load_type) {

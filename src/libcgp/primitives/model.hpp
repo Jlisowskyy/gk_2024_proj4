@@ -96,8 +96,8 @@ class ModelSerializer
     void ProcessNode_(const aiNode *node, const aiScene *scene);
     std::shared_ptr<Mesh> ProcessMesh_(const aiMesh *mesh, const aiScene *scene);
     void LoadMaterialTextures_(
-        std::vector<std::shared_ptr<Texture>> &textures, const aiMaterial *material, aiTextureType type,
-        Texture::Type texture_type
+        std::vector<std::shared_ptr<Texture>> &textures, const aiScene *scene, const aiMaterial *material,
+        aiTextureType type, Texture::Type texture_type
     );
 
     // ------------------------------
@@ -106,6 +106,7 @@ class ModelSerializer
 
     std::vector<std::shared_ptr<Mesh>> meshes_{};
     std::string directory_{};
+    std::string full_path_{};
 };
 
 LIBGCP_DECL_END_
