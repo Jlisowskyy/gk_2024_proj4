@@ -73,9 +73,11 @@ void LibGcp::Engine::ProcessUserMovement_(const long delta)
 
 void LibGcp::Engine::ProcessFreeCameraMovement_(const long delta)
 {
-    static constexpr double kFreeCamSpeed = 1000.0;
+    static constexpr double kFreeCamSpeed = 10.0;
 
     const double distance = kFreeCamSpeed * static_cast<double>(delta) / 1e+6;
+    TRACE("Travelling: " << distance);
+
     free_camera_.MoveFreeCamera(static_cast<float>(distance), keys_);
 }
 

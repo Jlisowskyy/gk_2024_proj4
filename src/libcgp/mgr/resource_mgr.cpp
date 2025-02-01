@@ -217,8 +217,10 @@ std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::LoadTextureFromMemory_(con
     int channels;
 
     unsigned char *imageData = stbi_load_from_memory(data, len, &width, &height, &channels, 0);
+    auto texture             = std::make_shared<Texture>(imageData, width, height, channels, Texture::Type::kLast);
+    stbi_image_free(imageData);
 
-    return std::make_shared<Texture>(imageData, width, height, channels, Texture::Type::kLast);
+    return texture;
 }
 
 LibGcp::Rc LibGcp::ResourceMgr::LoadShaderFromMemory_(const std::string &vert, const std::string &frag)

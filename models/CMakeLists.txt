@@ -3,7 +3,6 @@ message(STATUS "Downloading models...")
 set(MODEL_OOT "${CMAKE_BINARY_DIR}/models")
 file(MAKE_DIRECTORY ${MODEL_OOT})
 
-# Define model entries as triplets: URL, zip filename, extraction directory
 set(model_entries
         "https://learnopengl.com/data/models/backpack.zip"
         "backpack.zip"
@@ -12,11 +11,14 @@ set(model_entries
         "https://www.dropbox.com/scl/fi/orupih2mtai52o0ou7bjd/cs_office_csgo_real_light_version.glb?rlkey=nkes07bobyaa7imdc0mi9r4y3&st=sqnh254k&dl=0"
         "csgo.glb"
         "csgo"
+
+        "https://www.dropbox.com/scl/fi/7m1rctjjvtsirbr85yslp/full-gameready-city-buildings.zip?rlkey=yiexa553tt043bovyum2e9lay&st=ej66p7gp&dl=0"
+        "town_map.zip"
+        "town_map"
 )
 
 set(archive_extensions zip tar "tar.gz" tgz "tar.bz2" tbz2)
 
-# Process entries in groups of 3
 list(LENGTH model_entries entry_count)
 math(EXPR entry_iterations "${entry_count} / 3 - 1")
 
