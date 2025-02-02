@@ -21,6 +21,8 @@ class DebugOverlay
     // Class interaction
     // ------------------------------
 
+    void Init();
+
     void DestroyOverlay();
 
     void EnableOverlay(GLFWwindow *window);
@@ -49,13 +51,20 @@ class DebugOverlay
     void ShowDynamics_();
     void ShowSelectedObjects_();
 
+    void SetSelectedObject_(int idx);
+
     // ------------------------------
     // Class fields
     // ------------------------------
 
     std::vector<std::string> static_object_names_{};
+    std::vector<std::string> static_object_mesh_names_{};
     const StaticObject *static_object_{};
+    std::shared_ptr<Model> static_object_model_{};
+    std::shared_ptr<Mesh> static_object_mesh_{};
+
     int selected_static_object_idx_{-1};
+    int selected_mesh_idx_{-1};
 
     GLFWwindow *window_{};
 };

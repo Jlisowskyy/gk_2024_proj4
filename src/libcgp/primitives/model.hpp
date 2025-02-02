@@ -53,6 +53,10 @@ class Model
 
     void Draw(Shader &shader) const;
 
+    NDSCRD FAST_CALL size_t GetMeshesCount() const { return meshes_.size(); }
+
+    NDSCRD FAST_CALL std::shared_ptr<Mesh> GetMesh(const size_t idx) const { return meshes_[idx]; }
+
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------

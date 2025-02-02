@@ -46,6 +46,8 @@ class StaticObject
 
     FAST_CALL uint64_t GetId() const { return id_; }
 
+    NDSCRD FAST_CALL std::shared_ptr<Model> GetModel() const { return model_; }
+
     // ------------------------------
     // Class fields
     // ------------------------------
