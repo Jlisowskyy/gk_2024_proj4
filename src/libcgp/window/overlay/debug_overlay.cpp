@@ -1,3 +1,4 @@
+#include <libcgp/engine/engine.hpp>
 #include <libcgp/mgr/object_mgr.hpp>
 #include <libcgp/mgr/resource_mgr.hpp>
 #include <libcgp/mgr/settings_mgr.hpp>
@@ -71,6 +72,7 @@ void LibGcp::DebugOverlay::Init()
         static_object_names_.push_back("Object " + std::to_string(object.GetId()));
     }
     selected_static_object_idx_ = -1;
+    shader_ = ResourceMgr::GetInstance().GetShader("contours//contours", ResourceMgr::LoadType::kMemory);
 }
 
 void LibGcp::DebugOverlay::DestroyOverlay()
@@ -98,6 +100,8 @@ void LibGcp::DebugOverlay::EnableOverlay(GLFWwindow *window)
 
 void LibGcp::DebugOverlay::Draw()
 {
+    ShowSelectedObjects_();
+
     if (window_ == nullptr) {
         return;
     }
@@ -111,8 +115,6 @@ void LibGcp::DebugOverlay::Draw()
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    ShowSelectedObjects_();
 }
 
 void LibGcp::DebugOverlay::DrawSettings_()
@@ -169,8 +171,7 @@ void LibGcp::DebugOverlay::ShowStatics_()
             for (int i = 0; i < static_cast<int>(static_object_model_->GetMeshesCount()); i++) {
                 const bool is_selected = (selected_mesh_idx_ == i);
                 if (ImGui::Selectable(static_object_mesh_names_[i].c_str(), is_selected)) {
-                    selected_mesh_idx_  = i;
-                    static_object_mesh_ = static_object_model_->GetMesh(i);
+                    SetSelectedMesh_(i);
                 }
                 if (is_selected) {
                     ImGui::SetItemDefaultFocus();
@@ -187,26 +188,56 @@ void LibGcp::DebugOverlay::ShowDynamics_() {}
 
 void LibGcp::DebugOverlay::ShowSelectedObjects_()
 {
-    if (selected_static_object_idx_ == -1) {
+    if (static_object_mesh_ == nullptr) {
         return;
     }
+
+    shader_->Activate();
+    Engine::GetInstance().GetView().PrepareViewMatrices(*shader_);
+    Engine::GetInstance().GetView().PrepareModelMatrices(*shader_, static_object_->GetPosition());
+
+    glDisable(GL_DEPTH_TEST);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    static_object_mesh_->Draw(*shader_);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void LibGcp::DebugOverlay::SetSelectedObject_(const int idx)
 {
+    static_object_mesh_names_.clear();
+    static_object_mesh_ = nullptr;
+    selected_mesh_idx_  = -1;
+
     if (idx == selected_static_object_idx_) {
+        /* remove selection */
+
+        selected_static_object_idx_ = -1;
+        static_object_              = nullptr;
+        static_object_model_        = nullptr;
         return;
     }
 
     selected_static_object_idx_ = idx;
     static_object_              = &ObjectMgr::GetInstance().GetStaticObjects()[idx];
-    static_object_mesh_names_.clear();
-    static_object_model_ = static_object_->GetModel();
-    static_object_mesh_  = nullptr;
-    selected_mesh_idx_   = -1;
+    static_object_model_        = static_object_->GetModel();
 
     static_object_mesh_names_.reserve(static_object_model_->GetMeshesCount());
     for (size_t i = 0; i < static_object_model_->GetMeshesCount(); ++i) {
         static_object_mesh_names_.push_back("Mesh " + std::to_string(i));
     }
+}
+
+void LibGcp::DebugOverlay::SetSelectedMesh_(const int idx)
+{
+    if (idx == selected_mesh_idx_) {
+        /* remove selection */
+        selected_mesh_idx_  = -1;
+        static_object_mesh_ = nullptr;
+
+        return;
+    }
+
+    selected_mesh_idx_  = idx;
+    static_object_mesh_ = static_object_model_->GetMesh(idx);
 }

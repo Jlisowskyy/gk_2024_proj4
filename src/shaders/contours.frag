@@ -12,5 +12,6 @@ uniform sampler2D texture_specular02;
 
 void main()
 {
-    FragColor = texture(texture_diffuse01, TexCoord);
+    // pink color
+    FragColor = vec4(1.0, 0.0, 1.0, 1.0);
 }

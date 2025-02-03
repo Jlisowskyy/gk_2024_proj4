@@ -52,6 +52,7 @@ class DebugOverlay
     void ShowSelectedObjects_();
 
     void SetSelectedObject_(int idx);
+    void SetSelectedMesh_(int idx);
 
     // ------------------------------
     // Class fields
@@ -67,6 +68,7 @@ class DebugOverlay
     int selected_mesh_idx_{-1};
 
     GLFWwindow *window_{};
+    std::shared_ptr<Shader> shader_{};
 };
 
 LIBGCP_DECL_END_

@@ -14,7 +14,6 @@
 void LibGcp::ProcessLoopApp(const std::string& default_shader_name)
 {
     auto shader = ResourceMgr::GetInstance().GetShader(default_shader_name, ResourceMgr::LoadType::kMemory);
-    shader->Activate();
 
     Window::GetInstance().InitDebug();
     auto last_frame = std::chrono::steady_clock::now();
@@ -25,6 +24,7 @@ void LibGcp::ProcessLoopApp(const std::string& default_shader_name)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //  Render objects
+        shader->Activate();
         ObjectMgr::GetInstance().DrawStaticObjects(*shader);
 
         // Process progress
