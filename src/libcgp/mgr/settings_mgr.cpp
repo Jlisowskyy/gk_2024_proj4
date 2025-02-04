@@ -6,9 +6,10 @@ LibGcp::SettingsMgr::SettingsMgr(const std::vector<std::tuple<Setting, SettingCo
     TRACE("SettingsMgr::SettingsMgr()");
 
     /* load default settings */
-    SetSetting(Setting::kCameraType, CameraType::kStatic);
-    SetSetting<double>(Setting::kMouseSensitivity, 0.1);
-    SetSetting(Setting::kClockTicking, true);
+    SetSetting<Setting::kCameraType>(CameraType::kStatic);
+    SetSetting<Setting::kMouseSensitivity, double>(0.1);
+    SetSetting<Setting::kClockTicking>(true);
+    SetSetting<Setting::kFreeCameraSpeed, double>(10.0);
 
     /* load adjusted settings */
     for (const auto &[setting, container] : settings) {

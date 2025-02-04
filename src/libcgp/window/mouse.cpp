@@ -5,7 +5,7 @@
 
 void LibGcp::Mouse::Move(const double x_pos, const double y_pos) noexcept
 {
-    const double sensitivity = SettingsMgr::GetInstance().GetSetting<double>(SettingsMgr::Setting::kMouseSensitivity);
+    const double sensitivity = SettingsMgr::GetInstance().GetSetting<SettingsMgr::Setting::kMouseSensitivity, double>();
 
     if (!is_enabled_) {
         return;

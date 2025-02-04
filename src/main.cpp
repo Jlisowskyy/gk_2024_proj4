@@ -4,7 +4,8 @@
 #include <libcgp/mgr/resource_mgr.hpp>
 #include <libcgp/mgr/settings_mgr.hpp>
 
-static constexpr const char *kMapPath = "./models/town_map/source/town4new.glb";
+static constexpr const char *kMapPath1 = "./models/town_map/source/town4new.glb";
+static constexpr const char *kMapPath  = "./models/csgo.glb";
 
 #ifdef NDEBUG
 

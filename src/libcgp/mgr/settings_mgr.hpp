@@ -22,24 +22,30 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
     // Class internals
     // ------------------------------
 
-    static constexpr size_t kMaxSettings = 128;
+    static constexpr size_t kMaxSettings = 512;
 
     public:
     enum class Setting : std::uint16_t {
         kCameraType,
         kMouseSensitivity,
         kClockTicking,
+        kFreeCameraSpeed,
         kLast,
     };
 
     template <size_t N>
-    using SettingTypes = CxxUtils::TypeList<N, CameraType, double, bool>;
+    using SettingTypes = CxxUtils::TypeList<N, CameraType, double, bool, double>;
+    static_assert(SettingTypes<0>::size == static_cast<size_t>(Setting::kLast), "Setting types list is incomplete");
 
     static constexpr std::array kDescriptions{
         "Camera type",
         "Mouse sensitivity",
         "Is clock enabled",
+        "Free camera speed",
     };
+    static_assert(
+        kDescriptions.size() == static_cast<size_t>(Setting::kLast), "Setting descriptions list is incomplete"
+    );
 
     struct SettingContainer {
         template <typename T>
@@ -75,7 +81,7 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
         uint64_t data_{};
     };
 
-    using setting_t = std::vector<std::tuple<Setting, SettingContainer>>;
+    using setting_t = std::vector<std::tuple<Setting, SettingContainer> >;
 
     protected:
     static_assert(static_cast<size_t>(Setting::kLast) < kMaxSettings, "Too many settings");
@@ -88,6 +94,7 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
 
     public:
     SettingsMgr() = delete;
+
     ~SettingsMgr();
 
     FAST_CALL static SettingsMgr &InitInstance(const setting_t &settings) noexcept
@@ -101,6 +108,26 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
     // ------------------------------
     // Class interaction
     // ------------------------------
+
+    template <Setting kSetting, typename T>
+    FAST_CALL SettingsMgr &SetSetting(const T value) noexcept
+    {
+        static_assert(
+            std::is_same_v<T, typename SettingTypes<static_cast<size_t>(kSetting)>::type>, "Setting type mismatch"
+        );
+
+        return SetSetting(kSetting, value);
+    }
+
+    template <Setting kSetting, typename T>
+    FAST_CALL T GetSetting() const noexcept
+    {
+        static_assert(
+            std::is_same_v<T, typename SettingTypes<static_cast<size_t>(kSetting)>::type>, "Setting type mismatch"
+        );
+
+        return GetSetting<T>(kSetting);
+    }
 
     template <typename T>
     FAST_CALL SettingsMgr &SetSetting(const Setting setting, const T value) noexcept

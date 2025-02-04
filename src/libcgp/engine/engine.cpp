@@ -13,7 +13,7 @@ void LibGcp::Engine::Init() noexcept
     /* connect with settings */
     SettingsMgr::GetInstance().AddListener(SettingsMgr::Setting::kCameraType, OnCameraTypeChanged_);
 
-    /* Adjust camera type based on default settings */
+    /* Adjust camera type based on default settings - intentional cast */
     OnCameraTypeChanged_(SettingsMgr::GetInstance().GetSetting<uint64_t>(SettingsMgr::Setting::kCameraType));
 
     /* init flowing TEMP object */
@@ -26,11 +26,11 @@ void LibGcp::Engine::ProcessProgress(const long delta)
 {
     ProcessInput_(delta);
 
-    if (SettingsMgr::GetInstance().GetSetting<long>(SettingsMgr::Setting::kClockTicking)) {
+    if (SettingsMgr::GetInstance().GetSetting<SettingsMgr::Setting::kClockTicking, bool>()) {
         ProcessDynamicObjects_(delta);
     }
 
-    if (SettingsMgr::GetInstance().GetSetting<CameraType>(SettingsMgr::Setting::kCameraType) == CameraType::kFree) {
+    if (SettingsMgr::GetInstance().GetSetting<SettingsMgr::Setting::kCameraType, CameraType>() == CameraType::kFree) {
         ProcessFreeCameraMovement_(delta);
     }
 
@@ -44,15 +44,15 @@ void LibGcp::Engine::ProcessInput_(const long delta)
 {
     /* first process camera change */
     if (keys_[GLFW_KEY_F1]) {
-        SettingsMgr::GetInstance().SetSetting(SettingsMgr::Setting::kCameraType, CameraType::kStatic);
+        SettingsMgr::GetInstance().SetSetting<SettingsMgr::Setting::kCameraType>(CameraType::kStatic);
     } else if (keys_[GLFW_KEY_F2]) {
-        SettingsMgr::GetInstance().SetSetting(SettingsMgr::Setting::kCameraType, CameraType::kFollow);
+        SettingsMgr::GetInstance().SetSetting<SettingsMgr::Setting::kCameraType>(CameraType::kFollow);
     } else if (keys_[GLFW_KEY_F3]) {
-        SettingsMgr::GetInstance().SetSetting(SettingsMgr::Setting::kCameraType, CameraType::kFree);
+        SettingsMgr::GetInstance().SetSetting<SettingsMgr::Setting::kCameraType>(CameraType::kFree);
     } else if (keys_[GLFW_KEY_F4]) {
-        SettingsMgr::GetInstance().SetSetting(SettingsMgr::Setting::kCameraType, CameraType::kFirstPerson);
+        SettingsMgr::GetInstance().SetSetting<SettingsMgr::Setting::kCameraType>(CameraType::kFirstPerson);
     } else if (keys_[GLFW_KEY_F5]) {
-        SettingsMgr::GetInstance().SetSetting(SettingsMgr::Setting::kCameraType, CameraType::kThirdPerson);
+        SettingsMgr::GetInstance().SetSetting<SettingsMgr::Setting::kCameraType>(CameraType::kThirdPerson);
     }
 
     /* process overlay changes */
@@ -61,7 +61,7 @@ void LibGcp::Engine::ProcessInput_(const long delta)
     }
 
     /* process movement */
-    const long is_clock_enabled = SettingsMgr::GetInstance().GetSetting<long>(SettingsMgr::Setting::kClockTicking);
+    const long is_clock_enabled = SettingsMgr::GetInstance().GetSetting<SettingsMgr::Setting::kClockTicking, bool>();
     ProcessUserMovement_(is_clock_enabled * delta);
 }
 
@@ -69,9 +69,9 @@ void LibGcp::Engine::ProcessUserMovement_(const long delta) {}
 
 void LibGcp::Engine::ProcessFreeCameraMovement_(const long delta)
 {
-    static constexpr double kFreeCamSpeed = 10.0;
-
-    const double distance = kFreeCamSpeed * static_cast<double>(delta) / 1e+6;
+    const double free_cam_speed =
+        SettingsMgr::GetInstance().GetSetting<SettingsMgr::Setting::kFreeCameraSpeed, double>();
+    const double distance = free_cam_speed * static_cast<double>(delta) / 1e+6;
 
     free_camera_.MoveFreeCamera(static_cast<float>(distance), keys_);
 }
