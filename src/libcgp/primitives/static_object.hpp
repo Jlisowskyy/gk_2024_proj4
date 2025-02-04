@@ -44,6 +44,8 @@ class StaticObject
 
     const ObjectPosition &GetPosition() const { return position_; }
 
+    ObjectPosition &GetPosition() { return position_; }
+
     FAST_CALL uint64_t GetId() const { return id_; }
 
     NDSCRD FAST_CALL std::shared_ptr<Model> GetModel() const { return model_; }

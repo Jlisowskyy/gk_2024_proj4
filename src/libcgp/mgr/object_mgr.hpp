@@ -63,6 +63,8 @@ class ObjectMgr : public CxxUtils::Singleton<ObjectMgr>
 
     NDSCRD FAST_CALL const std::vector<StaticObject>& GetStaticObjects() const { return static_objects_; }
 
+    NDSCRD FAST_CALL StaticObject& GetStaticObject(const size_t idx) { return static_objects_[idx]; }
+
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------

@@ -158,14 +158,7 @@ void LibGcp::DebugOverlay::ShowStatics_()
     if (selected_static_object_idx_ == -1) {
         ImGui::Text("No object selected...");
     } else {
-        ImGui::Text(
-            "Selected object data:\n"
-            "Position: (%.2f, %.2f, %.2f)\n"
-            "Rotation: (%.2f, %.2f, %.2f)\n",
-            static_object_->GetPosition().position.x, static_object_->GetPosition().position.y,
-            static_object_->GetPosition().position.z, static_object_->GetPosition().rotation.x,
-            static_object_->GetPosition().rotation.y, static_object_->GetPosition().rotation.z
-        );
+        ShowObjectPositionInput_();
 
         if (ImGui::BeginListBox("Meshes")) {
             for (int i = 0; i < static_cast<int>(static_object_model_->GetMeshesCount()); i++) {
@@ -203,6 +196,20 @@ void LibGcp::DebugOverlay::ShowSelectedObjects_()
     glEnable(GL_DEPTH_TEST);
 }
 
+void LibGcp::DebugOverlay::ShowObjectPositionInput_()
+{
+    assert(static_object_ != nullptr);
+
+    ImGui::Text("Selected object data:");
+
+    ImGui::DragFloat3("Position", &static_object_->GetPosition().position.x, 0.01f);
+    ImGui::DragFloat3("Rotation", &static_object_->GetPosition().rotation.x, 0.01f);
+    ImGui::DragFloat3("Scale", &static_object_->GetPosition().scale.x, 0.01f);
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("Drag to adjust or double-click to type value. Hold Shift for faster changes.");
+    }
+}
 void LibGcp::DebugOverlay::SetSelectedObject_(const int idx)
 {
     static_object_mesh_names_.clear();
@@ -219,7 +226,7 @@ void LibGcp::DebugOverlay::SetSelectedObject_(const int idx)
     }
 
     selected_static_object_idx_ = idx;
-    static_object_              = &ObjectMgr::GetInstance().GetStaticObjects()[idx];
+    static_object_              = &ObjectMgr::GetInstance().GetStaticObject(idx);
     static_object_model_        = static_object_->GetModel();
 
     static_object_mesh_names_.reserve(static_object_model_->GetMeshesCount());

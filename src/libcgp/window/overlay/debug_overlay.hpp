@@ -50,6 +50,7 @@ class DebugOverlay
     void ShowStatics_();
     void ShowDynamics_();
     void ShowSelectedObjects_();
+    void ShowObjectPositionInput_();
 
     void SetSelectedObject_(int idx);
     void SetSelectedMesh_(int idx);
@@ -60,7 +61,7 @@ class DebugOverlay
 
     std::vector<std::string> static_object_names_{};
     std::vector<std::string> static_object_mesh_names_{};
-    const StaticObject *static_object_{};
+    StaticObject *static_object_{};
     std::shared_ptr<Model> static_object_model_{};
     std::shared_ptr<Mesh> static_object_mesh_{};
 
