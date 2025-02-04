@@ -2,6 +2,7 @@
 #define MGR_RESOURCE_MGR_HPP_
 
 #include <libcgp/defines.hpp>
+#include <libcgp/intf.hpp>
 #include <libcgp/primitives/model.hpp>
 #include <libcgp/primitives/shader.hpp>
 #include <libcgp/primitives/texture.hpp>
@@ -58,6 +59,7 @@ class ResourceMgr final : public CxxUtils::Singleton<ResourceMgr>
         std::array<std::string, 2> paths{};
         ResourceType type{};
         LoadType load_type{};
+        int8_t flip_texture{-1};
     };
 
     using resource_t = std::vector<ResourceSpec>;
@@ -86,6 +88,10 @@ class ResourceMgr final : public CxxUtils::Singleton<ResourceMgr>
 
     ResourceMgr &Init(const resource_t &resources);
 
+    std::shared_ptr<Texture> GetTexture(const ResourceSpec &resource);
+    std::shared_ptr<Shader> GetShader(const ResourceSpec &resource);
+    std::shared_ptr<Model> GetModel(const ResourceSpec &resource);
+
     std::shared_ptr<Texture> GetTexture(const std::string &texture_name, LoadType load_type);
     std::shared_ptr<Shader> GetShader(const std::string &shader_name, LoadType load_type);
     std::shared_ptr<Model> GetModel(const std::string &model_name, LoadType load_type);
@@ -103,15 +109,15 @@ class ResourceMgr final : public CxxUtils::Singleton<ResourceMgr>
 
     Rc LoadModelUnlocked_(const ResourceSpec &resource);
 
-    Rc LoadTextureFromExternal_(const std::string &texture_name);
+    Rc LoadTextureFromExternal_(const ResourceSpec &resource);
 
     std::shared_ptr<Texture> LoadTextureFromMemory_(const unsigned char *data, int len);
 
-    Rc LoadShaderFromMemory_(const std::string &vert, const std::string &frag);
+    Rc LoadShaderFromMemory_(const ResourceSpec &resource);
 
-    Rc LoadShaderFromExternal_(const std::string &vert, const std::string &frag);
+    Rc LoadShaderFromExternal_(const ResourceSpec &resource);
 
-    Rc LoadModelFromExternal_(const std::string &model_name);
+    Rc LoadModelFromExternal_(const ResourceSpec &resource);
 
     // ------------------------------
     // Class fields

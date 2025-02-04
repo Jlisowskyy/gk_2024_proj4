@@ -62,9 +62,10 @@ int main()
                 .load_type = LibGcp::ResourceMgr::LoadType::kMemory,
             },
             LibGcp::ResourceMgr::ResourceSpec{
-                .paths     = {"./models/backpack/backpack.obj"},
-                .type      = LibGcp::ResourceMgr::ResourceType::kModel,
-                .load_type = LibGcp::ResourceMgr::LoadType::kExternal,
+                .paths        = {"./models/backpack/backpack.obj"},
+                .type         = LibGcp::ResourceMgr::ResourceType::kModel,
+                .load_type    = LibGcp::ResourceMgr::LoadType::kExternal,
+                .flip_texture = true,
             },
         },
         {},

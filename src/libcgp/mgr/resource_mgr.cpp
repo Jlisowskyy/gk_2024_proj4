@@ -49,11 +49,12 @@ LibGcp::ResourceMgr &LibGcp::ResourceMgr::Init(const resource_t &resources)
     return *this;
 }
 
-std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTexture(
-    const std::string &texture_name, const LoadType load_type
-)
+std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTexture(const ResourceSpec &resource)
 {
+    assert(resource.type == ResourceType::kTexture);
+
     const std::lock_guard lock(texture_mutex_);
+    const std::string &texture_name = resource.paths[0];
 
     if (textures_.contains(texture_name)) {
         TRACE(texture_name + " texture already loaded");
@@ -61,19 +62,19 @@ std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTexture(
     }
 
     TRACE(texture_name + " texture not loaded");
-    R_ASSERT(IsSuccess(LoadTextureUnlocked_({
-        .paths     = {texture_name},
-        .load_type = load_type,
-    })));
+    R_ASSERT(IsSuccess(LoadTextureUnlocked_(resource)));
     TRACE(texture_name + " texture loaded");
 
     assert(textures_.contains(texture_name));
     return textures_.at(texture_name);
 }
 
-std::shared_ptr<LibGcp::Shader> LibGcp::ResourceMgr::GetShader(const std::string &shader_name, const LoadType load_type)
+std::shared_ptr<LibGcp::Shader> LibGcp::ResourceMgr::GetShader(const ResourceSpec &resource)
 {
+    assert(resource.type == ResourceType::kShader);
+
     const std::lock_guard lock(shader_mutex_);
+    const std::string shader_name = resource.paths[0] + "//" + resource.paths[1];
 
     if (shaders_.contains(shader_name)) {
         TRACE(shader_name + " shader already loaded");
@@ -82,23 +83,19 @@ std::shared_ptr<LibGcp::Shader> LibGcp::ResourceMgr::GetShader(const std::string
 
     TRACE(shader_name + " shader not loaded");
 
-    /* split for frag and vert shaders */
-    const size_t end = shader_name.find("//");
-    assert(end != std::string::npos);
-
-    R_ASSERT(IsSuccess(LoadShaderUnlocked_({
-        .paths     = {shader_name.substr(0, end), shader_name.substr(end + 2)},
-        .load_type = load_type,
-    })));
+    R_ASSERT(IsSuccess(LoadShaderUnlocked_(resource)));
     TRACE("shader loaded: " + shader_name);
 
     assert(shaders_.contains(shader_name));
     return shaders_.at(shader_name);
 }
 
-std::shared_ptr<LibGcp::Model> LibGcp::ResourceMgr::GetModel(const std::string &model_name, const LoadType load_type)
+std::shared_ptr<LibGcp::Model> LibGcp::ResourceMgr::GetModel(const ResourceSpec &resource)
 {
+    assert(resource.type == ResourceType::kModel);
+
     const std::lock_guard lock(model_mutex_);
+    const std::string &model_name = resource.paths[0];
 
     if (models_.contains(model_name)) {
         TRACE(model_name + " model already loaded");
@@ -106,14 +103,38 @@ std::shared_ptr<LibGcp::Model> LibGcp::ResourceMgr::GetModel(const std::string &
     }
 
     TRACE(model_name + " model not loaded");
-    R_ASSERT(IsSuccess(LoadModelUnlocked_({
-        .paths     = {model_name},
-        .load_type = load_type,
-    })));
+    R_ASSERT(IsSuccess(LoadModelUnlocked_(resource)));
     TRACE(model_name + " model loaded");
 
     assert(models_.contains(model_name));
     return models_.at(model_name);
+}
+
+std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTexture(
+    const std::string &texture_name, const LoadType load_type
+)
+{
+    return GetTexture({.paths = {texture_name}, .type = ResourceType::kTexture, .load_type = load_type});
+}
+
+std::shared_ptr<LibGcp::Shader> LibGcp::ResourceMgr::GetShader(const std::string &shader_name, const LoadType load_type)
+{
+    /* split for frag and vert shaders */
+    const size_t end = shader_name.find("//");
+    assert(end != std::string::npos);
+
+    const std::string vert = shader_name.substr(0, end);
+    const std::string frag = shader_name.substr(end + 2);
+
+    return GetShader({
+        .paths = {vert, frag},
+          .type = ResourceType::kShader, .load_type = load_type
+    });
+}
+
+std::shared_ptr<LibGcp::Model> LibGcp::ResourceMgr::GetModel(const std::string &model_name, const LoadType load_type)
+{
+    return GetModel({.paths = {model_name}, .type = ResourceType::kModel, .load_type = load_type});
 }
 
 std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTextureExternalSourceRaw(
@@ -150,7 +171,7 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadTextureUnlocked_(const ResourceSpec &resourc
 {
     switch (resource.load_type) {
         case LoadType::kExternal:
-            return LoadTextureFromExternal_(resource.paths[0]);
+            return LoadTextureFromExternal_(resource);
         case LoadType::kMemory:
             [[fallthrough]];
         case LoadType::kInternal:
@@ -164,9 +185,9 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadShaderUnlocked_(const ResourceSpec &resource
 {
     switch (resource.load_type) {
         case LoadType::kExternal:
-            return LoadShaderFromExternal_(resource.paths[0], resource.paths[1]);
+            return LoadShaderFromExternal_(resource);
         case LoadType::kMemory:
-            return LoadShaderFromMemory_(resource.paths[0], resource.paths[1]);
+            return LoadShaderFromMemory_(resource);
         case LoadType::kInternal:
             NOT_IMPLEMENTED;
         default:
@@ -178,7 +199,7 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadModelUnlocked_(const ResourceSpec &resource)
 {
     switch (resource.load_type) {
         case LoadType::kExternal:
-            return LoadModelFromExternal_(resource.paths[0]);
+            return LoadModelFromExternal_(resource);
         case LoadType::kMemory:
             [[fallthrough]];
         case LoadType::kInternal:
@@ -188,13 +209,18 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadModelUnlocked_(const ResourceSpec &resource)
     }
 }
 
-LibGcp::Rc LibGcp::ResourceMgr::LoadTextureFromExternal_(const std::string &texture_name)
+LibGcp::Rc LibGcp::ResourceMgr::LoadTextureFromExternal_(const ResourceSpec &resource)
 {
     int width{};
     int height{};
     int channels{};
 
-    stbi_set_flip_vertically_on_load(true);
+    const std::string &texture_name = resource.paths[0];
+
+    if (resource.flip_texture != -1) {
+        stbi_set_flip_vertically_on_load(resource.flip_texture);
+    }
+
     unsigned char *data = stbi_load(texture_name.c_str(), &width, &height, &channels, 0);
     if (!data) {
         TRACE("Failed to load texture: " + texture_name);
@@ -223,8 +249,11 @@ std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::LoadTextureFromMemory_(con
     return texture;
 }
 
-LibGcp::Rc LibGcp::ResourceMgr::LoadShaderFromMemory_(const std::string &vert, const std::string &frag)
+LibGcp::Rc LibGcp::ResourceMgr::LoadShaderFromMemory_(const ResourceSpec &resource)
 {
+    const std::string &vert = resource.paths[0];
+    const std::string &frag = resource.paths[1];
+
     R_ASSERT(StaticShaders::g_KnownFragmentShaders.contains(frag));
     R_ASSERT(StaticShaders::g_KnownVertexShaders.contains(vert));
 
@@ -238,8 +267,11 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadShaderFromMemory_(const std::string &vert, c
     return Rc::kSuccess;
 }
 
-LibGcp::Rc LibGcp::ResourceMgr::LoadShaderFromExternal_(const std::string &vert, const std::string &frag)
+LibGcp::Rc LibGcp::ResourceMgr::LoadShaderFromExternal_(const ResourceSpec &resource)
 {
+    const std::string &vert = resource.paths[0];
+    const std::string &frag = resource.paths[1];
+
     // TODO: replace throw with Rc
 
     std::string vertex_shader_code;
@@ -289,9 +321,14 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadShaderFromExternal_(const std::string &vert,
     return Rc::kSuccess;
 }
 
-LibGcp::Rc LibGcp::ResourceMgr::LoadModelFromExternal_(const std::string &model_name)
+LibGcp::Rc LibGcp::ResourceMgr::LoadModelFromExternal_(const ResourceSpec &resource)
 {
+    const std::string &model_name = resource.paths[0];
     ModelSerializer serializer{};
+
+    if (resource.flip_texture != -1) {
+        stbi_set_flip_vertically_on_load(resource.flip_texture);
+    }
 
     const auto model = serializer.LoadModelFromExternalFormat(model_name);
 
