@@ -1,5 +1,6 @@
 #include <libcgp/main.hpp>
 
+#include <libcgp/intf.hpp>
 #include <libcgp/mgr/object_mgr.hpp>
 #include <libcgp/mgr/resource_mgr.hpp>
 #include <libcgp/mgr/settings_mgr.hpp>
@@ -66,14 +67,28 @@ int main()
                 .paths        = {"./models/backpack/backpack.obj"},
                 .type         = LibGcp::ResourceMgr::ResourceType::kModel,
                 .load_type    = LibGcp::ResourceMgr::LoadType::kExternal,
-                .flip_texture = true,
+                .flip_texture = 1,
+            },
+            LibGcp::ResourceMgr::ResourceSpec{
+                .paths        = {"./models/bulb.glb"},
+                .type         = LibGcp::ResourceMgr::ResourceType::kModel,
+                .load_type    = LibGcp::ResourceMgr::LoadType::kExternal,
+                .flip_texture = 0,
             },
         },
         {},
         {LibGcp::StaticObjectSpec{
-            .position = {},
-            .name     = "./models/backpack/backpack.obj",
-        }},
+             .position = {},
+             .name     = "./models/backpack/backpack.obj",
+         },
+         LibGcp::StaticObjectSpec{
+             .position =
+                 {
+                     .position = {5.0f, 5.0f, 5.0f},
+                     .rotation = {1.6f, 0.0f, 0.0f},
+                 },
+             .name = "./models/bulb.glb",
+         }},
         "first_vertex_shader//first_fragment_shader"
     );
 }

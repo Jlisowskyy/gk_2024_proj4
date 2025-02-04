@@ -45,15 +45,27 @@ class DebugOverlay
     // ------------------------------
 
     protected:
-    void DrawSettings_();
-    void DrawObjects_();
-    void ShowStatics_();
-    void ShowDynamics_();
-    void ShowSelectedObjects_();
-    void ShowObjectPositionInput_();
+    void DrawSettingsEditorWindow_();
+
+    void DrawLiveObjectsInspectorWindow_();
+
+    void DrawSpawnModelsWindow_();
+
+    void DrawStaticObjectsSection_();
+
+    void DrawDynamicObjectsSection_();
+
+    void HighlightedSelectedMesh_();
+
+    void DrawSelectedObjectPositionEditor_();
+
+    void DrawSelectedModelSpawnSection_();
 
     void SetSelectedObject_(int idx);
+
     void SetSelectedMesh_(int idx);
+
+    void SetSelectedMode_(int idx);
 
     // ------------------------------
     // Class fields
@@ -67,6 +79,14 @@ class DebugOverlay
 
     int selected_static_object_idx_{-1};
     int selected_mesh_idx_{-1};
+    int selected_model_idx_{-1};
+
+    std::vector<std::string> model_names_{};
+    ObjectPosition spawn_model_pos_{
+        .position = {},
+        .rotation = {},
+        .scale    = {1.0f, 1.0f, 1.0f},
+    };
 
     GLFWwindow *window_{};
     std::shared_ptr<Shader> shader_{};

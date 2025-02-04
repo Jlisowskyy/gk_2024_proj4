@@ -66,10 +66,18 @@ void LibGcp::DebugOverlay::Init()
 {
     auto objects = ObjectMgr::GetInstance().GetStaticObjects();
 
+    static_object_names_.reserve(objects.size());
     for (const auto &object : objects) {
         static_object_names_.push_back("Object " + std::to_string(object.GetId()));
     }
-    selected_static_object_idx_ = -1;
+
+    auto models = ResourceMgr::GetInstance().GetModels();
+
+    model_names_.reserve(models.size());
+    for (const auto &[name, _] : models) {
+        model_names_.push_back(name);
+    }
+
     shader_ = ResourceMgr::GetInstance().GetShader("contours//contours", ResourceMgr::LoadType::kMemory);
 }
 
@@ -98,7 +106,7 @@ void LibGcp::DebugOverlay::EnableOverlay(GLFWwindow *window)
 
 void LibGcp::DebugOverlay::Draw()
 {
-    ShowSelectedObjects_();
+    HighlightedSelectedMesh_();
 
     if (window_ == nullptr) {
         return;
@@ -108,14 +116,15 @@ void LibGcp::DebugOverlay::Draw()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    DrawSettings_();
-    DrawObjects_();
+    DrawSettingsEditorWindow_();
+    DrawLiveObjectsInspectorWindow_();
+    DrawSpawnModelsWindow_();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void LibGcp::DebugOverlay::DrawSettings_()
+void LibGcp::DebugOverlay::DrawSettingsEditorWindow_()
 {
     ImGui::Begin("Settings Editor");
 
@@ -128,13 +137,41 @@ void LibGcp::DebugOverlay::DrawSettings_()
     ImGui::End();
 }
 
-void LibGcp::DebugOverlay::DrawObjects_()
+void LibGcp::DebugOverlay::DrawLiveObjectsInspectorWindow_()
 {
-    ShowStatics_();
-    ShowDynamics_();
+    DrawStaticObjectsSection_();
+    DrawDynamicObjectsSection_();
 }
 
-void LibGcp::DebugOverlay::ShowStatics_()
+void LibGcp::DebugOverlay::DrawSpawnModelsWindow_()
+{
+    if (ImGui::BeginListBox("Available models:")) {
+        for (int i = 0; i < static_cast<int>(model_names_.size()); i++) {
+            const bool is_selected = (selected_model_idx_ == i);
+            if (ImGui::Selectable(model_names_[i].c_str(), is_selected)) {
+                SetSelectedMode_(i);
+            }
+            if (is_selected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndListBox();
+    }
+
+    DrawSelectedModelSpawnSection_();
+}
+
+void LibGcp::DebugOverlay::SetSelectedMode_(const int idx)
+{
+    if (idx == selected_model_idx_) {
+        selected_model_idx_ = -1;
+        return;
+    }
+
+    selected_model_idx_ = idx;
+}
+
+void LibGcp::DebugOverlay::DrawStaticObjectsSection_()
 {
     ImGui::Begin("Static objects");
 
@@ -156,7 +193,7 @@ void LibGcp::DebugOverlay::ShowStatics_()
     if (selected_static_object_idx_ == -1) {
         ImGui::Text("No object selected...");
     } else {
-        ShowObjectPositionInput_();
+        DrawSelectedObjectPositionEditor_();
 
         if (ImGui::BeginListBox("Meshes")) {
             for (int i = 0; i < static_cast<int>(static_object_model_->GetMeshesCount()); i++) {
@@ -175,9 +212,9 @@ void LibGcp::DebugOverlay::ShowStatics_()
     ImGui::End();
 }
 
-void LibGcp::DebugOverlay::ShowDynamics_() {}
+void LibGcp::DebugOverlay::DrawDynamicObjectsSection_() {}
 
-void LibGcp::DebugOverlay::ShowSelectedObjects_()
+void LibGcp::DebugOverlay::HighlightedSelectedMesh_()
 {
     if (static_object_mesh_ == nullptr) {
         return;
@@ -194,7 +231,7 @@ void LibGcp::DebugOverlay::ShowSelectedObjects_()
     glEnable(GL_DEPTH_TEST);
 }
 
-void LibGcp::DebugOverlay::ShowObjectPositionInput_()
+void LibGcp::DebugOverlay::DrawSelectedObjectPositionEditor_()
 {
     assert(static_object_ != nullptr);
 
@@ -206,6 +243,26 @@ void LibGcp::DebugOverlay::ShowObjectPositionInput_()
 
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("Drag to adjust or double-click to type value. Hold Shift for faster changes.");
+    }
+}
+
+void LibGcp::DebugOverlay::DrawSelectedModelSpawnSection_()
+{
+    if (selected_model_idx_ == -1) {
+        return;
+    }
+
+    ImGui::DragFloat3("Position", &spawn_model_pos_.position.x, 0.01f);
+
+    ImGui::DragFloat3("Rotation", &spawn_model_pos_.rotation.x, 0.01f);
+
+    ImGui::DragFloat3("Scale", &spawn_model_pos_.scale.x, 0.01f);
+
+    if (ImGui::Button("Spawn")) {
+        ObjectMgr::GetInstance().AddStaticObject({
+            .position = spawn_model_pos_,
+            .name     = model_names_[selected_model_idx_],
+        });
     }
 }
 

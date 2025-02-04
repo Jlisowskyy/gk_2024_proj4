@@ -3,6 +3,7 @@
 
 #include <libcgp/defines.hpp>
 
+#include <libcgp/intf.hpp>
 #include <libcgp/primitives/shader.hpp>
 #include <libcgp/primitives/static_object.hpp>
 
@@ -64,6 +65,8 @@ class ObjectMgr : public CxxUtils::Singleton<ObjectMgr>
     NDSCRD FAST_CALL const std::vector<StaticObject>& GetStaticObjects() const { return static_objects_; }
 
     NDSCRD FAST_CALL StaticObject& GetStaticObject(const size_t idx) { return static_objects_[idx]; }
+
+    FAST_CALL void AddStaticObject(const StaticObjectSpec& spec) { CreateStaticObject_(spec); }
 
     // ---------------------------------
     // Class implementation methods

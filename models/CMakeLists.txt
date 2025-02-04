@@ -15,6 +15,10 @@ set(model_entries
         "https://www.dropbox.com/scl/fi/7m1rctjjvtsirbr85yslp/full-gameready-city-buildings.zip?rlkey=yiexa553tt043bovyum2e9lay&st=ej66p7gp&dl=0"
         "town_map.zip"
         "town_map"
+
+        "https://www.dropbox.com/scl/fi/go86pw2h7vpjjjykzfmrv/low_poly_light_bulb.glb?rlkey=hq4l2qot5kws9v2rsbgqxd547&st=lf858qq3&dl=0"
+        "bulb.glb"
+        "bulb"
 )
 
 set(archive_extensions zip tar "tar.gz" tgz "tar.bz2" tbz2)

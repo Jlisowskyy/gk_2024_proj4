@@ -98,6 +98,12 @@ class ResourceMgr final : public CxxUtils::Singleton<ResourceMgr>
 
     std::shared_ptr<Texture> GetTextureExternalSourceRaw(const std::string &path, const TextureSpec &spec);
 
+    FAST_CALL const std::unordered_map<std::string, std::shared_ptr<Texture>> &GetTextures() const { return textures_; }
+
+    FAST_CALL const std::unordered_map<std::string, std::shared_ptr<Shader>> &GetShaders() const { return shaders_; }
+
+    FAST_CALL const std::unordered_map<std::string, std::shared_ptr<Model>> &GetModels() const { return models_; }
+
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------
