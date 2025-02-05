@@ -8,11 +8,8 @@
 #include <libcgp/primitives/texture.hpp>
 #include <libcgp/rc.hpp>
 
-#include <CxxUtils/singleton.hpp>
+#include <CxxUtils/static_singleton.hpp>
 
-#include <array>
-#include <cassert>
-#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -32,61 +29,23 @@ LIBGCP_DECL_START_
  * - memory usage optimization
  * - implement multi-threaded async loading
  */
-class ResourceMgr final : public CxxUtils::Singleton<ResourceMgr>
+class ResourceMgrBase final : public CxxUtils::StaticSingletonHelper
 {
     static constexpr size_t kDefaultMapSize = 16384;
-
-    // ------------------------------
-    // Inner types
-    // ------------------------------
-
-    public:
-    enum class ResourceType : std::uint8_t {
-        kTexture,
-        kShader,
-        kModel,
-        kLast,
-    };
-
-    enum class LoadType : std::uint8_t {
-        kExternal,
-        kMemory,
-        kInternal,
-        kLast,
-    };
-
-    struct alignas(128) ResourceSpec {
-        std::array<std::string, 2> paths{};
-        ResourceType type{};
-        LoadType load_type{};
-        int8_t flip_texture{-1};
-    };
-
-    using resource_t = std::vector<ResourceSpec>;
 
     // ------------------------------
     // Object creation
     // ------------------------------
 
-    protected:
-    ResourceMgr() = default;
-
     public:
-    ~ResourceMgr();
-
-    FAST_CALL static ResourceMgr &InitInstance()
-    {
-        assert(!IsInited());
-
-        Singleton::InitInstance(new ResourceMgr());
-        return GetInstance();
-    }
+    ResourceMgrBase() = default;
+    ~ResourceMgrBase();
 
     // ------------------------------
     // Class interaction
     // ------------------------------
 
-    ResourceMgr &Init(const resource_t &resources);
+    ResourceMgrBase &Init(const resource_t &resources);
 
     std::shared_ptr<Texture> GetTexture(const ResourceSpec &resource);
     std::shared_ptr<Shader> GetShader(const ResourceSpec &resource);
@@ -138,6 +97,8 @@ class ResourceMgr final : public CxxUtils::Singleton<ResourceMgr>
     std::mutex model_mutex_{};
     std::unordered_map<std::string, std::shared_ptr<Model>> models_{};
 };
+
+using ResourceMgr = CxxUtils::StaticSingleton<ResourceMgrBase>;
 
 LIBGCP_DECL_END_
 

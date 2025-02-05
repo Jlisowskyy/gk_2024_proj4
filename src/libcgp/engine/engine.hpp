@@ -3,7 +3,7 @@
 
 #include <libcgp/defines.hpp>
 
-#include <CxxUtils/singleton.hpp>
+#include <CxxUtils/static_singleton.hpp>
 
 #include <libcgp/engine/view.hpp>
 
@@ -17,7 +17,7 @@
 // clang-format on
 
 LIBGCP_DECL_START_
-class Engine final : public CxxUtils::Singleton<Engine>
+class EngineBase final : public CxxUtils::StaticSingletonHelper
 {
     // ------------------------------
     // Class internals
@@ -27,19 +27,9 @@ class Engine final : public CxxUtils::Singleton<Engine>
     // Object creation
     // ------------------------------
 
-    protected:
-    Engine() = default;
-
     public:
-    ~Engine() override;
-
-    FAST_CALL static Engine &InitInstance() noexcept
-    {
-        assert(!IsInited());
-
-        Singleton::InitInstance(new Engine());
-        return GetInstance();
-    }
+    EngineBase() = default;
+    ~EngineBase() override;
 
     // ------------------------------
     // Class interaction
@@ -86,6 +76,8 @@ class Engine final : public CxxUtils::Singleton<Engine>
     std::array<int, GLFW_KEY_LAST> keys_{};
     View view_{};
 };
+
+using Engine = CxxUtils::StaticSingleton<EngineBase>;
 
 LIBGCP_DECL_END_
 

@@ -18,9 +18,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-LibGcp::ResourceMgr::~ResourceMgr() { TRACE("ResourceMgr::~ResourceMgr()"); }
+LibGcp::ResourceMgrBase::~ResourceMgrBase() { TRACE("ResourceMgrBase::~ResourceMgrBase()"); }
 
-LibGcp::ResourceMgr &LibGcp::ResourceMgr::Init(const resource_t &resources)
+LibGcp::ResourceMgrBase &LibGcp::ResourceMgrBase::Init(const resource_t &resources)
 {
     TRACE("Resource MGR init");
 
@@ -49,7 +49,7 @@ LibGcp::ResourceMgr &LibGcp::ResourceMgr::Init(const resource_t &resources)
     return *this;
 }
 
-std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTexture(const ResourceSpec &resource)
+std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgrBase::GetTexture(const ResourceSpec &resource)
 {
     assert(resource.type == ResourceType::kTexture);
 
@@ -69,7 +69,7 @@ std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTexture(const ResourceS
     return textures_.at(texture_name);
 }
 
-std::shared_ptr<LibGcp::Shader> LibGcp::ResourceMgr::GetShader(const ResourceSpec &resource)
+std::shared_ptr<LibGcp::Shader> LibGcp::ResourceMgrBase::GetShader(const ResourceSpec &resource)
 {
     assert(resource.type == ResourceType::kShader);
 
@@ -90,7 +90,7 @@ std::shared_ptr<LibGcp::Shader> LibGcp::ResourceMgr::GetShader(const ResourceSpe
     return shaders_.at(shader_name);
 }
 
-std::shared_ptr<LibGcp::Model> LibGcp::ResourceMgr::GetModel(const ResourceSpec &resource)
+std::shared_ptr<LibGcp::Model> LibGcp::ResourceMgrBase::GetModel(const ResourceSpec &resource)
 {
     assert(resource.type == ResourceType::kModel);
 
@@ -110,14 +110,16 @@ std::shared_ptr<LibGcp::Model> LibGcp::ResourceMgr::GetModel(const ResourceSpec 
     return models_.at(model_name);
 }
 
-std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTexture(
+std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgrBase::GetTexture(
     const std::string &texture_name, const LoadType load_type
 )
 {
     return GetTexture({.paths = {texture_name}, .type = ResourceType::kTexture, .load_type = load_type});
 }
 
-std::shared_ptr<LibGcp::Shader> LibGcp::ResourceMgr::GetShader(const std::string &shader_name, const LoadType load_type)
+std::shared_ptr<LibGcp::Shader> LibGcp::ResourceMgrBase::GetShader(
+    const std::string &shader_name, const LoadType load_type
+)
 {
     /* split for frag and vert shaders */
     const size_t end = shader_name.find("//");
@@ -132,12 +134,14 @@ std::shared_ptr<LibGcp::Shader> LibGcp::ResourceMgr::GetShader(const std::string
     });
 }
 
-std::shared_ptr<LibGcp::Model> LibGcp::ResourceMgr::GetModel(const std::string &model_name, const LoadType load_type)
+std::shared_ptr<LibGcp::Model> LibGcp::ResourceMgrBase::GetModel(
+    const std::string &model_name, const LoadType load_type
+)
 {
     return GetModel({.paths = {model_name}, .type = ResourceType::kModel, .load_type = load_type});
 }
 
-std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTextureExternalSourceRaw(
+std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgrBase::GetTextureExternalSourceRaw(
     const std::string &path, const TextureSpec &spec
 )
 {
@@ -167,7 +171,7 @@ std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::GetTextureExternalSourceRa
     return texture;
 }
 
-LibGcp::Rc LibGcp::ResourceMgr::LoadTextureUnlocked_(const ResourceSpec &resource)
+LibGcp::Rc LibGcp::ResourceMgrBase::LoadTextureUnlocked_(const ResourceSpec &resource)
 {
     switch (resource.load_type) {
         case LoadType::kExternal:
@@ -181,7 +185,7 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadTextureUnlocked_(const ResourceSpec &resourc
     }
 }
 
-LibGcp::Rc LibGcp::ResourceMgr::LoadShaderUnlocked_(const ResourceSpec &resource)
+LibGcp::Rc LibGcp::ResourceMgrBase::LoadShaderUnlocked_(const ResourceSpec &resource)
 {
     switch (resource.load_type) {
         case LoadType::kExternal:
@@ -195,7 +199,7 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadShaderUnlocked_(const ResourceSpec &resource
     }
 }
 
-LibGcp::Rc LibGcp::ResourceMgr::LoadModelUnlocked_(const ResourceSpec &resource)
+LibGcp::Rc LibGcp::ResourceMgrBase::LoadModelUnlocked_(const ResourceSpec &resource)
 {
     switch (resource.load_type) {
         case LoadType::kExternal:
@@ -209,7 +213,7 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadModelUnlocked_(const ResourceSpec &resource)
     }
 }
 
-LibGcp::Rc LibGcp::ResourceMgr::LoadTextureFromExternal_(const ResourceSpec &resource)
+LibGcp::Rc LibGcp::ResourceMgrBase::LoadTextureFromExternal_(const ResourceSpec &resource)
 {
     int width{};
     int height{};
@@ -236,7 +240,9 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadTextureFromExternal_(const ResourceSpec &res
     return Rc::kSuccess;
 }
 
-std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::LoadTextureFromMemory_(const unsigned char *data, const int len)
+std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgrBase::LoadTextureFromMemory_(
+    const unsigned char *data, const int len
+)
 {
     int width;
     int height;
@@ -249,7 +255,7 @@ std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgr::LoadTextureFromMemory_(con
     return texture;
 }
 
-LibGcp::Rc LibGcp::ResourceMgr::LoadShaderFromMemory_(const ResourceSpec &resource)
+LibGcp::Rc LibGcp::ResourceMgrBase::LoadShaderFromMemory_(const ResourceSpec &resource)
 {
     const std::string &vert = resource.paths[0];
     const std::string &frag = resource.paths[1];
@@ -267,7 +273,7 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadShaderFromMemory_(const ResourceSpec &resour
     return Rc::kSuccess;
 }
 
-LibGcp::Rc LibGcp::ResourceMgr::LoadShaderFromExternal_(const ResourceSpec &resource)
+LibGcp::Rc LibGcp::ResourceMgrBase::LoadShaderFromExternal_(const ResourceSpec &resource)
 {
     const std::string &vert = resource.paths[0];
     const std::string &frag = resource.paths[1];
@@ -321,7 +327,7 @@ LibGcp::Rc LibGcp::ResourceMgr::LoadShaderFromExternal_(const ResourceSpec &reso
     return Rc::kSuccess;
 }
 
-LibGcp::Rc LibGcp::ResourceMgr::LoadModelFromExternal_(const ResourceSpec &resource)
+LibGcp::Rc LibGcp::ResourceMgrBase::LoadModelFromExternal_(const ResourceSpec &resource)
 {
     const std::string &model_name = resource.paths[0];
     ModelSerializer serializer{};

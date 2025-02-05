@@ -4,17 +4,17 @@
 #include <libcgp/utils/macros.hpp>
 #include <libcgp/window/window.hpp>
 
-LibGcp::Engine::~Engine() { TRACE("Engine::~Engine()"); }
+LibGcp::EngineBase::~EngineBase() { TRACE("EngineBase::~EngineBase()"); }
 
-void LibGcp::Engine::Init() noexcept
+void LibGcp::EngineBase::Init() noexcept
 {
-    TRACE("Engine::Init()");
+    TRACE("EngineBase::Init()");
 
     /* connect with settings */
-    SettingsMgr::GetInstance().AddListener(SettingsMgr::Setting::kCameraType, OnCameraTypeChanged_);
+    SettingsMgr::GetInstance().AddListener(Setting::kCameraType, OnCameraTypeChanged_);
 
     /* Adjust camera type based on default settings - intentional cast */
-    OnCameraTypeChanged_(SettingsMgr::GetInstance().GetSetting<uint64_t>(SettingsMgr::Setting::kCameraType));
+    OnCameraTypeChanged_(SettingsMgr::GetInstance().GetSetting<uint64_t>(Setting::kCameraType));
 
     /* init flowing TEMP object */
     flowing_camera_.position = glm::vec3{};
@@ -22,15 +22,15 @@ void LibGcp::Engine::Init() noexcept
     flowing_camera_.up       = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
-void LibGcp::Engine::ProcessProgress(const long delta)
+void LibGcp::EngineBase::ProcessProgress(const long delta)
 {
     ProcessInput_(delta);
 
-    if (SettingsMgr::GetInstance().GetSetting<SettingsMgr::Setting::kClockTicking, bool>()) {
+    if (SettingsMgr::GetInstance().GetSetting<Setting::kClockTicking, bool>()) {
         ProcessDynamicObjects_(delta);
     }
 
-    if (SettingsMgr::GetInstance().GetSetting<SettingsMgr::Setting::kCameraType, CameraType>() == CameraType::kFree) {
+    if (SettingsMgr::GetInstance().GetSetting<Setting::kCameraType, CameraType>() == CameraType::kFree) {
         ProcessFreeCameraMovement_(delta);
     }
 
@@ -40,19 +40,19 @@ void LibGcp::Engine::ProcessProgress(const long delta)
     keys_.fill(0);
 }
 
-void LibGcp::Engine::ProcessInput_(const long delta)
+void LibGcp::EngineBase::ProcessInput_(const long delta)
 {
     /* first process camera change */
     if (keys_[GLFW_KEY_F1]) {
-        SettingsMgr::GetInstance().SetSetting<SettingsMgr::Setting::kCameraType>(CameraType::kStatic);
+        SettingsMgr::GetInstance().SetSetting<Setting::kCameraType>(CameraType::kStatic);
     } else if (keys_[GLFW_KEY_F2]) {
-        SettingsMgr::GetInstance().SetSetting<SettingsMgr::Setting::kCameraType>(CameraType::kFollow);
+        SettingsMgr::GetInstance().SetSetting<Setting::kCameraType>(CameraType::kFollow);
     } else if (keys_[GLFW_KEY_F3]) {
-        SettingsMgr::GetInstance().SetSetting<SettingsMgr::Setting::kCameraType>(CameraType::kFree);
+        SettingsMgr::GetInstance().SetSetting<Setting::kCameraType>(CameraType::kFree);
     } else if (keys_[GLFW_KEY_F4]) {
-        SettingsMgr::GetInstance().SetSetting<SettingsMgr::Setting::kCameraType>(CameraType::kFirstPerson);
+        SettingsMgr::GetInstance().SetSetting<Setting::kCameraType>(CameraType::kFirstPerson);
     } else if (keys_[GLFW_KEY_F5]) {
-        SettingsMgr::GetInstance().SetSetting<SettingsMgr::Setting::kCameraType>(CameraType::kThirdPerson);
+        SettingsMgr::GetInstance().SetSetting<Setting::kCameraType>(CameraType::kThirdPerson);
     }
 
     /* process overlay changes */
@@ -61,22 +61,21 @@ void LibGcp::Engine::ProcessInput_(const long delta)
     }
 
     /* process movement */
-    const long is_clock_enabled = SettingsMgr::GetInstance().GetSetting<SettingsMgr::Setting::kClockTicking, bool>();
+    const long is_clock_enabled = SettingsMgr::GetInstance().GetSetting<Setting::kClockTicking, bool>();
     ProcessUserMovement_(is_clock_enabled * delta);
 }
 
-void LibGcp::Engine::ProcessUserMovement_(const long delta) {}
+void LibGcp::EngineBase::ProcessUserMovement_(const long delta) {}
 
-void LibGcp::Engine::ProcessFreeCameraMovement_(const long delta)
+void LibGcp::EngineBase::ProcessFreeCameraMovement_(const long delta)
 {
-    const double free_cam_speed =
-        SettingsMgr::GetInstance().GetSetting<SettingsMgr::Setting::kFreeCameraSpeed, double>();
-    const double distance = free_cam_speed * static_cast<double>(delta) / 1e+6;
+    const double free_cam_speed = SettingsMgr::GetInstance().GetSetting<Setting::kFreeCameraSpeed, double>();
+    const double distance       = free_cam_speed * static_cast<double>(delta) / 1e+6;
 
     free_camera_.MoveFreeCamera(static_cast<float>(distance), keys_);
 }
 
-void LibGcp::Engine::ProcessDynamicObjects_(const long delta)
+void LibGcp::EngineBase::ProcessDynamicObjects_(const long delta)
 {
     /* TODO: temporary, bind object movement to camera movement later */
     const double radius = 30.0f;
@@ -88,7 +87,7 @@ void LibGcp::Engine::ProcessDynamicObjects_(const long delta)
     flowing_camera_.front    = -flowing_camera_.position;
 }
 
-void LibGcp::Engine::OnCameraTypeChanged_(const uint64_t new_value)
+void LibGcp::EngineBase::OnCameraTypeChanged_(const uint64_t new_value)
 {
     TRACE("Camera type changed to " << new_value);
 
@@ -96,24 +95,24 @@ void LibGcp::Engine::OnCameraTypeChanged_(const uint64_t new_value)
     switch (static_cast<CameraType>(new_value)) {
         case CameraType::kStatic: {
             Window::GetInstance().GetMouse().BindCamera(nullptr);
-            GetInstance().view_.BindCameraWithObjet(&GetInstance().static_camera_);
+            Engine::GetInstance().view_.BindCameraWithObjet(&Engine::GetInstance().static_camera_);
         } break;
         case CameraType::kFollow: {
             Window::GetInstance().GetMouse().BindCamera(nullptr);
-            GetInstance().view_.BindCameraWithObjet(&GetInstance().flowing_camera_);
+            Engine::GetInstance().view_.BindCameraWithObjet(&Engine::GetInstance().flowing_camera_);
         } break;
         case CameraType::kFree: {
             /* preserve old camera */
-            GetInstance().free_camera_ = GetInstance().view_.GetBindObject();
+            Engine::GetInstance().free_camera_ = Engine::GetInstance().view_.GetBindObject();
 
             /* ensure yaw pitch is set and ready */
-            GetInstance().free_camera_.ConvertVectorToYawPitch();
+            Engine::GetInstance().free_camera_.ConvertVectorToYawPitch();
 
             /* bind camera to mouse */
-            Window::GetInstance().GetMouse().BindCamera(&GetInstance().free_camera_);
+            Window::GetInstance().GetMouse().BindCamera(&Engine::GetInstance().free_camera_);
 
             /* bind camera to view */
-            GetInstance().view_.BindCameraWithObjet(&GetInstance().free_camera_);
+            Engine::GetInstance().view_.BindCameraWithObjet(&Engine::GetInstance().free_camera_);
         } break;
         case CameraType::kFirstPerson:
             NOT_IMPLEMENTED;

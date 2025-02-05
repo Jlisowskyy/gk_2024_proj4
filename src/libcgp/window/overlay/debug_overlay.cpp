@@ -25,14 +25,11 @@
 template <size_t N, class T>
 static void DisplaySetting()
 {
-    const char *desc = LibGcp::SettingsMgr::kDescriptions[N];
-    int value        = static_cast<int>(
-        LibGcp::SettingsMgr::GetInstance().GetSetting<static_cast<LibGcp::SettingsMgr::Setting>(N), T>()
-    );
+    const char *desc = LibGcp::kSettingsDescriptions[N];
+    int value = static_cast<int>(LibGcp::SettingsMgr::GetInstance().GetSetting<static_cast<LibGcp::Setting>(N), T>());
 
     if (ImGui::InputInt(desc, &value)) {
-        LibGcp::SettingsMgr::GetInstance().SetSetting<static_cast<LibGcp::SettingsMgr::Setting>(N)>(static_cast<T>(value
-        ));
+        LibGcp::SettingsMgr::GetInstance().SetSetting<static_cast<LibGcp::Setting>(N)>(static_cast<T>(value));
     }
 }
 
@@ -40,14 +37,12 @@ template <size_t N, class T>
     requires std::is_floating_point_v<T>
 static void DisplaySetting()
 {
-    double value = static_cast<double>(
-        LibGcp::SettingsMgr::GetInstance().GetSetting<static_cast<LibGcp::SettingsMgr::Setting>(N), T>()
-    );
-    const char *desc = LibGcp::SettingsMgr::kDescriptions[N];
+    double value =
+        static_cast<double>(LibGcp::SettingsMgr::GetInstance().GetSetting<static_cast<LibGcp::Setting>(N), T>());
+    const char *desc = LibGcp::kSettingsDescriptions[N];
 
     if (ImGui::InputDouble(desc, &value, 0.1, 1.0, "%.5f")) {
-        LibGcp::SettingsMgr::GetInstance().SetSetting<static_cast<LibGcp::SettingsMgr::Setting>(N)>(static_cast<T>(value
-        ));
+        LibGcp::SettingsMgr::GetInstance().SetSetting<static_cast<LibGcp::Setting>(N)>(static_cast<T>(value));
     }
 }
 
@@ -78,7 +73,7 @@ void LibGcp::DebugOverlay::Init()
         model_names_.push_back(name);
     }
 
-    shader_ = ResourceMgr::GetInstance().GetShader("contours//contours", ResourceMgr::LoadType::kMemory);
+    shader_ = ResourceMgr::GetInstance().GetShader("contours//contours", LoadType::kMemory);
 }
 
 void LibGcp::DebugOverlay::DestroyOverlay()
@@ -128,11 +123,9 @@ void LibGcp::DebugOverlay::DrawSettingsEditorWindow_()
 {
     ImGui::Begin("Settings Editor");
 
-    CxxUtils::IterateTypeList<static_cast<size_t>(SettingsMgr::Setting::kLast) - 1, SettingsMgr::SettingTypes>::Apply(
-        []<size_t N, class T>() {
-            DisplaySetting<N, T>();
-        }
-    );
+    CxxUtils::IterateTypeList<static_cast<size_t>(Setting::kLast) - 1, SettingTypes>::Apply([]<size_t N, class T>() {
+        DisplaySetting<N, T>();
+    });
 
     ImGui::End();
 }

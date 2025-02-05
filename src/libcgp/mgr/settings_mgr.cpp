@@ -1,7 +1,6 @@
 #include <libcgp/mgr/settings_mgr.hpp>
-#include <libcgp/settings.hpp>
 
-LibGcp::SettingsMgr::SettingsMgr(const std::vector<std::tuple<Setting, SettingContainer>> &settings) noexcept
+LibGcp::SettingsMgrBase::SettingsMgrBase(const std::vector<std::tuple<Setting, SettingContainer>> &settings) noexcept
 {
     TRACE("SettingsMgr::SettingsMgr()");
 
@@ -17,4 +16,4 @@ LibGcp::SettingsMgr::SettingsMgr(const std::vector<std::tuple<Setting, SettingCo
     }
 }
 
-LibGcp::SettingsMgr::~SettingsMgr() { TRACE("SettingsMgr::~SettingsMgr()"); }
+LibGcp::SettingsMgrBase::~SettingsMgrBase() { TRACE("SettingsMgr::~SettingsMgr()"); }

@@ -2,21 +2,20 @@
 #define MGR_SETTINGS_MGR_HPP_
 
 #include <libcgp/defines.hpp>
-#include <libcgp/settings.hpp>
+#include <libcgp/intf.hpp>
 
-#include <CxxUtils/singleton.hpp>
+#include <CxxUtils/static_singleton.hpp>
 #include <CxxUtils/type_list.hpp>
 
 #include <array>
 #include <cassert>
 #include <cstdint>
-#include <cstdlib>
 #include <tuple>
 #include <type_traits>
 #include <vector>
 
 LIBGCP_DECL_START_
-class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
+class SettingsMgrBase final : public CxxUtils::StaticSingletonHelper
 {
     // ------------------------------
     // Class internals
@@ -25,28 +24,6 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
     static constexpr size_t kMaxSettings = 512;
 
     public:
-    enum class Setting : std::uint16_t {
-        kCameraType,
-        kMouseSensitivity,
-        kClockTicking,
-        kFreeCameraSpeed,
-        kLast,
-    };
-
-    template <size_t N>
-    using SettingTypes = CxxUtils::TypeList<N, CameraType, double, bool, double>;
-    static_assert(SettingTypes<0>::size == static_cast<size_t>(Setting::kLast), "Setting types list is incomplete");
-
-    static constexpr std::array kDescriptions{
-        "Camera type",
-        "Mouse sensitivity",
-        "Is clock enabled",
-        "Free camera speed",
-    };
-    static_assert(
-        kDescriptions.size() == static_cast<size_t>(Setting::kLast), "Setting descriptions list is incomplete"
-    );
-
     struct SettingContainer {
         template <typename T>
         explicit SettingContainer(const T value) noexcept
@@ -90,27 +67,17 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
     // Object creation
     // ------------------------------
 
-    explicit SettingsMgr(const setting_t &settings) noexcept;
-
     public:
-    SettingsMgr() = delete;
-
-    ~SettingsMgr();
-
-    FAST_CALL static SettingsMgr &InitInstance(const setting_t &settings) noexcept
-    {
-        assert(!IsInited());
-
-        Singleton::InitInstance(new SettingsMgr(settings));
-        return GetInstance();
-    }
+    explicit SettingsMgrBase(const setting_t &settings) noexcept;
+    SettingsMgrBase() = delete;
+    ~SettingsMgrBase();
 
     // ------------------------------
     // Class interaction
     // ------------------------------
 
     template <Setting kSetting, typename T>
-    FAST_CALL SettingsMgr &SetSetting(const T value) noexcept
+    FAST_CALL SettingsMgrBase &SetSetting(const T value) noexcept
     {
         static_assert(
             std::is_same_v<T, typename SettingTypes<static_cast<size_t>(kSetting)>::type>, "Setting type mismatch"
@@ -130,7 +97,7 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
     }
 
     template <typename T>
-    FAST_CALL SettingsMgr &SetSetting(const Setting setting, const T value) noexcept
+    FAST_CALL SettingsMgrBase &SetSetting(const Setting setting, const T value) noexcept
     {
         if (settings_[static_cast<size_t>(setting)].GetSetting<T>() == value) {
             return *this;
@@ -150,7 +117,7 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
         return settings_[static_cast<size_t>(setting)].GetSetting<T>();
     }
 
-    FAST_CALL SettingsMgr &AddListener(const Setting setting, void (*listener)(uint64_t)) noexcept
+    FAST_CALL SettingsMgrBase &AddListener(const Setting setting, void (*listener)(uint64_t)) noexcept
     {
         listeners_[static_cast<size_t>(setting)].push_back(listener);
 
@@ -169,6 +136,9 @@ class SettingsMgr final : public CxxUtils::Singleton<SettingsMgr>
     std::array<SettingContainer, kMaxSettings> settings_{};
     std::array<std::vector<void (*)(uint64_t)>, kMaxSettings> listeners_{};
 };
+
+using setting_t   = SettingsMgrBase::setting_t;
+using SettingsMgr = CxxUtils::StaticSingleton<SettingsMgrBase>;
 
 LIBGCP_DECL_END_
 

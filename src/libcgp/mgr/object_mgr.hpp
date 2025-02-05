@@ -7,18 +7,13 @@
 #include <libcgp/primitives/shader.hpp>
 #include <libcgp/primitives/static_object.hpp>
 
-#include <CxxUtils/singleton.hpp>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <CxxUtils/static_singleton.hpp>
 
 #include <cassert>
-#include <string>
 #include <vector>
 
 LIBGCP_DECL_START_
-class ObjectMgr : public CxxUtils::Singleton<ObjectMgr>
+class ObjectMgrBase : public CxxUtils::StaticSingletonHelper
 {
     // ------------------------------
     // Internal public types
@@ -26,31 +21,13 @@ class ObjectMgr : public CxxUtils::Singleton<ObjectMgr>
 
     static constexpr size_t kDefaultStorageSize = static_cast<size_t>(2 * 16384);
 
-    public:
-    struct DynamicObjectSpec {
-        int xd;
-    };
-
-    using static_objects_t  = std::vector<StaticObjectSpec>;
-    using dynamic_objects_t = std::vector<DynamicObjectSpec>;
-
     // ------------------------------
     // Object creation
     // ------------------------------
 
-    protected:
-    ObjectMgr() = default;
-
     public:
-    ~ObjectMgr();
-
-    FAST_CALL static ObjectMgr& InitInstance()
-    {
-        assert(!IsInited());
-
-        Singleton::InitInstance(new ObjectMgr());
-        return GetInstance();
-    }
+    ObjectMgrBase() = default;
+    ~ObjectMgrBase();
 
     // ------------------------------
     // Class interaction
@@ -83,6 +60,8 @@ class ObjectMgr : public CxxUtils::Singleton<ObjectMgr>
 
     std::vector<StaticObject> static_objects_;
 };
+
+using ObjectMgr = CxxUtils::StaticSingleton<ObjectMgrBase>;
 
 LIBGCP_DECL_END_
 

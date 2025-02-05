@@ -11,7 +11,6 @@
 #include <libcgp/intf.hpp>
 #include <libcgp/mgr/object_mgr.hpp>
 #include <libcgp/primitives/shader.hpp>
-#include <libcgp/settings.hpp>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

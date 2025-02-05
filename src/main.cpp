@@ -53,26 +53,26 @@ int main()
         {
     },
         {
-            LibGcp::ResourceMgr::ResourceSpec{
+            LibGcp::ResourceSpec{
                 .paths     = {"first_vertex_shader", "first_fragment_shader"},
-                .type      = LibGcp::ResourceMgr::ResourceType::kShader,
-                .load_type = LibGcp::ResourceMgr::LoadType::kMemory,
+                .type      = LibGcp::ResourceType::kShader,
+                .load_type = LibGcp::LoadType::kMemory,
             },
-            LibGcp::ResourceMgr::ResourceSpec{
+            LibGcp::ResourceSpec{
                 .paths     = {"contours", "contours"},
-                .type      = LibGcp::ResourceMgr::ResourceType::kShader,
-                .load_type = LibGcp::ResourceMgr::LoadType::kMemory,
+                .type      = LibGcp::ResourceType::kShader,
+                .load_type = LibGcp::LoadType::kMemory,
             },
-            LibGcp::ResourceMgr::ResourceSpec{
+            LibGcp::ResourceSpec{
                 .paths        = {"./models/backpack/backpack.obj"},
-                .type         = LibGcp::ResourceMgr::ResourceType::kModel,
-                .load_type    = LibGcp::ResourceMgr::LoadType::kExternal,
+                .type         = LibGcp::ResourceType::kModel,
+                .load_type    = LibGcp::LoadType::kExternal,
                 .flip_texture = 1,
             },
-            LibGcp::ResourceMgr::ResourceSpec{
+            LibGcp::ResourceSpec{
                 .paths        = {"./models/bulb.glb"},
-                .type         = LibGcp::ResourceMgr::ResourceType::kModel,
-                .load_type    = LibGcp::ResourceMgr::LoadType::kExternal,
+                .type         = LibGcp::ResourceType::kModel,
+                .load_type    = LibGcp::LoadType::kExternal,
                 .flip_texture = 0,
             },
         },

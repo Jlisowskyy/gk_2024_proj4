@@ -10,9 +10,8 @@
 #include <string>
 
 int LibGcp::RenderEngineMain(
-    const SettingsMgr::setting_t &settings, const ResourceMgr::resource_t &resources,
-    const ObjectMgr::dynamic_objects_t &dynamic_objects, const ObjectMgr::static_objects_t &static_objects,
-    const std::string &default_shader_name
+    const setting_t &settings, const resource_t &resources, const dynamic_objects_t &dynamic_objects,
+    const static_objects_t &static_objects, const std::string &default_shader_name
 )
 {
     /* initialize components */
