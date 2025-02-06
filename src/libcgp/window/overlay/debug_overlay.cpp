@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h> /* (include after glad) */
 // clang-format on
 
+#include <ImGuiFileDialog.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -170,6 +171,23 @@ void LibGcp::DebugOverlay::DrawLiveObjectsInspectorWindow_()
 
 void LibGcp::DebugOverlay::DrawSpawnModelsWindow_()
 {
+    if (ImGui::Button("Open File")) {
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".glb,.obj,.fbx");
+    }
+
+    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            const std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+            ResourceMgr::GetInstance().GetModel({
+                .paths        = {filePath},
+                .type         = ResourceType::kModel,
+                .load_type    = LoadType::kExternal,
+                .flip_texture = 1,
+            });
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
+
     if (ImGui::BeginListBox("Available models:")) {
         for (int i = 0; i < static_cast<int>(model_names_.size()); i++) {
             const bool is_selected = (selected_model_idx_ == i);
@@ -200,6 +218,7 @@ void LibGcp::DebugOverlay::FillObjectNames_()
 {
     std::lock_guard lock(ObjectMgr::GetInstance().GetStaticObjects().GetMutex());
 
+    static_object_names_.clear();
     static_object_names_.reserve(ObjectMgr::GetInstance().GetStaticObjects().size());
     for (const auto &object : ObjectMgr::GetInstance().GetStaticObjects()) {
         static_object_names_.push_back("Object " + std::to_string(object.GetId()));

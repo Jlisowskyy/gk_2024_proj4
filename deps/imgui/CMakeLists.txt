@@ -31,3 +31,5 @@ target_include_directories(imgui PUBLIC
         ${libimgui_SOURCE_DIR}
         ${libimgui_SOURCE_DIR}/backends/
 )
+
+target_link_libraries(imgui PRIVATE glfw)

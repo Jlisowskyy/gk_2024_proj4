@@ -49,6 +49,7 @@ target_link_libraries(${LIB_NAME} PUBLIC
         assimp::assimp
         CxxUtilsLib
         imgui
+        ImGuiFileDialog
 )
 
 # ------------------------------
