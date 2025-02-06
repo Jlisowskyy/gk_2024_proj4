@@ -53,7 +53,7 @@ std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgrBase::GetTexture(const Resou
 {
     assert(resource.type == ResourceType::kTexture);
 
-    const std::lock_guard lock(texture_mutex_);
+    const std::lock_guard lock(textures_.GetMutex());
     const std::string &texture_name = resource.paths[0];
 
     if (textures_.contains(texture_name)) {
@@ -73,7 +73,7 @@ std::shared_ptr<LibGcp::Shader> LibGcp::ResourceMgrBase::GetShader(const Resourc
 {
     assert(resource.type == ResourceType::kShader);
 
-    const std::lock_guard lock(shader_mutex_);
+    const std::lock_guard lock(shaders_.GetMutex());
     const std::string shader_name = resource.paths[0] + "//" + resource.paths[1];
 
     if (shaders_.contains(shader_name)) {
@@ -94,7 +94,7 @@ std::shared_ptr<LibGcp::Model> LibGcp::ResourceMgrBase::GetModel(const ResourceS
 {
     assert(resource.type == ResourceType::kModel);
 
-    const std::lock_guard lock(model_mutex_);
+    const std::lock_guard lock(models_.GetMutex());
     const std::string &model_name = resource.paths[0];
 
     if (models_.contains(model_name)) {
@@ -145,7 +145,7 @@ std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgrBase::GetTextureExternalSour
     const std::string &path, const TextureSpec &spec
 )
 {
-    const std::lock_guard lock(texture_mutex_);
+    const std::lock_guard lock(textures_.GetMutex());
 
     if (textures_.contains(path)) {
         TRACE(path + " texture already loaded");

@@ -8,6 +8,7 @@
 #include <libcgp/primitives/texture.hpp>
 #include <libcgp/rc.hpp>
 
+#include <CxxUtils/data_types/extended_map.hpp>
 #include <CxxUtils/static_singleton.hpp>
 
 #include <memory>
@@ -57,11 +58,11 @@ class ResourceMgrBase final : public CxxUtils::StaticSingletonHelper
 
     std::shared_ptr<Texture> GetTextureExternalSourceRaw(const std::string &path, const TextureSpec &spec);
 
-    FAST_CALL const std::unordered_map<std::string, std::shared_ptr<Texture>> &GetTextures() const { return textures_; }
+    FAST_CALL CxxUtils::ExtendedMap<std::string, std::shared_ptr<Texture>> &GetTextures() { return textures_; }
 
-    FAST_CALL const std::unordered_map<std::string, std::shared_ptr<Shader>> &GetShaders() const { return shaders_; }
+    FAST_CALL CxxUtils::ExtendedMap<std::string, std::shared_ptr<Shader>> &GetShaders() { return shaders_; }
 
-    FAST_CALL const std::unordered_map<std::string, std::shared_ptr<Model>> &GetModels() const { return models_; }
+    FAST_CALL CxxUtils::ExtendedMap<std::string, std::shared_ptr<Model>> &GetModels() { return models_; }
 
     // ---------------------------------
     // Class implementation methods
@@ -88,14 +89,9 @@ class ResourceMgrBase final : public CxxUtils::StaticSingletonHelper
     // Class fields
     // ------------------------------
 
-    std::mutex texture_mutex_{};
-    std::unordered_map<std::string, std::shared_ptr<Texture>> textures_{};
-
-    std::mutex shader_mutex_{};
-    std::unordered_map<std::string, std::shared_ptr<Shader>> shaders_{};
-
-    std::mutex model_mutex_{};
-    std::unordered_map<std::string, std::shared_ptr<Model>> models_{};
+    CxxUtils::ExtendedMap<std::string, std::shared_ptr<Texture>> textures_;
+    CxxUtils::ExtendedMap<std::string, std::shared_ptr<Shader>> shaders_;
+    CxxUtils::ExtendedMap<std::string, std::shared_ptr<Model>> models_;
 };
 
 using ResourceMgr = CxxUtils::StaticSingleton<ResourceMgrBase>;

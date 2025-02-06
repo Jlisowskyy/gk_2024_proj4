@@ -7,9 +7,9 @@
 #include <libcgp/primitives/shader.hpp>
 #include <libcgp/primitives/static_object.hpp>
 
+#include <CxxUtils/data_types/extended_map.hpp>
 #include <CxxUtils/static_singleton.hpp>
 
-#include <cassert>
 #include <vector>
 
 LIBGCP_DECL_START_
@@ -27,7 +27,7 @@ class ObjectMgrBase : public CxxUtils::StaticSingletonHelper
 
     public:
     ObjectMgrBase() = default;
-    ~ObjectMgrBase();
+    ~ObjectMgrBase() override;
 
     // ------------------------------
     // Class interaction

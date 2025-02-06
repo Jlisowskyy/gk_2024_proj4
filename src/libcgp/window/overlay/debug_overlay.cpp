@@ -66,14 +66,8 @@ void LibGcp::DebugOverlay::Init()
         static_object_names_.push_back("Object " + std::to_string(object.GetId()));
     }
 
-    auto models = ResourceMgr::GetInstance().GetModels();
-
-    model_names_.reserve(models.size());
-    for (const auto &[name, _] : models) {
-        model_names_.push_back(name);
-    }
-
-    shader_ = ResourceMgr::GetInstance().GetShader("contours//contours", LoadType::kMemory);
+    model_names_ = ResourceMgr::GetInstance().GetModels().GetKeys();
+    shader_      = ResourceMgr::GetInstance().GetShader("contours//contours", LoadType::kMemory);
 }
 
 void LibGcp::DebugOverlay::DestroyOverlay()
