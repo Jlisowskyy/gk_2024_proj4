@@ -34,7 +34,10 @@ void LibGcp::ObjectMgrBase::ProcessProgress(long delta_time_micros) {}
 void LibGcp::ObjectMgrBase::CreateStaticObject_(const StaticObjectSpec &spec)
 {
     std::lock_guard lock(static_objects_.GetMutex());
-    static_objects_.emplace_back(spec.position, ResourceMgr::GetInstance().GetModel(spec.name, LoadType::kExternal));
+    auto obj = static_objects_.emplace_back(
+        spec.position, ResourceMgr::GetInstance().GetModel(spec.name, LoadType::kExternal)
+    );
+    static_objects_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(obj);
 }
 
 void LibGcp::ObjectMgrBase::CreateDynamicObject_([[maybe_unused]] const DynamicObjectSpec &spec) {}

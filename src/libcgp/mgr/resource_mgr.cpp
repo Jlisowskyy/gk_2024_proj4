@@ -168,6 +168,7 @@ std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgrBase::GetTextureExternalSour
     textures_[path] = texture;
     TRACE("Loaded texture: " + path);
 
+    textures_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(path);
     return texture;
 }
 
@@ -236,6 +237,7 @@ LibGcp::Rc LibGcp::ResourceMgrBase::LoadTextureFromExternal_(const ResourceSpec 
 
     assert(!textures_.contains(texture_name));
     textures_[texture_name] = texture;
+    textures_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(texture_name);
 
     return Rc::kSuccess;
 }
@@ -269,6 +271,7 @@ LibGcp::Rc LibGcp::ResourceMgrBase::LoadShaderFromMemory_(const ResourceSpec &re
 
     assert(!shaders_.contains(vert + "//" + frag));
     shaders_[vert + "//" + frag] = shader;
+    shaders_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(vert + "//" + frag);
 
     return Rc::kSuccess;
 }
@@ -323,6 +326,7 @@ LibGcp::Rc LibGcp::ResourceMgrBase::LoadShaderFromExternal_(const ResourceSpec &
 
     assert(!shaders_.contains(vert + "//" + frag));
     shaders_[vert + "//" + frag] = shader;
+    shaders_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(vert + "//" + frag);
 
     return Rc::kSuccess;
 }
@@ -345,6 +349,7 @@ LibGcp::Rc LibGcp::ResourceMgrBase::LoadModelFromExternal_(const ResourceSpec &r
 
     assert(!models_.contains(model_name));
     models_[model_name] = model;
+    models_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(model_name);
 
     return Rc::kSuccess;
 }

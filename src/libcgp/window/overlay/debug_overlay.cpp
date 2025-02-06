@@ -59,9 +59,7 @@ LibGcp::DebugOverlay::~DebugOverlay()
 
 void LibGcp::DebugOverlay::Init()
 {
-    FillObjectNames_();
-    model_names_ = ResourceMgr::GetInstance().GetModels().GetKeys();
-    shader_      = ResourceMgr::GetInstance().GetShader("contours//contours", LoadType::kMemory);
+    shader_ = ResourceMgr::GetInstance().GetShader("contours//contours", LoadType::kMemory);
 }
 
 void LibGcp::DebugOverlay::DestroyOverlay()
@@ -69,6 +67,20 @@ void LibGcp::DebugOverlay::DestroyOverlay()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+
+    /* remove events */
+    ResourceMgr::GetInstance().GetModels().GetListeners().RemoveListener<CxxUtils::ContainerEvents::kAdd>(
+        add_model_listener_
+    );
+    ResourceMgr::GetInstance().GetModels().GetListeners().RemoveListener<CxxUtils::ContainerEvents::kRemove>(
+        remove_model_listener_
+    );
+    ObjectMgr::GetInstance().GetStaticObjects().GetListeners().RemoveListener<CxxUtils::ContainerEvents::kAdd>(
+        add_object_listener_
+    );
+    ObjectMgr::GetInstance().GetStaticObjects().GetListeners().RemoveListener<CxxUtils::ContainerEvents::kRemove>(
+        remove_object_listener_
+    );
 
     window_ = nullptr;
 }
@@ -83,6 +95,44 @@ void LibGcp::DebugOverlay::EnableOverlay(GLFWwindow *window)
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
+
+    FillObjectNames_();
+    model_names_ = ResourceMgr::GetInstance().GetModels().GetKeys();
+
+    /* Events */
+    add_model_listener_ =
+        ResourceMgr::GetInstance().GetModels().GetListeners().AddListener<CxxUtils::ContainerEvents::kAdd>(
+            [this](const std::string &name) {
+                model_names_.push_back(name);
+            }
+        );
+
+    remove_model_listener_ =
+        ResourceMgr::GetInstance().GetModels().GetListeners().AddListener<CxxUtils::ContainerEvents::kRemove>(
+            [this](const std::string &name) {
+                model_names_.erase(std::remove(model_names_.begin(), model_names_.end(), name), model_names_.end());
+            }
+        );
+
+    add_object_listener_ =
+        ObjectMgr::GetInstance().GetStaticObjects().GetListeners().AddListener<CxxUtils::ContainerEvents::kAdd>(
+            [this](const StaticObject &object) {
+                static_object_names_.push_back("Object " + std::to_string(object.GetId()));
+            }
+        );
+
+    remove_object_listener_ =
+        ObjectMgr::GetInstance().GetStaticObjects().GetListeners().AddListener<CxxUtils::ContainerEvents::kRemove>(
+            [this](const StaticObject &object) {
+                static_object_names_.erase(
+                    std::remove(
+                        static_object_names_.begin(), static_object_names_.end(),
+                        "Object " + std::to_string(object.GetId())
+                    ),
+                    static_object_names_.end()
+                );
+            }
+        );
 
     window_ = window;
 }

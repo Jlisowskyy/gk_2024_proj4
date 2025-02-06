@@ -73,23 +73,33 @@ class DebugOverlay
     // Class fields
     // ------------------------------
 
+    /* Info to display */
     std::vector<std::string> static_object_names_{};
     std::vector<std::string> static_object_mesh_names_{};
+    std::vector<std::string> model_names_{};
     StaticObject *static_object_{};
     std::shared_ptr<Model> static_object_model_{};
     std::shared_ptr<Mesh> static_object_mesh_{};
 
+    /* Selection idxes */
     int selected_static_object_idx_{-1};
     int selected_mesh_idx_{-1};
     int selected_model_idx_{-1};
 
-    std::vector<std::string> model_names_{};
+    /* Spawn model info */
     ObjectPosition spawn_model_pos_{
         .position = {},
         .rotation = {},
         .scale    = {1.0f, 1.0f, 1.0f},
     };
 
+    /* Event data */
+    int add_model_listener_{};
+    int remove_model_listener_{};
+    int add_object_listener_{};
+    int remove_object_listener_{};
+
+    /* Window info */
     GLFWwindow *window_{};
     std::shared_ptr<Shader> shader_{};
 };
