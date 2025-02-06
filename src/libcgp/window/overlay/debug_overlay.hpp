@@ -67,6 +67,8 @@ class DebugOverlay
 
     void SetSelectedMode_(int idx);
 
+    void FillObjectNames_();
+
     // ------------------------------
     // Class fields
     // ------------------------------

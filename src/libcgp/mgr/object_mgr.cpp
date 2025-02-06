@@ -33,6 +33,7 @@ void LibGcp::ObjectMgrBase::ProcessProgress(long delta_time_micros) {}
 
 void LibGcp::ObjectMgrBase::CreateStaticObject_(const StaticObjectSpec &spec)
 {
+    std::lock_guard lock(static_objects_.GetMutex());
     static_objects_.emplace_back(spec.position, ResourceMgr::GetInstance().GetModel(spec.name, LoadType::kExternal));
 }
 

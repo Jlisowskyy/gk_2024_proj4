@@ -7,7 +7,7 @@
 #include <libcgp/primitives/shader.hpp>
 #include <libcgp/primitives/static_object.hpp>
 
-#include <CxxUtils/data_types/extended_map.hpp>
+#include <CxxUtils/data_types/extended_vector.hpp>
 #include <CxxUtils/static_singleton.hpp>
 
 #include <vector>
@@ -39,9 +39,7 @@ class ObjectMgrBase : public CxxUtils::StaticSingletonHelper
 
     void ProcessProgress(long delta_time_micros);
 
-    NDSCRD FAST_CALL const std::vector<StaticObject>& GetStaticObjects() const { return static_objects_; }
-
-    NDSCRD FAST_CALL StaticObject& GetStaticObject(const size_t idx) { return static_objects_[idx]; }
+    NDSCRD FAST_CALL CxxUtils::ExtendedVector<StaticObject>& GetStaticObjects() { return static_objects_; }
 
     FAST_CALL void AddStaticObject(const StaticObjectSpec& spec) { CreateStaticObject_(spec); }
 
@@ -58,7 +56,7 @@ class ObjectMgrBase : public CxxUtils::StaticSingletonHelper
     // Class fields
     // ------------------------------
 
-    std::vector<StaticObject> static_objects_;
+    CxxUtils::ExtendedVector<StaticObject> static_objects_;
 };
 
 using ObjectMgr = CxxUtils::StaticSingleton<ObjectMgrBase>;

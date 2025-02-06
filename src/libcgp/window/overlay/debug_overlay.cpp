@@ -59,13 +59,7 @@ LibGcp::DebugOverlay::~DebugOverlay()
 
 void LibGcp::DebugOverlay::Init()
 {
-    auto objects = ObjectMgr::GetInstance().GetStaticObjects();
-
-    static_object_names_.reserve(objects.size());
-    for (const auto &object : objects) {
-        static_object_names_.push_back("Object " + std::to_string(object.GetId()));
-    }
-
+    FillObjectNames_();
     model_names_ = ResourceMgr::GetInstance().GetModels().GetKeys();
     shader_      = ResourceMgr::GetInstance().GetShader("contours//contours", LoadType::kMemory);
 }
@@ -156,6 +150,16 @@ void LibGcp::DebugOverlay::SetSelectedMode_(const int idx)
     }
 
     selected_model_idx_ = idx;
+}
+
+void LibGcp::DebugOverlay::FillObjectNames_()
+{
+    std::lock_guard lock(ObjectMgr::GetInstance().GetStaticObjects().GetMutex());
+
+    static_object_names_.reserve(ObjectMgr::GetInstance().GetStaticObjects().size());
+    for (const auto &object : ObjectMgr::GetInstance().GetStaticObjects()) {
+        static_object_names_.push_back("Object " + std::to_string(object.GetId()));
+    }
 }
 
 void LibGcp::DebugOverlay::DrawStaticObjectsSection_()
@@ -269,7 +273,7 @@ void LibGcp::DebugOverlay::SetSelectedObject_(const int idx)
     }
 
     selected_static_object_idx_ = idx;
-    static_object_              = &ObjectMgr::GetInstance().GetStaticObject(idx);
+    static_object_              = &ObjectMgr::GetInstance().GetStaticObjects()[idx];
     static_object_model_        = static_object_->GetModel();
 
     static_object_mesh_names_.reserve(static_object_model_->GetMeshesCount());
