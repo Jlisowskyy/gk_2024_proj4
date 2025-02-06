@@ -110,7 +110,7 @@ void LibGcp::DebugOverlay::EnableOverlay(GLFWwindow *window)
     remove_model_listener_ =
         ResourceMgr::GetInstance().GetModels().GetListeners().AddListener<CxxUtils::ContainerEvents::kRemove>(
             [this](const std::string &name) {
-                model_names_.erase(std::remove(model_names_.begin(), model_names_.end(), name), model_names_.end());
+                std::erase(model_names_, name);
             }
         );
 
@@ -124,13 +124,7 @@ void LibGcp::DebugOverlay::EnableOverlay(GLFWwindow *window)
     remove_object_listener_ =
         ObjectMgr::GetInstance().GetStaticObjects().GetListeners().AddListener<CxxUtils::ContainerEvents::kRemove>(
             [this](const StaticObject &object) {
-                static_object_names_.erase(
-                    std::remove(
-                        static_object_names_.begin(), static_object_names_.end(),
-                        "Object " + std::to_string(object.GetId())
-                    ),
-                    static_object_names_.end()
-                );
+                std::erase(static_object_names_, "Object " + std::to_string(object.GetId()));
             }
         );
 
@@ -231,6 +225,7 @@ void LibGcp::DebugOverlay::DrawStaticObjectsSection_()
 
     ImGui::Separator();
 
+    DrawDeleteObjectButton_();
     if (selected_static_object_idx_ == -1) {
         ImGui::Text("No object selected...");
     } else {
@@ -304,6 +299,21 @@ void LibGcp::DebugOverlay::DrawSelectedModelSpawnSection_()
             .position = spawn_model_pos_,
             .name     = model_names_[selected_model_idx_],
         });
+    }
+}
+
+void LibGcp::DebugOverlay::DrawDeleteObjectButton_()
+{
+    if (selected_static_object_idx_ == -1) {
+        return;
+    }
+
+    if (ImGui::Button("Delete")) {
+        const uint64_t ident = static_object_->GetId();
+        SetSelectedObject_(selected_static_object_idx_);
+        ObjectMgr::GetInstance().RemoveStaticObject(ident);
+
+        return;
     }
 }
 

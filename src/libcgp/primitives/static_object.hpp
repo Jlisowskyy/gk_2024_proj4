@@ -27,6 +27,14 @@ class StaticObject
 
     ~StaticObject() = default;
 
+    StaticObject(const StaticObject &) = default;
+
+    StaticObject &operator=(const StaticObject &) = default;
+
+    StaticObject(StaticObject &&) = default;
+
+    StaticObject &operator=(StaticObject &&) = default;
+
     StaticObject(const ObjectPosition &position, const std::shared_ptr<Model> &model)
         : id_(id_counter_.fetch_add(1)), position_(position), model_(model)
     {
@@ -55,7 +63,7 @@ class StaticObject
     // ------------------------------
 
     protected:
-    const uint64_t id_;
+    uint64_t id_;
     ObjectPosition position_;
     std::shared_ptr<Model> model_;
 };

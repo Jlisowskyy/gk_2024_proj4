@@ -61,6 +61,8 @@ class DebugOverlay
 
     void DrawSelectedModelSpawnSection_();
 
+    void DrawDeleteObjectButton_();
+
     void SetSelectedObject_(int idx);
 
     void SetSelectedMesh_(int idx);

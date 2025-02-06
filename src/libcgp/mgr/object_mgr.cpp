@@ -31,6 +31,19 @@ void LibGcp::ObjectMgrBase::DrawStaticObjects(Shader &shader)
 
 void LibGcp::ObjectMgrBase::ProcessProgress(long delta_time_micros) {}
 
+void LibGcp::ObjectMgrBase::RemoveStaticObject(const uint64_t ident)
+{
+    std::lock_guard lock(static_objects_.GetMutex());
+
+    const auto obj_it = std::ranges::find_if(static_objects_, [ident](const StaticObject &obj) {
+        return obj.GetId() == ident;
+    });
+    assert(obj_it != static_objects_.end());
+
+    static_objects_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kRemove>(*obj_it);
+    static_objects_.erase(obj_it);
+}
+
 void LibGcp::ObjectMgrBase::CreateStaticObject_(const StaticObjectSpec &spec)
 {
     std::lock_guard lock(static_objects_.GetMutex());

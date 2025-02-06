@@ -10,6 +10,7 @@
 #include <CxxUtils/data_types/extended_vector.hpp>
 #include <CxxUtils/static_singleton.hpp>
 
+#include <mutex>
 #include <vector>
 
 LIBGCP_DECL_START_
@@ -27,30 +28,33 @@ class ObjectMgrBase : public CxxUtils::StaticSingletonHelper
 
     public:
     ObjectMgrBase() = default;
+
     ~ObjectMgrBase() override;
 
     // ------------------------------
     // Class interaction
     // ------------------------------
 
-    void Init(const static_objects_t& static_objects, const dynamic_objects_t& dynamic_objects);
+    void Init(const static_objects_t &static_objects, const dynamic_objects_t &dynamic_objects);
 
-    void DrawStaticObjects(Shader& shader);
+    void DrawStaticObjects(Shader &shader);
 
     void ProcessProgress(long delta_time_micros);
 
-    NDSCRD FAST_CALL CxxUtils::ExtendedVector<StaticObject>& GetStaticObjects() { return static_objects_; }
+    NDSCRD FAST_CALL CxxUtils::ExtendedVector<StaticObject> &GetStaticObjects() { return static_objects_; }
 
-    FAST_CALL void AddStaticObject(const StaticObjectSpec& spec) { CreateStaticObject_(spec); }
+    FAST_CALL void AddStaticObject(const StaticObjectSpec &spec) { CreateStaticObject_(spec); }
+
+    void RemoveStaticObject(uint64_t ident);
 
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------
 
     protected:
-    void CreateStaticObject_(const StaticObjectSpec& spec);
+    void CreateStaticObject_(const StaticObjectSpec &spec);
 
-    void CreateDynamicObject_(const DynamicObjectSpec& spec);
+    void CreateDynamicObject_(const DynamicObjectSpec &spec);
 
     // ------------------------------
     // Class fields
