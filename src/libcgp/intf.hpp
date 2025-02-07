@@ -235,13 +235,13 @@ struct SceneSerialized {
         SceneVersion scene_version;
         TextureVersion texture_version;
         ModelVersion model_version;
-        size_t total_bytes;
+        size_t header_bytes;
+        size_t payload_bytes;
 
         size_t num_strings;
         size_t num_settings;
         size_t num_resources;
         size_t num_statics;
-        size_t default_shader;
     };
 
     struct SettingsSerialized {
@@ -263,16 +263,16 @@ struct SceneSerialized {
 
     struct StringSerialized {
         size_t length;
-        char data[0];
+        /* char data[0]; */
     };
 
     SceneHeader header;
 
-    SettingsSerialized settings[0];
-    ResourceSerialized resources[0];
-    StaticObjectSerialized static_objects[0];
-    size_t string_table[0];
-    StringSerialized string_data[0];
+    /* SettingsSerialized settings[]; */
+    /* ResourceSerialized resources[]; */
+    /* StaticObjectSerialized static_objects[]; */
+    /* size_t string_table[]; */
+    /* StringSerialized string_data[]; */
 };
 
 LIBGCP_DECL_END_

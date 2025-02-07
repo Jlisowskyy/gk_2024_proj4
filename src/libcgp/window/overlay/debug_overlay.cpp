@@ -1,7 +1,11 @@
 #include <libcgp/engine/engine.hpp>
+#include <libcgp/intf.hpp>
 #include <libcgp/mgr/object_mgr.hpp>
 #include <libcgp/mgr/resource_mgr.hpp>
 #include <libcgp/mgr/settings_mgr.hpp>
+#include <libcgp/rc.hpp>
+#include <libcgp/serialization/scene_serializer.hpp>
+#include <libcgp/todo.hpp>
 #include <libcgp/window/overlay/debug_overlay.hpp>
 
 #include <CxxUtils/type_list.hpp>
@@ -17,6 +21,7 @@
 #include <imgui_impl_opengl3.h>
 
 #include <cassert>
+#include <libcgp/utils/files.hpp>
 #include <type_traits>
 
 // ------------------------------------
@@ -147,6 +152,8 @@ void LibGcp::DebugOverlay::Draw()
     DrawSettingsEditorWindow_();
     DrawLiveObjectsInspectorWindow_();
     DrawSpawnModelsWindow_();
+    DrawSceneWindow_();
+    DrawFailure_();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -171,6 +178,8 @@ void LibGcp::DebugOverlay::DrawLiveObjectsInspectorWindow_()
 
 void LibGcp::DebugOverlay::DrawSpawnModelsWindow_()
 {
+    ImGui::Begin("Spawn models:");
+
     if (ImGui::Button("Open File")) {
         ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".glb,.obj,.fbx");
     }
@@ -202,6 +211,56 @@ void LibGcp::DebugOverlay::DrawSpawnModelsWindow_()
     }
 
     DrawSelectedModelSpawnSection_();
+
+    ImGui::End();
+}
+
+void LibGcp::DebugOverlay::DrawSceneWindow_()
+{
+    ImGui::Begin("Scene editor: ");
+
+    if (ImGui::Button("Save scene")) {
+        IGFD::FileDialog::Instance()->OpenDialog("SaveFileDlg", "Save File", ".libgcp_scene");
+    }
+
+    if (IGFD::FileDialog::Instance()->Display("SaveFileDlg")) {
+        if (IGFD::FileDialog::Instance()->IsOk()) {
+            const std::string filePath = IGFD::FileDialog::Instance()->GetFilePathName();
+
+            TODO_THREADS
+            SceneSerializer serializer(GetDirFromFile(filePath));
+            const auto rc = serializer.SerializeScene(GetFileName(filePath), SerializationType::kShallow);
+
+            if (IsFailure(rc)) {
+                TRACE("Failed to save scene: " << GetRcDescription(rc));
+                TriggerFailure_(GetRcDescription(rc));
+            } else {
+                TRACE("Scene saved successfully");
+            }
+        }
+        IGFD::FileDialog::Instance()->Close();
+    }
+
+    ImGui::End();
+}
+
+void LibGcp::DebugOverlay::DrawFailure_()
+{
+    if (show_failure_) {
+        ImGui::OpenPopup("Failure");
+    }
+
+    if (ImGui::BeginPopupModal("Failure", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text(failure_message_.c_str());
+        ImGui::Separator();
+
+        if (ImGui::Button("OK")) {
+            ImGui::CloseCurrentPopup();
+            show_failure_ = false;
+        }
+
+        ImGui::EndPopup();
+    }
 }
 
 void LibGcp::DebugOverlay::SetSelectedMode_(const int idx)
@@ -223,6 +282,12 @@ void LibGcp::DebugOverlay::FillObjectNames_()
     for (const auto &object : ObjectMgr::GetInstance().GetStaticObjects()) {
         static_object_names_.push_back("Object " + std::to_string(object.GetId()));
     }
+}
+
+void LibGcp::DebugOverlay::TriggerFailure_(const std::string &message)
+{
+    show_failure_    = true;
+    failure_message_ = message;
 }
 
 void LibGcp::DebugOverlay::DrawStaticObjectsSection_()

@@ -75,7 +75,7 @@ void LibGcp::EngineBase::ProcessInput_(const long delta)
     ProcessUserMovement_(is_clock_enabled * delta);
 }
 
-void LibGcp::EngineBase::ProcessUserMovement_(const long delta) {}
+void LibGcp::EngineBase::ProcessUserMovement_([[maybe_unused]] const long delta) {}
 
 void LibGcp::EngineBase::ProcessFreeCameraMovement_(const long delta)
 {

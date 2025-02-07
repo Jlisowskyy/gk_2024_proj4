@@ -51,6 +51,10 @@ class DebugOverlay
 
     void DrawSpawnModelsWindow_();
 
+    void DrawSceneWindow_();
+
+    void DrawFailure_();
+
     void DrawStaticObjectsSection_();
 
     void DrawDynamicObjectsSection_();
@@ -70,6 +74,8 @@ class DebugOverlay
     void SetSelectedMode_(int idx);
 
     void FillObjectNames_();
+
+    void TriggerFailure_(const std::string &message);
 
     // ------------------------------
     // Class fields
@@ -100,6 +106,10 @@ class DebugOverlay
     int remove_model_listener_{};
     int add_object_listener_{};
     int remove_object_listener_{};
+
+    /* failure */
+    bool show_failure_{};
+    std::string failure_message_{};
 
     /* Window info */
     GLFWwindow *window_{};

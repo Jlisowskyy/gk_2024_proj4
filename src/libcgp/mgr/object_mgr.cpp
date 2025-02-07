@@ -29,7 +29,7 @@ void LibGcp::ObjectMgrBase::DrawStaticObjects(Shader &shader)
     }
 }
 
-void LibGcp::ObjectMgrBase::ProcessProgress(long delta_time_micros) {}
+void LibGcp::ObjectMgrBase::ProcessProgress([[maybe_unused]] long delta_time_micros) {}
 
 void LibGcp::ObjectMgrBase::RemoveStaticObject(const uint64_t ident)
 {

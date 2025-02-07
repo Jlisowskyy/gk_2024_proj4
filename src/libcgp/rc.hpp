@@ -36,6 +36,8 @@ FAST_CALL constexpr const char *GetRcDescription(const Rc code) noexcept
 
 static FAST_CALL constexpr bool IsSuccess(const Rc code) noexcept { return code == Rc::kSuccess; }
 
+static FAST_CALL constexpr bool IsFailure(const Rc code) noexcept { return !IsSuccess(code); }
+
 LIBGCP_DECL_END_
 
 #endif  // RC_HPP_

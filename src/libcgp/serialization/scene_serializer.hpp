@@ -37,19 +37,21 @@ class SceneSerializer
     // ------------------------------
 
     protected:
-    Rc _serializeSceneShallow(const std::string &scene_name);
+    Rc SerializeSceneShallow_(const std::string &scene_name);
 
-    Rc _serializeSceneDeep(const std::string &scene_name);
+    Rc SerializeSceneDeep_(const std::string &scene_name);
 
-    Rc _serializeSceneDeepPack(const std::string &scene_name);
+    Rc SerializeSceneDeepPack_(const std::string &scene_name);
 
-    Rc _serializeSceneDeepAttach(const std::string &scene_name);
+    Rc SerializeSceneDeepAttach_(const std::string &scene_name);
 
-    std::vector<SceneSerialized::SettingsSerialized> _serializeSettings();
+    std::vector<SceneSerialized::SettingsSerialized> SerializeSettings_();
 
-    std::vector<SceneSerialized::ResourceSerialized> _serializeResources();
+    std::vector<SceneSerialized::ResourceSerialized> SerializeResources_();
 
-    std::vector<SceneSerialized::StaticObjectSerialized> _serializeStaticObjects();
+    std::vector<SceneSerialized::StaticObjectSerialized> SerializeStaticObjects_();
+
+    void SaveStringTable(std::ofstream &file);
 
     size_t GetStringId_(const std::string &name);
 
