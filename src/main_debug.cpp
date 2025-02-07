@@ -49,39 +49,33 @@ int main()
 
 int main()
 {
-    return LibGcp::RenderEngineMain(
+    return LibGcp::RenderEngineMain({
+        {},
         {
-    },
-        {
-            LibGcp::ResourceSpec{
+         LibGcp::ResourceSpec{
                 .paths     = {"first_vertex_shader", "first_fragment_shader"},
                 .type      = LibGcp::ResourceType::kShader,
                 .load_type = LibGcp::LoadType::kMemory,
-            },
-            LibGcp::ResourceSpec{
+            }, LibGcp::ResourceSpec{
                 .paths     = {"contours", "contours"},
                 .type      = LibGcp::ResourceType::kShader,
                 .load_type = LibGcp::LoadType::kMemory,
-            },
-            LibGcp::ResourceSpec{
+            }, LibGcp::ResourceSpec{
                 .paths        = {"./models/backpack/backpack.obj"},
                 .type         = LibGcp::ResourceType::kModel,
                 .load_type    = LibGcp::LoadType::kExternal,
                 .flip_texture = 1,
-            },
-            LibGcp::ResourceSpec{
+            }, LibGcp::ResourceSpec{
                 .paths        = {"./models/bulb.glb"},
                 .type         = LibGcp::ResourceType::kModel,
                 .load_type    = LibGcp::LoadType::kExternal,
                 .flip_texture = 0,
-            },
-        },
+            }, },
         {},
         {LibGcp::StaticObjectSpec{
              .position = {},
              .name     = "./models/backpack/backpack.obj",
-         },
-         LibGcp::StaticObjectSpec{
+         }, LibGcp::StaticObjectSpec{
              .position =
                  {
                      .position = {5.0f, 5.0f, 5.0f},
@@ -90,7 +84,7 @@ int main()
              .name = "./models/bulb.glb",
          }},
         "first_vertex_shader//first_fragment_shader"
-    );
+    });
 }
 
 #endif

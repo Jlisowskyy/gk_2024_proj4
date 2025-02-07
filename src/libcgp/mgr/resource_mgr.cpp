@@ -167,6 +167,7 @@ std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgrBase::GetTextureExternalSour
 
     textures_[path] = texture;
     TRACE("Loaded texture: " + path);
+    texture->SaveSpec({.load_type = LoadType::kExternalRaw});
 
     textures_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(path);
     return texture;
@@ -238,6 +239,7 @@ LibGcp::Rc LibGcp::ResourceMgrBase::LoadTextureFromExternal_(const ResourceSpec 
     assert(!textures_.contains(texture_name));
     textures_[texture_name] = texture;
     textures_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(texture_name);
+    texture->SaveSpec(resource);
 
     return Rc::kSuccess;
 }
@@ -272,6 +274,7 @@ LibGcp::Rc LibGcp::ResourceMgrBase::LoadShaderFromMemory_(const ResourceSpec &re
     assert(!shaders_.contains(vert + "//" + frag));
     shaders_[vert + "//" + frag] = shader;
     shaders_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(vert + "//" + frag);
+    shader->SaveSpec(resource);
 
     return Rc::kSuccess;
 }
@@ -327,6 +330,7 @@ LibGcp::Rc LibGcp::ResourceMgrBase::LoadShaderFromExternal_(const ResourceSpec &
     assert(!shaders_.contains(vert + "//" + frag));
     shaders_[vert + "//" + frag] = shader;
     shaders_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(vert + "//" + frag);
+    shader->SaveSpec(resource);
 
     return Rc::kSuccess;
 }
@@ -350,6 +354,7 @@ LibGcp::Rc LibGcp::ResourceMgrBase::LoadModelFromExternal_(const ResourceSpec &r
     assert(!models_.contains(model_name));
     models_[model_name] = model;
     models_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(model_name);
+    model->SaveSpec(resource);
 
     return Rc::kSuccess;
 }

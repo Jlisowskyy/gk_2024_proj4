@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <libcgp/defines.hpp>
+#include <libcgp/intf.hpp>
 
 #include <cassert>
 
@@ -78,7 +79,7 @@ LIBGCP_DECL_START_
 // Shader class
 // ------------------------------
 
-class Shader
+class Shader : public Resource
 {
     // ------------------------------
     // Inner types

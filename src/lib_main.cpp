@@ -9,20 +9,17 @@
 
 #include <string>
 
-int LibGcp::RenderEngineMain(
-    const setting_t &settings, const resource_t &resources, const dynamic_objects_t &dynamic_objects,
-    const static_objects_t &static_objects, const std::string &default_shader_name
-)
+int LibGcp::RenderEngineMain(const Scene& scene)
 {
     /* initialize components */
-    SettingsMgr::InitInstance(settings);
+    SettingsMgr::InitInstance(scene.settings);
     Window::InitInstance().Init();
-    ResourceMgr::InitInstance().Init(resources);
-    ObjectMgr::InitInstance().Init(static_objects, dynamic_objects);
+    ResourceMgr::InitInstance().Init(scene.resources);
+    ObjectMgr::InitInstance().Init(scene.static_object, scene.dynamic_objects);
     Engine::InitInstance().Init();
 
     /* render loop */
-    ProcessLoopApp(default_shader_name);
+    ProcessLoopApp(scene.default_shader_name);
 
     /* cleanup */
     Window::DeleteInstance();

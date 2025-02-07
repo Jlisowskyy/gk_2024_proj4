@@ -16,7 +16,7 @@ file(GLOB_RECURSE LIB_SOURCES
 message(STATUS "Files: ${LIB_SOURCES}")
 
 # Ensure main.cpp removed from lib sources
-list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
+list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/main_debug.cpp")
 
 # ------------------------------
 # Define static library
@@ -56,15 +56,25 @@ target_link_libraries(${LIB_NAME} PUBLIC
 # Define executable
 # ------------------------------
 
-add_executable(${EXEC_NAME}
-        main.cpp
+add_executable(${EXEC_NAME}_debug
+        main_debug.cpp
+)
+
+add_executable(${EXEC_NAME}_game
+        main_game.cpp
+)
+
+add_executable(${EXEC_NAME}_editor
+        main_editor.cpp
 )
 
 # ------------------------------
 # Link lib to executable
 # ------------------------------
 
-target_link_libraries(${EXEC_NAME} ${LIB_NAME})
+target_link_libraries(${EXEC_NAME}_debug PRIVATE ${LIB_NAME})
+target_link_libraries(${EXEC_NAME}_game PRIVATE ${LIB_NAME})
+target_link_libraries(${EXEC_NAME}_editor PRIVATE ${LIB_NAME})
 
 # ------------------------------
 # Add compile options

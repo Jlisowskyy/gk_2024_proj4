@@ -23,43 +23,6 @@ class SettingsMgrBase final : public CxxUtils::StaticSingletonHelper
 
     static constexpr size_t kMaxSettings = 512;
 
-    public:
-    struct SettingContainer {
-        template <typename T>
-        explicit SettingContainer(const T value) noexcept
-        {
-            SetSetting(value);
-        }
-
-        SettingContainer() = default;
-
-        template <typename T>
-        FAST_CALL uint64_t SetSetting(const T value) noexcept
-        {
-            static_assert(sizeof(T) <= sizeof(uint64_t), "Setting value is too large");
-            static_assert(std::is_trivially_copyable<T>::value, "Setting type must be trivially copyable");
-
-            *reinterpret_cast<T *>(&data_) = value;
-            return data_;
-        }
-
-        template <typename T>
-        NDSCRD FAST_CALL T GetSetting() const noexcept
-        {
-            static_assert(sizeof(T) <= sizeof(uint64_t), "Setting value is too large");
-            static_assert(std::is_trivially_copyable<T>::value, "Setting type must be trivially copyable");
-
-            return *reinterpret_cast<const T *>(&data_);
-        }
-
-        NDSCRD FAST_CALL uint64_t GetRaw() const noexcept { return data_; }
-
-        protected:
-        uint64_t data_{};
-    };
-
-    using setting_t = std::vector<std::tuple<Setting, SettingContainer> >;
-
     protected:
     static_assert(static_cast<size_t>(Setting::kLast) < kMaxSettings, "Too many settings");
 
@@ -137,7 +100,6 @@ class SettingsMgrBase final : public CxxUtils::StaticSingletonHelper
     std::array<std::vector<void (*)(uint64_t)>, kMaxSettings> listeners_{};
 };
 
-using setting_t   = SettingsMgrBase::setting_t;
 using SettingsMgr = CxxUtils::StaticSingleton<SettingsMgrBase>;
 
 LIBGCP_DECL_END_

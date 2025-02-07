@@ -2,6 +2,7 @@
 #define LIBGCP_MODEL_HPP_
 
 #include <libcgp/defines.hpp>
+#include <libcgp/intf.hpp>
 #include <libcgp/primitives/mesh.hpp>
 #include <libcgp/primitives/texture.hpp>
 
@@ -26,7 +27,7 @@ class Shader;
 // Model class
 // ------------------------------
 
-class Model
+class Model : public Resource
 {
     public:
     // ------------------------------

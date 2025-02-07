@@ -9,13 +9,14 @@
 #include <unordered_map>
 
 #include <libcgp/defines.hpp>
+#include <libcgp/intf.hpp>
 
 LIBGCP_DECL_START_
 // ------------------------------
 // Texture class
 // ------------------------------
 
-class Texture
+class Texture : public Resource
 {
     public:
     // ------------------------------
