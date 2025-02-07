@@ -6,7 +6,7 @@
 #include <string>
 
 LIBGCP_DECL_START_
-void ProcessLoopApp(const std::string& default_shader_name);
+void ProcessLoopApp();
 
 LIBGCP_DECL_END_
 

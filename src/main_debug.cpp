@@ -57,10 +57,6 @@ int main()
                 .type      = LibGcp::ResourceType::kShader,
                 .load_type = LibGcp::LoadType::kMemory,
             }, LibGcp::ResourceSpec{
-                .paths     = {"contours", "contours"},
-                .type      = LibGcp::ResourceType::kShader,
-                .load_type = LibGcp::LoadType::kMemory,
-            }, LibGcp::ResourceSpec{
                 .paths        = {"./models/backpack/backpack.obj"},
                 .type         = LibGcp::ResourceType::kModel,
                 .load_type    = LibGcp::LoadType::kExternal,
@@ -83,7 +79,6 @@ int main()
                  },
              .name = "./models/bulb.glb",
          }},
-        "first_vertex_shader//first_fragment_shader"
     });
 }
 

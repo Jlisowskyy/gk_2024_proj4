@@ -43,6 +43,8 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
 
     FAST_CALL void ButtonPressed(const int key) { ++keys_[key]; }
 
+    NDSCRD FAST_CALL std::shared_ptr<Shader> GetDefaultShader() const noexcept { return default_shader_; }
+
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------
@@ -57,6 +59,10 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
     void ProcessDynamicObjects_(long delta);
 
     static void OnCameraTypeChanged_(uint64_t new_value);
+
+    static void OnDefaultShaderChanged_(uint64_t new_value);
+
+    static std::shared_ptr<Shader> FindShaderWithId(uint64_t id);
 
     // ------------------------------
     // Class fields
@@ -75,6 +81,8 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
 
     std::array<int, GLFW_KEY_LAST> keys_{};
     View view_{};
+
+    std::shared_ptr<Shader> default_shader_{};
 };
 
 using Engine = CxxUtils::StaticSingleton<EngineBase>;

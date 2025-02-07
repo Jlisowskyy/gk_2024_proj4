@@ -33,7 +33,7 @@ class SettingsMgrBase final : public CxxUtils::StaticSingletonHelper
     public:
     explicit SettingsMgrBase(const setting_t &settings) noexcept;
     SettingsMgrBase() = delete;
-    ~SettingsMgrBase();
+    ~SettingsMgrBase() override;
 
     // ------------------------------
     // Class interaction

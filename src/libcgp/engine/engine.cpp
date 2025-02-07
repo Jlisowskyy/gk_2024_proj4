@@ -20,6 +20,16 @@ void LibGcp::EngineBase::Init() noexcept
     flowing_camera_.position = glm::vec3{};
     flowing_camera_.front    = glm::vec3(0.0f, 0.0f, -1.0f);
     flowing_camera_.up       = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    /* load default shader */
+    const uint64_t default_id = SettingsMgr::GetInstance().GetSetting<uint64_t>(Setting::kBaseShader);
+    R_ASSERT(default_id < Shader::GetInstanceCount() && "Default shader not found");
+    ;
+
+    default_shader_ = FindShaderWithId(default_id);
+    R_ASSERT(Engine::GetInstance().default_shader_ && "Default shader not found");
+
+    SettingsMgr::GetInstance().AddListener(Setting::kBaseShader, OnDefaultShaderChanged_);
 }
 
 void LibGcp::EngineBase::ProcessProgress(const long delta)
@@ -123,4 +133,33 @@ void LibGcp::EngineBase::OnCameraTypeChanged_(const uint64_t new_value)
         default:
             R_ASSERT(false && "Unknown camera type")
     }
+}
+
+void LibGcp::EngineBase::OnDefaultShaderChanged_(const uint64_t new_value)
+{
+    if (new_value == Engine::GetInstance().default_shader_->GetInstanceID()) {
+        return;
+    }
+
+    /* correct value if necessary */
+    if (new_value >= Shader::GetInstanceCount()) {
+        SettingsMgr::GetInstance().SetSetting<Setting::kBaseShader>(Shader::GetInstanceCount() - 1);
+        return;
+    }
+
+    Engine::GetInstance().default_shader_ = FindShaderWithId(new_value);
+    R_ASSERT(Engine::GetInstance().default_shader_ && "Default shader not found");
+}
+
+std::shared_ptr<LibGcp::Shader> LibGcp::EngineBase::FindShaderWithId(const uint64_t id)
+{
+    std::lock_guard lock(ResourceMgr::GetInstance().GetShaders().GetMutex());
+
+    for (const auto &[_, shader] : ResourceMgr::GetInstance().GetShaders()) {
+        if (shader->GetInstanceID() == id) {
+            return shader;
+        }
+    }
+
+    return nullptr;
 }

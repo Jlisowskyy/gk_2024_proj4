@@ -139,6 +139,7 @@ enum class Setting : std::uint16_t {
     kMouseSensitivity,
     kClockTicking,
     kFreeCameraSpeed,
+    kBaseShader,
     kLast,
 };
 
@@ -188,14 +189,11 @@ struct SettingContainer {
 using setting_t = std::vector<std::tuple<Setting, SettingContainer> >;
 
 template <size_t N>
-using SettingTypes = CxxUtils::TypeList<N, CameraType, double, bool, double>;
+using SettingTypes = CxxUtils::TypeList<N, CameraType, double, bool, double, uint64_t>;
 static_assert(SettingTypes<0>::size == static_cast<size_t>(Setting::kLast), "Setting types list is incomplete");
 
 static constexpr std::array kSettingsDescriptions{
-    "Camera type",
-    "Mouse sensitivity",
-    "Is clock enabled",
-    "Free camera speed",
+    "Camera type", "Mouse sensitivity", "Is clock enabled", "Free camera speed", "ID of the base render shader",
 };
 static_assert(
     kSettingsDescriptions.size() == static_cast<size_t>(Setting::kLast), "Setting descriptions list is incomplete"
@@ -206,7 +204,17 @@ struct Scene {
     resource_t resources;
     dynamic_objects_t dynamic_objects;
     static_objects_t static_object;
-    std::string default_shader_name;
+};
+
+static inline const Scene kEmptyScene{
+    {},
+    {ResourceSpec{
+        .paths     = {"first_vertex_shader", "first_fragment_shader"},
+        .type      = ResourceType::kShader,
+        .load_type = LoadType::kMemory,
+    }},
+    {},
+    {},
 };
 
 // ------------------------------

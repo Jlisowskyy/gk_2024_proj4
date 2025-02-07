@@ -9,6 +9,7 @@ LibGcp::SettingsMgrBase::SettingsMgrBase(const std::vector<std::tuple<Setting, S
     SetSetting<Setting::kMouseSensitivity, double>(0.1);
     SetSetting<Setting::kClockTicking>(true);
     SetSetting<Setting::kFreeCameraSpeed, double>(10.0);
+    SetSetting<Setting::kBaseShader, uint64_t>(0);
 
     /* load adjusted settings */
     for (const auto &[setting, container] : settings) {

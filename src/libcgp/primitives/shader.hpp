@@ -9,6 +9,8 @@
 #include <libcgp/defines.hpp>
 #include <libcgp/intf.hpp>
 
+#include <CxxUtils/instance_counter.hpp>
+
 #include <cassert>
 
 /**
@@ -79,7 +81,7 @@ LIBGCP_DECL_START_
 // Shader class
 // ------------------------------
 
-class Shader : public Resource
+class Shader : public Resource, public CxxUtils::InstanceCounter<Shader>
 {
     // ------------------------------
     // Inner types

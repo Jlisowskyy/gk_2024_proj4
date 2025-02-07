@@ -11,10 +11,8 @@
 #include <chrono>
 #include <string>
 
-void LibGcp::ProcessLoopApp(const std::string& default_shader_name)
+void LibGcp::ProcessLoopApp()
 {
-    auto shader = ResourceMgr::GetInstance().GetShader(default_shader_name, LoadType::kMemory);
-
     Window::GetInstance().InitDebug();
 
     /* At this point all events should be connected */
@@ -26,6 +24,7 @@ void LibGcp::ProcessLoopApp(const std::string& default_shader_name)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //  Render objects
+        const auto shader = Engine::GetInstance().GetDefaultShader();
         shader->Activate();
         ObjectMgr::GetInstance().DrawStaticObjects(*shader);
 

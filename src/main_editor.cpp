@@ -1,3 +1,3 @@
 #include <libcgp/main.hpp>
 
-int main() { return LibGcp::RenderEngineMain({}); }
+int main() { return LibGcp::RenderEngineMain(LibGcp::kEmptyScene); }

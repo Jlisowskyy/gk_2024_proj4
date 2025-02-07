@@ -7,8 +7,6 @@
 #include <libcgp/mgr/settings_mgr.hpp>
 #include <libcgp/window/window.hpp>
 
-#include <string>
-
 int LibGcp::RenderEngineMain(const Scene& scene)
 {
     /* initialize components */
@@ -19,7 +17,7 @@ int LibGcp::RenderEngineMain(const Scene& scene)
     Engine::InitInstance().Init();
 
     /* render loop */
-    ProcessLoopApp(scene.default_shader_name);
+    ProcessLoopApp();
 
     /* cleanup */
     Window::DeleteInstance();
