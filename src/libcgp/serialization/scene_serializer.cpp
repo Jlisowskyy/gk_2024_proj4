@@ -192,6 +192,11 @@ std::vector<LibGcp::SceneSerialized::ResourceSerialized> LibGcp::SceneSerializer
             continue;
         }
 
+        if (!texture->is_serializable) {
+            /* texture is not serializable */
+            continue;
+        }
+
         const size_t id = GetStringId_(name);
 
         resources.push_back({
@@ -211,6 +216,11 @@ std::vector<LibGcp::SceneSerialized::ResourceSerialized> LibGcp::SceneSerializer
     ResourceMgr::GetInstance().GetShaders().Lock();
 
     for (const auto &[name, shader] : ResourceMgr::GetInstance().GetShaders()) {
+        if (!shader->is_serializable) {
+            /* shader is not serializable */
+            continue;
+        }
+
         /* split shader name */
         const auto shader_name     = name;
         const auto pos             = shader_name.find("//");

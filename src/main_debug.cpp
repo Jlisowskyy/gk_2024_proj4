@@ -1,85 +1,24 @@
 #include <libcgp/main.hpp>
 
-#include <libcgp/intf.hpp>
-#include <libcgp/mgr/object_mgr.hpp>
-#include <libcgp/mgr/resource_mgr.hpp>
-#include <libcgp/mgr/settings_mgr.hpp>
+#include <libcgp/serialization/scene_serializer.hpp>
+#include <libcgp/utils/files.hpp>
 
-static constexpr const char *kMapPath1 = "./models/town_map/source/town4new.glb";
-static constexpr const char *kMapPath  = "./models/csgo.glb";
-
-#ifdef NDEBUG
+static constexpr const char *kDebugSceneDefault = "./scenes/test_scene_1.libgcp_scene";
+using namespace LibGcp;
 
 int main()
 {
-    return LibGcp::RenderEngineMain(
-        {
-    },
-        {LibGcp::ResourceMgr::ResourceSpec{
-             .paths     = {"first_vertex_shader", "first_fragment_shader"},
-             .type      = LibGcp::ResourceMgr::ResourceType::kShader,
-             .load_type = LibGcp::ResourceMgr::LoadType::kMemory,
-         },
-         LibGcp::ResourceMgr::ResourceSpec{
-             .paths     = {"./models/backpack/backpack.obj"},
-             .type      = LibGcp::ResourceMgr::ResourceType::kModel,
-             .load_type = LibGcp::ResourceMgr::LoadType::kExternal,
-         },
-         LibGcp::ResourceMgr::ResourceSpec{
-             .paths     = {kMapPath},
-             .type      = LibGcp::ResourceMgr::ResourceType::kModel,
-             .load_type = LibGcp::ResourceMgr::LoadType::kExternal,
-         }},
-        {},
-        {
-            LibGcp::StaticObjectSpec{
-                .position = {},
-                .name     = kMapPath,
-            },
-            // LibGcp::StaticObjectSpec{
-            //     .position = {},
-            //     .name = "./models/backpack/backpack.obj",
-            // }
-        },
-        "first_vertex_shader//first_fragment_shader"
-    );
+    const std::string dir        = GetDirFromFile(kDebugSceneDefault);
+    const std::string scene_name = GetFileName(kDebugSceneDefault);
+
+    SceneSerializer scene_serializer(dir);
+    const auto [rc, scene] = scene_serializer.LoadScene(scene_name, SerializationType::kShallow);
+
+    if (IsFailure(rc)) {
+        std::cerr << "Failed to load scene: " << kDebugSceneDefault << " caused by: " << GetRcDescription(rc)
+                  << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return RenderEngineMain(scene);
 }
-
-#else
-
-int main()
-{
-    return LibGcp::RenderEngineMain({
-        {},
-        {
-         LibGcp::ResourceSpec{
-                .paths     = {"first_vertex_shader", "first_fragment_shader"},
-                .type      = LibGcp::ResourceType::kShader,
-                .load_type = LibGcp::LoadType::kMemory,
-            }, LibGcp::ResourceSpec{
-                .paths        = {"./models/backpack/backpack.obj"},
-                .type         = LibGcp::ResourceType::kModel,
-                .load_type    = LibGcp::LoadType::kExternal,
-                .flip_texture = 1,
-            }, LibGcp::ResourceSpec{
-                .paths        = {"./models/bulb.glb"},
-                .type         = LibGcp::ResourceType::kModel,
-                .load_type    = LibGcp::LoadType::kExternal,
-                .flip_texture = 0,
-            }, },
-        {},
-        {LibGcp::StaticObjectSpec{
-             .position = {},
-             .name     = "./models/backpack/backpack.obj",
-         }, LibGcp::StaticObjectSpec{
-             .position =
-                 {
-                     .position = {5.0f, 5.0f, 5.0f},
-                     .rotation = {1.6f, 0.0f, 0.0f},
-                 },
-             .name = "./models/bulb.glb",
-         }},
-    });
-}
-
-#endif

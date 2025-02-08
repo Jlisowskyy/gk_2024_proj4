@@ -169,6 +169,7 @@ std::shared_ptr<LibGcp::Texture> LibGcp::ResourceMgrBase::GetTextureExternalSour
     textures_[path] = texture;
     TRACE("Loaded texture: " + path);
     texture->SaveSpec({.load_type = LoadType::kExternalRaw});
+    texture->is_serializable = false;
 
     textures_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(&path);
     return texture;

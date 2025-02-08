@@ -65,7 +65,12 @@ LibGcp::DebugOverlay::~DebugOverlay()
 
 void LibGcp::DebugOverlay::Init()
 {
-    shader_ = ResourceMgr::GetInstance().GetShader("contours//contours", LoadType::kMemory);
+    shader_ = ResourceMgr::GetInstance().GetShader({
+        .paths           = {"contours", "contours"},
+        .type            = ResourceType::kShader,
+        .load_type       = LoadType::kMemory,
+        .is_serializable = false,
+    });
 }
 
 void LibGcp::DebugOverlay::DestroyOverlay()

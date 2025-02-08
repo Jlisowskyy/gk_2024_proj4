@@ -109,7 +109,7 @@ struct ResourceSpec {
     ResourceType type{};
     LoadType load_type{};
     int8_t flip_texture{-1};
-    bool was_introduced_by_model{false};
+    bool is_serializable{true};
 };
 
 using resource_t = std::vector<ResourceSpec>;
@@ -121,13 +121,15 @@ struct Resource {
     public:
     const uint64_t resource_id = id_counter_.fetch_add(1);
 
-    LoadType load_type  = LoadType::kLast;
-    int8_t flip_texture = -1;
+    LoadType load_type   = LoadType::kLast;
+    int8_t flip_texture  = -1;
+    bool is_serializable = true;
 
     void SaveSpec(const ResourceSpec &spec) noexcept
     {
-        load_type    = spec.load_type;
-        flip_texture = spec.flip_texture;
+        load_type       = spec.load_type;
+        flip_texture    = spec.flip_texture;
+        is_serializable = spec.is_serializable;
     }
 };
 

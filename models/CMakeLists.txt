@@ -1,7 +1,7 @@
 message(STATUS "Downloading models...")
 
-set(MODEL_OOT "${CMAKE_BINARY_DIR}/models")
-file(MAKE_DIRECTORY ${MODEL_OOT})
+set(MODEL_OUT "${CMAKE_SOURCE_DIR}/models")
+file(MAKE_DIRECTORY ${MODEL_OUT})
 
 set(model_entries
         "https://learnopengl.com/data/models/backpack.zip"
@@ -37,8 +37,8 @@ foreach(idx RANGE ${entry_iterations})
 
     message(STATUS "Processing entry ${idx}: ${url}")
 
-    set(output_path "${MODEL_OOT}/${zip_filename}")
-    set(extract_path "${MODEL_OOT}/${extract_dir}")
+    set(output_path "${MODEL_OUT}/${zip_filename}")
+    set(extract_path "${MODEL_OUT}/${extract_dir}")
 
     if(NOT EXISTS ${output_path})
         message(STATUS "Downloading model: ${zip_filename} from ${url}")

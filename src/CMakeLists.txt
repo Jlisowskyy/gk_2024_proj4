@@ -15,8 +15,10 @@ file(GLOB_RECURSE LIB_SOURCES
 
 message(STATUS "Files: ${LIB_SOURCES}")
 
-# Ensure main.cpp removed from lib sources
+# Ensure mains removed from lib sources
 list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/main_debug.cpp")
+list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/main_editor.cpp")
+list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/main_game.cpp")
 
 # ------------------------------
 # Define static library

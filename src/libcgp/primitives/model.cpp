@@ -140,7 +140,12 @@ void LibGcp::ModelSerializer::LoadMaterialTextures_(
         if (ai_texture == nullptr) {
             const std::filesystem::path texture_full_path = weakly_canonical(dir_path / str.C_Str());
 
-            texture = ResourceMgr::GetInstance().GetTexture(texture_full_path.string(), LoadType::kExternal);
+            texture = ResourceMgr::GetInstance().GetTexture({
+                .paths           = {texture_full_path.string()},
+                .type            = ResourceType::kTexture,
+                .load_type       = LoadType::kExternal,
+                .is_serializable = false,
+            });
         } else {
             const std::string full_path = full_path_ + "/" + str.C_Str();
 
