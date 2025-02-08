@@ -126,6 +126,8 @@ class DebugOverlay
     int remove_model_listener_{};
     int add_object_listener_{};
     int remove_object_listener_{};
+    int clear_objects_listener_{};
+    int clear_models_listener_{};
 
     /* failure */
     bool show_failure_{};

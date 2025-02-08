@@ -81,11 +81,17 @@ void LibGcp::DebugOverlay::DestroyOverlay()
     ResourceMgr::GetInstance().GetModels().GetListeners().RemoveListener<CxxUtils::ContainerEvents::kRemove>(
         remove_model_listener_
     );
+    ResourceMgr::GetInstance().GetModels().GetListeners().RemoveListener<CxxUtils::ContainerEvents::kClear>(
+        clear_models_listener_
+    );
     ObjectMgr::GetInstance().GetStaticObjects().GetListeners().RemoveListener<CxxUtils::ContainerEvents::kAdd>(
         add_object_listener_
     );
     ObjectMgr::GetInstance().GetStaticObjects().GetListeners().RemoveListener<CxxUtils::ContainerEvents::kRemove>(
         remove_object_listener_
+    );
+    ObjectMgr::GetInstance().GetStaticObjects().GetListeners().RemoveListener<CxxUtils::ContainerEvents::kClear>(
+        clear_objects_listener_
     );
 
     window_ = nullptr;
@@ -120,6 +126,13 @@ void LibGcp::DebugOverlay::EnableOverlay(GLFWwindow *window)
             }
         );
 
+    clear_models_listener_ =
+        ResourceMgr::GetInstance().GetModels().GetListeners().AddListener<CxxUtils::ContainerEvents::kClear>(
+            [this](const std::string *) {
+                model_names_.clear();
+            }
+        );
+
     add_object_listener_ =
         ObjectMgr::GetInstance().GetStaticObjects().GetListeners().AddListener<CxxUtils::ContainerEvents::kAdd>(
             [this](const StaticObject *object) {
@@ -131,6 +144,13 @@ void LibGcp::DebugOverlay::EnableOverlay(GLFWwindow *window)
         ObjectMgr::GetInstance().GetStaticObjects().GetListeners().AddListener<CxxUtils::ContainerEvents::kRemove>(
             [this](const StaticObject *object) {
                 std::erase(static_object_names_, "Object " + std::to_string(object->GetId()));
+            }
+        );
+
+    clear_objects_listener_ =
+        ObjectMgr::GetInstance().GetStaticObjects().GetListeners().AddListener<CxxUtils::ContainerEvents::kClear>(
+            [this](const StaticObject *) {
+                static_object_names_.clear();
             }
         );
 
@@ -234,6 +254,14 @@ void LibGcp::DebugOverlay::DrawSceneWindow_()
             TRACE("Scene loaded successfully");
         }
     });
+
+    if (ImGui::Button("Clear all objects")) {
+        ObjectMgr::GetInstance().GetStaticObjects().Clear();
+    }
+
+    if (ImGui::Button("Load default scene")) {
+        Engine::GetInstance().ReloadScene(kEmptyScene);
+    }
 
     ImGui::End();
 }
