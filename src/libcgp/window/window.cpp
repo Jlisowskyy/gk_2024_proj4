@@ -74,7 +74,7 @@ void LibGcp::Window::SyncMousePositionWithWindow_()
 }
 
 void LibGcp::Window::KeyCallback(
-    GLFWwindow *window, const int key, [[maybe_unused]] int scancode, const int action, [[maybe_unused]] int mode
+    GLFWwindow *window, const int key, UNUSED int scancode, const int action, UNUSED int mode
 )
 {
     TRACE("Key pressed " << key << " scancode " << scancode << " mode " << mode);
@@ -89,7 +89,7 @@ void LibGcp::Window::KeyCallback(
     }
 }
 
-void LibGcp::Window::FrameBufferSizeCallback([[maybe_unused]] GLFWwindow *window, const int width, const int height)
+void LibGcp::Window::FrameBufferSizeCallback(UNUSED GLFWwindow *window, const int width, const int height)
 {
     TRACE("framebuffer_size_callback");
 
@@ -97,7 +97,7 @@ void LibGcp::Window::FrameBufferSizeCallback([[maybe_unused]] GLFWwindow *window
     GetInstance().SyncMousePositionWithWindow_();
 }
 
-void LibGcp::Window::MouseCallback([[maybe_unused]] GLFWwindow *window, const double xpos, const double ypos)
+void LibGcp::Window::MouseCallback(UNUSED GLFWwindow *window, const double xpos, const double ypos)
 {
     GetInstance().mouse_.Move(xpos, ypos);
 }

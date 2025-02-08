@@ -10,11 +10,11 @@
 int LibGcp::RenderEngineMain(const Scene& scene)
 {
     /* initialize components */
-    SettingsMgr::InitInstance(scene.settings);
+    SettingsMgr::InitInstance();
     Window::InitInstance().Init();
-    ResourceMgr::InitInstance().Init(scene.resources);
-    ObjectMgr::InitInstance().Init(scene.static_object, scene.dynamic_objects);
-    Engine::InitInstance().Init();
+    ResourceMgr::InitInstance();
+    ObjectMgr::InitInstance();
+    Engine::InitInstance().Init(scene);
 
     /* render loop */
     ProcessLoopApp();

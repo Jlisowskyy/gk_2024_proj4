@@ -31,13 +31,14 @@ class SettingsMgrBase final : public CxxUtils::StaticSingletonHelper
     // ------------------------------
 
     public:
-    explicit SettingsMgrBase(const setting_t &settings) noexcept;
-    SettingsMgrBase() = delete;
+    SettingsMgrBase();
     ~SettingsMgrBase() override;
 
     // ------------------------------
     // Class interaction
     // ------------------------------
+
+    void LoadDefaultSettings();
 
     template <Setting kSetting, typename T>
     FAST_CALL SettingsMgrBase &SetSetting(const T value) noexcept

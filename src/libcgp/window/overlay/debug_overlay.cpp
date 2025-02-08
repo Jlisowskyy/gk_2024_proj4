@@ -108,29 +108,29 @@ void LibGcp::DebugOverlay::EnableOverlay(GLFWwindow *window)
     /* Events */
     add_model_listener_ =
         ResourceMgr::GetInstance().GetModels().GetListeners().AddListener<CxxUtils::ContainerEvents::kAdd>(
-            [this](const std::string &name) {
-                model_names_.push_back(name);
+            [this](const std::string *name) {
+                model_names_.push_back(*name);
             }
         );
 
     remove_model_listener_ =
         ResourceMgr::GetInstance().GetModels().GetListeners().AddListener<CxxUtils::ContainerEvents::kRemove>(
-            [this](const std::string &name) {
-                std::erase(model_names_, name);
+            [this](const std::string *name) {
+                std::erase(model_names_, *name);
             }
         );
 
     add_object_listener_ =
         ObjectMgr::GetInstance().GetStaticObjects().GetListeners().AddListener<CxxUtils::ContainerEvents::kAdd>(
-            [this](const StaticObject &object) {
-                static_object_names_.push_back("Object " + std::to_string(object.GetId()));
+            [this](const StaticObject *object) {
+                static_object_names_.push_back("Object " + std::to_string(object->GetId()));
             }
         );
 
     remove_object_listener_ =
         ObjectMgr::GetInstance().GetStaticObjects().GetListeners().AddListener<CxxUtils::ContainerEvents::kRemove>(
-            [this](const StaticObject &object) {
-                std::erase(static_object_names_, "Object " + std::to_string(object.GetId()));
+            [this](const StaticObject *object) {
+                std::erase(static_object_names_, "Object " + std::to_string(object->GetId()));
             }
         );
 
@@ -180,22 +180,14 @@ void LibGcp::DebugOverlay::DrawSpawnModelsWindow_()
 {
     ImGui::Begin("Spawn models:");
 
-    if (ImGui::Button("Open File")) {
-        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".glb,.obj,.fbx");
-    }
-
-    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
-        if (ImGuiFileDialog::Instance()->IsOk()) {
-            const std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
-            ResourceMgr::GetInstance().GetModel({
-                .paths        = {filePath},
-                .type         = ResourceType::kModel,
-                .load_type    = LoadType::kExternal,
-                .flip_texture = 1,
-            });
-        }
-        ImGuiFileDialog::Instance()->Close();
-    }
+    DisplayFileDialog_("ChooseFileDlgKey", "Choose File", ".glb,.obj,.fbx", [](const std::string &filePath) {
+        ResourceMgr::GetInstance().GetModel({
+            .paths        = {filePath},
+            .type         = ResourceType::kModel,
+            .load_type    = LoadType::kExternal,
+            .flip_texture = 1,
+        });
+    });
 
     if (ImGui::BeginListBox("Available models:")) {
         for (int i = 0; i < static_cast<int>(model_names_.size()); i++) {
@@ -219,27 +211,29 @@ void LibGcp::DebugOverlay::DrawSceneWindow_()
 {
     ImGui::Begin("Scene editor: ");
 
-    if (ImGui::Button("Save scene")) {
-        IGFD::FileDialog::Instance()->OpenDialog("SaveFileDlg", "Save File", ".libgcp_scene");
-    }
+    DisplayFileDialog_("SaveFileDlg", "Save Scene", ".libgcp_scene", [&](const std::string &filePath) {
+        SceneSerializer serializer(GetDirFromFile(filePath));
+        const auto rc = serializer.SerializeScene(GetFileName(filePath), SerializationType::kShallow);
 
-    if (IGFD::FileDialog::Instance()->Display("SaveFileDlg")) {
-        if (IGFD::FileDialog::Instance()->IsOk()) {
-            const std::string filePath = IGFD::FileDialog::Instance()->GetFilePathName();
-
-            TODO_THREADS
-            SceneSerializer serializer(GetDirFromFile(filePath));
-            const auto rc = serializer.SerializeScene(GetFileName(filePath), SerializationType::kShallow);
-
-            if (IsFailure(rc)) {
-                TRACE("Failed to save scene: " << GetRcDescription(rc));
-                TriggerFailure_(GetRcDescription(rc));
-            } else {
-                TRACE("Scene saved successfully");
-            }
+        if (IsFailure(rc)) {
+            TRACE("Failed to save scene: " << GetRcDescription(rc));
+            TriggerFailure_(GetRcDescription(rc));
+        } else {
+            TRACE("Scene saved successfully");
         }
-        IGFD::FileDialog::Instance()->Close();
-    }
+    });
+
+    DisplayFileDialog_("ChooseFileDlgKey", "Load scene", ".libgcp_scene", [&](const std::string &filePath) {
+        SceneSerializer serializer(GetDirFromFile(filePath));
+        const auto [rc, scene] = serializer.LoadScene(GetFileName(filePath), SerializationType::kShallow);
+
+        if (IsFailure(rc)) {
+            TRACE("Failed to load scene: " << GetRcDescription(rc));
+            TriggerFailure_(GetRcDescription(rc));
+        } else {
+            TRACE("Scene loaded successfully");
+        }
+    });
 
     ImGui::End();
 }

@@ -35,7 +35,7 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
     // Class interaction
     // ------------------------------
 
-    void Init() noexcept;
+    void Init(const Scene &scene) noexcept;
 
     FAST_CALL View &GetView() noexcept { return view_; }
 
@@ -44,6 +44,8 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
     FAST_CALL void ButtonPressed(const int key) { ++keys_[key]; }
 
     NDSCRD FAST_CALL std::shared_ptr<Shader> GetDefaultShader() const noexcept { return default_shader_; }
+
+    void ReloadScene(const Scene &scene);
 
     // ---------------------------------
     // Class implementation methods

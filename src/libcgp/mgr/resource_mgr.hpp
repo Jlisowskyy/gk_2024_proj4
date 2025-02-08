@@ -39,14 +39,14 @@ class ResourceMgrBase final : public CxxUtils::StaticSingletonHelper
     // ------------------------------
 
     public:
-    ResourceMgrBase() = default;
-    ~ResourceMgrBase();
+    ResourceMgrBase();
+    ~ResourceMgrBase() override;
 
     // ------------------------------
     // Class interaction
     // ------------------------------
 
-    ResourceMgrBase &Init(const resource_t &resources);
+    void LoadResourceFromScene(const Scene &scene);
 
     std::shared_ptr<Texture> GetTexture(const ResourceSpec &resource);
     std::shared_ptr<Shader> GetShader(const ResourceSpec &resource);

@@ -48,19 +48,33 @@ LibGcp::Rc LibGcp::SceneSerializer::SerializeScene(const std::string &scene_name
     }
 }
 
-LibGcp::Scene LibGcp::SceneSerializer::LoadScene(
-    [[maybe_unused]] const std::string &scene_name, [[maybe_unused]] SerializationType type
-){NOT_IMPLEMENTED}
+std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadScene(
+    const std::string &scene_name, const SerializationType type
+)
+{
+    switch (type) {
+        case SerializationType::kShallow:
+            return LoadSceneShallow_(scene_name);
+        case SerializationType::kDeep:
+            return LoadSceneDeep_(scene_name);
+        case SerializationType::kDeepPack:
+            return LoadSceneDeepPack_(scene_name);
+        case SerializationType::kDeepAttach:
+            return LoadSceneDeepAttach_(scene_name);
+        default:
+            R_ASSERT(false);
+    }
+}
 
 LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneShallow_(const std::string &scene_name)
 {
     SceneSerialized serial_struct{};
 
-    serial_struct.header.source_version  = kGlobalVersion;
-    serial_struct.header.scene_version   = kSceneVersion;
-    serial_struct.header.texture_version = kTextureVersion;
-    serial_struct.header.model_version   = kModelVersion;
-    serial_struct.header.header_bytes    = sizeof(SceneSerialized::SceneHeader);
+    serial_struct.header.base_header.source_version  = kGlobalVersion;
+    serial_struct.header.base_header.scene_version   = kSceneVersion;
+    serial_struct.header.base_header.texture_version = kTextureVersion;
+    serial_struct.header.base_header.model_version   = kModelVersion;
+    serial_struct.header.base_header.header_bytes    = sizeof(SceneSerialized::SceneHeader);
 
     serial_struct.header.num_settings = static_cast<size_t>(Setting::kLast);
 
@@ -90,7 +104,7 @@ LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneShallow_(const std::string &sc
     }
 
     /* save payload size */
-    serial_struct.header.payload_bytes = total_bytes;
+    serial_struct.header.base_header.payload_bytes = total_bytes;
 
     /* write to file */
     std::ofstream file(output_dir_ + "/" + scene_name, std::ios::binary);
@@ -123,13 +137,11 @@ LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneShallow_(const std::string &sc
     return Rc::kSuccess;
 }
 
-LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneDeep_([[maybe_unused]] const std::string &scene_name){NOT_IMPLEMENTED}
+LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneDeep_(UNUSED const std::string &scene_name){NOT_IMPLEMENTED}
 
-LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneDeepPack_([[maybe_unused]] const std::string &scene_name
-){NOT_IMPLEMENTED}
+LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneDeepPack_(UNUSED const std::string &scene_name){NOT_IMPLEMENTED}
 
-LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneDeepAttach_([[maybe_unused]] const std::string &scene_name
-){NOT_IMPLEMENTED}
+LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneDeepAttach_(UNUSED const std::string &scene_name){NOT_IMPLEMENTED}
 
 std::vector<LibGcp::SceneSerialized::SettingsSerialized> LibGcp::SceneSerializer::SerializeSettings_()
 {
@@ -295,4 +307,18 @@ size_t LibGcp::SceneSerializer::GetStringId_(const std::string &name)
     }
 
     return id;
+}
+
+std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneShallow_(const std::string &scene_name) {}
+
+std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneDeep_(UNUSED const std::string &scene_name
+){NOT_IMPLEMENTED}
+
+std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneDeepPack_(UNUSED const std::string &scene_name
+){NOT_IMPLEMENTED}
+
+std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneDeepAttach_(UNUSED const std::string &scene_name
+)
+{
+    NOT_IMPLEMENTED
 }

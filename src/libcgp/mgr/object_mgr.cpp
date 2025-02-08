@@ -6,15 +6,18 @@
 
 #include <vector>
 
+LibGcp::ObjectMgrBase::ObjectMgrBase()
+{
+    TRACE("ObjectMgrBase::ObjectMgrBase()");
+
+    static_objects_.reserve(kDefaultStorageSize);
+}
+
 LibGcp::ObjectMgrBase::~ObjectMgrBase() { TRACE("ObjectMgrBase::~ObjectMgrBase()"); }
 
-void LibGcp::ObjectMgrBase::Init(
-    const static_objects_t &static_objects, [[maybe_unused]] const dynamic_objects_t &dynamic_objects
-)
+void LibGcp::ObjectMgrBase::LoadObjectsFromScene(const Scene &scene)
 {
-    static_objects_.reserve(kDefaultStorageSize);
-
-    for (const auto &spec : static_objects) {
+    for (const auto &spec : scene.static_object) {
         CreateStaticObject_(spec);
     }
 }
@@ -29,7 +32,7 @@ void LibGcp::ObjectMgrBase::DrawStaticObjects(Shader &shader)
     }
 }
 
-void LibGcp::ObjectMgrBase::ProcessProgress([[maybe_unused]] long delta_time_micros) {}
+void LibGcp::ObjectMgrBase::ProcessProgress(UNUSED long delta_time_micros) {}
 
 void LibGcp::ObjectMgrBase::RemoveStaticObject(const uint64_t ident)
 {
@@ -40,7 +43,7 @@ void LibGcp::ObjectMgrBase::RemoveStaticObject(const uint64_t ident)
     });
     assert(obj_it != static_objects_.end());
 
-    static_objects_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kRemove>(*obj_it);
+    static_objects_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kRemove>(&(*obj_it));
     static_objects_.erase(obj_it);
 }
 
@@ -50,7 +53,7 @@ void LibGcp::ObjectMgrBase::CreateStaticObject_(const StaticObjectSpec &spec)
     auto obj = static_objects_.emplace_back(
         spec.position, ResourceMgr::GetInstance().GetModel(spec.name, LoadType::kExternal)
     );
-    static_objects_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(obj);
+    static_objects_.GetListeners().NotifyListeners<CxxUtils::ContainerEvents::kAdd>(&obj);
 }
 
-void LibGcp::ObjectMgrBase::CreateDynamicObject_([[maybe_unused]] const DynamicObjectSpec &spec) {}
+void LibGcp::ObjectMgrBase::CreateDynamicObject_(UNUSED const DynamicObjectSpec &spec) {}

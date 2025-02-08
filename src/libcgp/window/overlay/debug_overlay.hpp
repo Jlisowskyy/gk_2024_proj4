@@ -2,6 +2,9 @@
 #define WINDOW_OVERLAY_DEBUG_OVERLAY_HPP_
 
 #include <libcgp/defines.hpp>
+#include <libcgp/utils/files.hpp>
+
+#include <ImGuiFileDialog.h>
 
 struct GLFWwindow;
 
@@ -76,6 +79,23 @@ class DebugOverlay
     void FillObjectNames_();
 
     void TriggerFailure_(const std::string &message);
+
+    template <class FuncT>
+    static void DisplayFileDialog_(
+        const std::string &key, const std::string &title, const std::string &extensions, FuncT &&func
+    )
+    {
+        if (ImGui::Button(title.c_str())) {
+            ImGuiFileDialog::Instance()->OpenDialog(key, title, extensions.c_str());
+        }
+
+        if (ImGuiFileDialog::Instance()->Display(key)) {
+            if (ImGuiFileDialog::Instance()->IsOk()) {
+                func(GetFullPath(ImGuiFileDialog::Instance()->GetFilePathName()));
+            }
+            ImGuiFileDialog::Instance()->Close();
+        }
+    }
 
     // ------------------------------
     // Class fields

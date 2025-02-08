@@ -5,8 +5,8 @@
 #include <libcgp/intf.hpp>
 #include <libcgp/rc.hpp>
 
-#include <cstdint>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 
 LIBGCP_DECL_START_
@@ -30,7 +30,7 @@ class SceneSerializer
     /* Without file format */
     Rc SerializeScene(const std::string &scene_name, SerializationType type);
 
-    Scene LoadScene(const std::string &scene_name, SerializationType type);
+    std::tuple<Rc, Scene> LoadScene(const std::string &scene_name, SerializationType type);
 
     // ------------------------------
     // Implementation methods
@@ -54,6 +54,14 @@ class SceneSerializer
     void SaveStringTable(std::ofstream &file);
 
     size_t GetStringId_(const std::string &name);
+
+    std::tuple<Rc, Scene> LoadSceneShallow_(const std::string &scene_name);
+
+    std::tuple<Rc, Scene> LoadSceneDeep_(const std::string &scene_name);
+
+    std::tuple<Rc, Scene> LoadSceneDeepPack_(const std::string &scene_name);
+
+    std::tuple<Rc, Scene> LoadSceneDeepAttach_(const std::string &scene_name);
 
     // ------------------------------
     // Class fields

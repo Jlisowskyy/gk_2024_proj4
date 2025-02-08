@@ -230,13 +230,17 @@ enum class SerializationType : std::uint8_t {
 };
 
 struct SceneSerialized {
-    struct SceneHeader {
+    struct BaseHeader {
         Version source_version;
         SceneVersion scene_version;
         TextureVersion texture_version;
         ModelVersion model_version;
         size_t header_bytes;
         size_t payload_bytes;
+    };
+
+    struct SceneHeader {
+        BaseHeader base_header;
 
         size_t num_strings;
         size_t num_settings;

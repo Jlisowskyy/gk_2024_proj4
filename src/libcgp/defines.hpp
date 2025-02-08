@@ -27,6 +27,7 @@
 #define LIBGCP_DECL_END_ }
 
 #define NDSCRD [[nodiscard]]
+#define UNUSED [[maybe_unused]]
 
 #ifdef USE_TRACES_
 #define TRACE(stream) std::cout << stream << std::endl

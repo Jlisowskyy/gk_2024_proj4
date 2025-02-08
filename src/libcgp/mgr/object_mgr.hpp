@@ -27,7 +27,7 @@ class ObjectMgrBase : public CxxUtils::StaticSingletonHelper
     // ------------------------------
 
     public:
-    ObjectMgrBase() = default;
+    ObjectMgrBase();
 
     ~ObjectMgrBase() override;
 
@@ -35,7 +35,7 @@ class ObjectMgrBase : public CxxUtils::StaticSingletonHelper
     // Class interaction
     // ------------------------------
 
-    void Init(const static_objects_t &static_objects, const dynamic_objects_t &dynamic_objects);
+    void LoadObjectsFromScene(const Scene &scene);
 
     void DrawStaticObjects(Shader &shader);
 

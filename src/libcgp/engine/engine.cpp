@@ -6,7 +6,7 @@
 
 LibGcp::EngineBase::~EngineBase() { TRACE("EngineBase::~EngineBase()"); }
 
-void LibGcp::EngineBase::Init() noexcept
+void LibGcp::EngineBase::Init(const Scene &scene) noexcept
 {
     TRACE("EngineBase::Init()");
 
@@ -16,20 +16,23 @@ void LibGcp::EngineBase::Init() noexcept
     /* Adjust camera type based on default settings - intentional cast */
     OnCameraTypeChanged_(SettingsMgr::GetInstance().GetSetting<uint64_t>(Setting::kCameraType));
 
+    /* Add reaction on shader change */
+    SettingsMgr::GetInstance().AddListener(Setting::kBaseShader, OnDefaultShaderChanged_);
+
     /* init flowing TEMP object */
     flowing_camera_.position = glm::vec3{};
     flowing_camera_.front    = glm::vec3(0.0f, 0.0f, -1.0f);
     flowing_camera_.up       = glm::vec3(0.0f, 1.0f, 0.0f);
 
+    /* load initial scene */
+    ReloadScene(scene);
+
     /* load default shader */
     const uint64_t default_id = SettingsMgr::GetInstance().GetSetting<uint64_t>(Setting::kBaseShader);
     R_ASSERT(default_id < Shader::GetInstanceCount() && "Default shader not found");
-    ;
 
     default_shader_ = FindShaderWithId(default_id);
     R_ASSERT(Engine::GetInstance().default_shader_ && "Default shader not found");
-
-    SettingsMgr::GetInstance().AddListener(Setting::kBaseShader, OnDefaultShaderChanged_);
 }
 
 void LibGcp::EngineBase::ProcessProgress(const long delta)
@@ -48,6 +51,32 @@ void LibGcp::EngineBase::ProcessProgress(const long delta)
 
     /* Reset keys input for next frame */
     keys_.fill(0);
+}
+
+void LibGcp::EngineBase::ReloadScene(const Scene &scene)
+{
+    /* remove all objects */
+    ObjectMgr::GetInstance().GetStaticObjects().Clear();
+
+    /* clean all resources */
+    ResourceMgr::GetInstance().GetModels().Clear();
+    ResourceMgr::GetInstance().GetShaders().Clear();
+    ResourceMgr::GetInstance().GetTextures().Clear();
+
+    /* load resources */
+    ResourceMgr::GetInstance().LoadResourceFromScene(scene);
+
+    /* load objects */
+    ObjectMgr::GetInstance().LoadObjectsFromScene(scene);
+
+    /* Note that settings must be loaded after all objects as there may be some events to fire */
+    /* ensure default are loaded */
+    SettingsMgr::GetInstance().LoadDefaultSettings();
+
+    /* load settings */
+    for (const auto &[setting, obj] : scene.settings) {
+        SettingsMgr::GetInstance().SetSetting<uint64_t>(setting, obj.GetRaw());
+    }
 }
 
 void LibGcp::EngineBase::ProcessInput_(const long delta)
@@ -75,7 +104,7 @@ void LibGcp::EngineBase::ProcessInput_(const long delta)
     ProcessUserMovement_(is_clock_enabled * delta);
 }
 
-void LibGcp::EngineBase::ProcessUserMovement_([[maybe_unused]] const long delta) {}
+void LibGcp::EngineBase::ProcessUserMovement_(UNUSED const long delta) {}
 
 void LibGcp::EngineBase::ProcessFreeCameraMovement_(const long delta)
 {
