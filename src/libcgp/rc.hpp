@@ -18,13 +18,26 @@ enum class Rc {
     kFailedToCreateDir,
     kNoPermission,
     kFileAlreadyExists,
+    kOutdatedProtocol,
+    kTooOldSoftware,
+    kCorruptedFile,
     kLast,
 };
 
 static constexpr std::array kRcDescriptions{
-    "Success",        "Unknown failure",     "Failed to load",  "Failed to open file",
-    "File not found", "Directory not found", "Not a directory", "Failed to create directory",
-    "No permission",  "File already exists",
+    "Success",
+    "Unknown failure",
+    "Failed to load",
+    "Failed to open file",
+    "File not found",
+    "Directory not found",
+    "Not a directory",
+    "Failed to create directory",
+    "No permission",
+    "File already exists",
+    "Too old data format to process",
+    "Version of the program is too old",
+    "Corrupted file",
 };
 
 static_assert(kRcDescriptions.size() == static_cast<size_t>(Rc::kLast), "Rc descriptions list is incomplete");

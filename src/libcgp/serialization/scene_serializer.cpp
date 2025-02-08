@@ -11,7 +11,6 @@
 
 #include <filesystem>
 #include <fstream>
-#include <ios>
 #include <string>
 #include <unordered_map>
 
@@ -28,10 +27,10 @@ LibGcp::Rc LibGcp::SceneSerializer::SerializeScene(const std::string &scene_name
     if (!FileWriteable(output_dir_)) {
         return Rc::kNoPermission;
     }
-
-    if (std::filesystem::exists(output_dir_ + "/" + scene_name)) {
-        return Rc::kFileAlreadyExists;
-    }
+    //
+    // if (std::filesystem::exists(output_dir_ + "/" + scene_name)) {
+    //     return Rc::kFileAlreadyExists;
+    // }
 
     /* dispatch serialization */
     switch (type) {
@@ -79,7 +78,8 @@ LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneShallow_(const std::string &sc
     serial_struct.header.num_settings = static_cast<size_t>(Setting::kLast);
 
     string_map_.clear();
-    string_counter_    = 0;
+    string_counter_    = 1;
+    string_map_[""]    = 0;
     size_t total_bytes = 0;
 
     /* gather data */
@@ -167,14 +167,14 @@ std::vector<LibGcp::SceneSerialized::ResourceSerialized> LibGcp::SceneSerializer
 
     ResourceMgr::GetInstance().GetModels().Lock();
 
-    for (const auto &resource : ResourceMgr::GetInstance().GetModels()) {
-        const size_t id = GetStringId_(resource.first);
+    for (const auto &[name, model] : ResourceMgr::GetInstance().GetModels()) {
+        const size_t id = GetStringId_(name);
 
         resources.push_back({
             .paths        = {id, 0},
             .type         = ResourceType::kModel,
-            .load_type    = resource.second->load_type,
-            .flip_texture = resource.second->flip_texture,
+            .load_type    = model->load_type,
+            .flip_texture = model->flip_texture,
         });
     }
 
@@ -186,14 +186,19 @@ std::vector<LibGcp::SceneSerialized::ResourceSerialized> LibGcp::SceneSerializer
 
     ResourceMgr::GetInstance().GetTextures().Lock();
 
-    for (const auto &resource : ResourceMgr::GetInstance().GetTextures()) {
-        const size_t id = GetStringId_(resource.first);
+    for (const auto &[name, texture] : ResourceMgr::GetInstance().GetTextures()) {
+        if (texture->load_type == LoadType::kExternalRaw) {
+            /* texture is embedded to the model */
+            continue;
+        }
+
+        const size_t id = GetStringId_(name);
 
         resources.push_back({
             .paths        = {id, 0},
             .type         = ResourceType::kTexture,
-            .load_type    = resource.second->load_type,
-            .flip_texture = resource.second->flip_texture,
+            .load_type    = texture->load_type,
+            .flip_texture = texture->flip_texture,
         });
     }
 
@@ -205,9 +210,9 @@ std::vector<LibGcp::SceneSerialized::ResourceSerialized> LibGcp::SceneSerializer
 
     ResourceMgr::GetInstance().GetShaders().Lock();
 
-    for (const auto &resource : ResourceMgr::GetInstance().GetShaders()) {
+    for (const auto &[name, shader] : ResourceMgr::GetInstance().GetShaders()) {
         /* split shader name */
-        const auto shader_name     = resource.first;
+        const auto shader_name     = name;
         const auto pos             = shader_name.find("//");
         const auto vertex_shader   = shader_name.substr(0, pos);
         const auto fragment_shader = shader_name.substr(pos + 2);
@@ -218,8 +223,8 @@ std::vector<LibGcp::SceneSerialized::ResourceSerialized> LibGcp::SceneSerializer
         resources.push_back({
             .paths        = {vertex_id, fragment_id},
             .type         = ResourceType::kShader,
-            .load_type    = resource.second->load_type,
-            .flip_texture = resource.second->flip_texture,
+            .load_type    = shader->load_type,
+            .flip_texture = shader->flip_texture,
         });
     }
 
@@ -309,7 +314,98 @@ size_t LibGcp::SceneSerializer::GetStringId_(const std::string &name)
     return id;
 }
 
-std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneShallow_(const std::string &scene_name) {}
+std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneShallow_(const std::string &scene_name) const
+{
+    if (const auto rc = VerifyFile_(scene_name); IsFailure(rc)) {
+        return {rc, {}};
+    }
+
+    /* open file as binary and read header */
+    std::ifstream file(output_dir_ + "/" + scene_name, std::ios::binary);
+    SceneSerialized::SceneHeader header{};
+    file.read(reinterpret_cast<char *>(&header), sizeof(SceneSerialized::SceneHeader));
+
+    /* check magic */
+    if (header.base_header.magic != SceneSerialized::kMagic) {
+        return {Rc::kCorruptedFile, kEmptyScene};
+    }
+
+    /* check version */
+    if (header.base_header.scene_version < kMinSceneVersion) {
+        return {Rc::kOutdatedProtocol, kEmptyScene};
+    }
+
+    Scene scene{};
+    // std::vec
+
+    /* load settings */
+    std::vector<SceneSerialized::SettingsSerialized> settings{};
+    settings.resize(header.num_settings);
+    file.read(
+        reinterpret_cast<char *>(settings.data()), header.num_settings * sizeof(SceneSerialized::SettingsSerialized)
+    );
+
+    /* convert settings */
+    scene.settings.reserve(header.num_settings);
+    for (const auto &setting : settings) {
+        scene.settings.emplace_back(static_cast<Setting>(setting.setting), setting.value);
+    }
+
+    /* load resources */
+    std::vector<SceneSerialized::ResourceSerialized> resources{};
+    resources.resize(header.num_resources);
+    file.read(
+        reinterpret_cast<char *>(resources.data()), header.num_resources * sizeof(SceneSerialized::ResourceSerialized)
+    );
+
+    /* load static objects */
+    std::vector<SceneSerialized::StaticObjectSerialized> static_objects{};
+    static_objects.resize(header.num_statics);
+    file.read(
+        reinterpret_cast<char *>(static_objects.data()),
+        header.num_statics * sizeof(SceneSerialized::StaticObjectSerialized)
+    );
+
+    /* load string table */
+    std::vector<size_t> string_table{};
+    string_table.resize(header.num_strings);
+    file.read(reinterpret_cast<char *>(string_table.data()), header.num_strings * sizeof(size_t));
+
+    /* load strings */
+    std::vector<char> string_data{};
+    string_data.resize(header.base_header.payload_bytes);
+    file.read(string_data.data(), header.base_header.payload_bytes);
+
+    std::vector<std::string> strings{};
+    strings.reserve(header.num_strings);
+
+    /* convert strings */
+    for (size_t idx = 0; idx < header.num_strings; ++idx) {
+        const auto offset = string_table[idx];
+        const auto length = *reinterpret_cast<size_t *>(&string_data[offset]);
+
+        strings.emplace_back(&string_data[offset + sizeof(size_t)], length);
+    }
+
+    /* convert resources */
+    scene.resources.reserve(header.num_resources);
+    for (const auto &resource : resources) {
+        scene.resources.push_back({
+            {strings[resource.paths[0]], strings[resource.paths[1]]},
+            static_cast<ResourceType>(resource.type),
+            static_cast<LoadType>(resource.load_type),
+            resource.flip_texture
+        });
+    }
+
+    /* convert static objects */
+    scene.static_objects.reserve(header.num_statics);
+    for (const auto &object : static_objects) {
+        scene.static_objects.push_back({object.position, strings[object.name]});
+    }
+
+    return {Rc::kSuccess, scene};
+}
 
 std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneDeep_(UNUSED const std::string &scene_name
 ){NOT_IMPLEMENTED}
@@ -318,7 +414,30 @@ std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneDeepPack
 ){NOT_IMPLEMENTED}
 
 std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneDeepAttach_(UNUSED const std::string &scene_name
-)
+){NOT_IMPLEMENTED}
+
+LibGcp::Rc LibGcp::SceneSerializer::VerifyFile_(const std::string &file_name) const
 {
-    NOT_IMPLEMENTED
+    if (!std::filesystem::exists(output_dir_)) {
+        return Rc::kDirNotFound;
+    }
+
+    if (!std::filesystem::is_directory(output_dir_)) {
+        return Rc::kNotADirectory;
+    }
+
+    if (!FileWriteable(output_dir_)) {
+        return Rc::kNoPermission;
+    }
+
+    if (!std::filesystem::exists(output_dir_ + "/" + file_name)) {
+        return Rc::kFileAlreadyExists;
+    }
+
+    if (!std::filesystem::is_regular_file(output_dir_ + "/" + file_name) ||
+        !FileReadable(output_dir_ + "/" + file_name)) {
+        return Rc::kFailedToOpenFile;
+    }
+
+    return Rc::kSuccess;
 }

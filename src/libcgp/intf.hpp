@@ -104,7 +104,7 @@ enum class LoadType : std::uint8_t {
     kLast,
 };
 
-struct alignas(128) ResourceSpec {
+struct ResourceSpec {
     std::array<std::string, 2> paths{};
     ResourceType type{};
     LoadType load_type{};
@@ -203,7 +203,7 @@ struct Scene {
     setting_t settings;
     resource_t resources;
     dynamic_objects_t dynamic_objects;
-    static_objects_t static_object;
+    static_objects_t static_objects;
 };
 
 static inline const Scene kEmptyScene{
@@ -230,6 +230,8 @@ enum class SerializationType : std::uint8_t {
 };
 
 struct SceneSerialized {
+    static constexpr uint64_t kMagic = 0xC4A1234BFEAE341;
+
     struct BaseHeader {
         Version source_version;
         SceneVersion scene_version;
@@ -237,6 +239,8 @@ struct SceneSerialized {
         ModelVersion model_version;
         size_t header_bytes;
         size_t payload_bytes;
+
+        uint64_t magic = kMagic;
     };
 
     struct SceneHeader {

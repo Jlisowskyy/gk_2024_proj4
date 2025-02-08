@@ -17,7 +17,7 @@ LibGcp::ObjectMgrBase::~ObjectMgrBase() { TRACE("ObjectMgrBase::~ObjectMgrBase()
 
 void LibGcp::ObjectMgrBase::LoadObjectsFromScene(const Scene &scene)
 {
-    for (const auto &spec : scene.static_object) {
+    for (const auto &spec : scene.static_objects) {
         CreateStaticObject_(spec);
     }
 }

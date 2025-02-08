@@ -55,13 +55,15 @@ class SceneSerializer
 
     size_t GetStringId_(const std::string &name);
 
-    std::tuple<Rc, Scene> LoadSceneShallow_(const std::string &scene_name);
+    std::tuple<Rc, Scene> LoadSceneShallow_(const std::string &scene_name) const;
 
     std::tuple<Rc, Scene> LoadSceneDeep_(const std::string &scene_name);
 
     std::tuple<Rc, Scene> LoadSceneDeepPack_(const std::string &scene_name);
 
     std::tuple<Rc, Scene> LoadSceneDeepAttach_(const std::string &scene_name);
+
+    Rc VerifyFile_(const std::string &file_name) const;
 
     // ------------------------------
     // Class fields

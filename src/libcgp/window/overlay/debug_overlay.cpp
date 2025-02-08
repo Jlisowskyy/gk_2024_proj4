@@ -200,7 +200,7 @@ void LibGcp::DebugOverlay::DrawSpawnModelsWindow_()
 {
     ImGui::Begin("Spawn models:");
 
-    DisplayFileDialog_("ChooseFileDlgKey", "Choose File", ".glb,.obj,.fbx", [](const std::string &filePath) {
+    DisplayFileDialog_("ModelFileDlg", "Choose File", ".glb,.obj,.fbx", [](const std::string &filePath) {
         ResourceMgr::GetInstance().GetModel({
             .paths        = {filePath},
             .type         = ResourceType::kModel,
@@ -231,7 +231,7 @@ void LibGcp::DebugOverlay::DrawSceneWindow_()
 {
     ImGui::Begin("Scene editor: ");
 
-    DisplayFileDialog_("SaveFileDlg", "Save Scene", ".libgcp_scene", [&](const std::string &filePath) {
+    DisplayFileDialog_("SaveSceneDlg", "Save Scene", ".libgcp_scene", [&](const std::string &filePath) {
         SceneSerializer serializer(GetDirFromFile(filePath));
         const auto rc = serializer.SerializeScene(GetFileName(filePath), SerializationType::kShallow);
 
@@ -243,7 +243,7 @@ void LibGcp::DebugOverlay::DrawSceneWindow_()
         }
     });
 
-    DisplayFileDialog_("ChooseFileDlgKey", "Load scene", ".libgcp_scene", [&](const std::string &filePath) {
+    DisplayFileDialog_("LoadSceneDlg", "Load scene", ".libgcp_scene", [&](const std::string &filePath) {
         SceneSerializer serializer(GetDirFromFile(filePath));
         const auto [rc, scene] = serializer.LoadScene(GetFileName(filePath), SerializationType::kShallow);
 
@@ -252,6 +252,7 @@ void LibGcp::DebugOverlay::DrawSceneWindow_()
             TriggerFailure_(GetRcDescription(rc));
         } else {
             TRACE("Scene loaded successfully");
+            Engine::GetInstance().ReloadScene(scene);
         }
     });
 
@@ -259,7 +260,7 @@ void LibGcp::DebugOverlay::DrawSceneWindow_()
         ObjectMgr::GetInstance().GetStaticObjects().Clear();
     }
 
-    if (ImGui::Button("Load default scene")) {
+    if (ImGui::Button("Load empty scene")) {
         Engine::GetInstance().ReloadScene(kEmptyScene);
     }
 
