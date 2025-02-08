@@ -7,18 +7,24 @@ set(model_entries
         "https://learnopengl.com/data/models/backpack.zip"
         "backpack.zip"
         "backpack"
-
-        "https://www.dropbox.com/scl/fi/orupih2mtai52o0ou7bjd/cs_office_csgo_real_light_version.glb?rlkey=nkes07bobyaa7imdc0mi9r4y3&st=sqnh254k&dl=0"
-        "csgo.glb"
-        "csgo"
-
-        "https://www.dropbox.com/scl/fi/7m1rctjjvtsirbr85yslp/full-gameready-city-buildings.zip?rlkey=yiexa553tt043bovyum2e9lay&st=ej66p7gp&dl=0"
-        "town_map.zip"
-        "town_map"
-
+        
         "https://www.dropbox.com/scl/fi/go86pw2h7vpjjjykzfmrv/low_poly_light_bulb.glb?rlkey=hq4l2qot5kws9v2rsbgqxd547&st=lf858qq3&dl=0"
         "bulb.glb"
         "bulb"
+
+        "https://www.dropbox.com/scl/fi/4dycyagrn0jjgdncig5su/ak47-counter-strike-2.zip?rlkey=w5r2hv94zwozpxwv6lajjua9l&st=9zh8wmhq&dl=0"
+        "ak47.zip"
+        "ak47"
+
+        "https://www.dropbox.com/scl/fi/mtsc1xyuxepys5ozhgl9k/zsas-cs2-agent-model-blue.zip?rlkey=h0oc3gn9z3mk8ibpg4x4vgaei&st=xc1vm42j&dl=0"
+        "at_model.zip"
+        "at_model"
+
+        "https://www.dropbox.com/scl/fi/mydpsbkn55rt396781gj3/professional__cs2_agent_model_miami.glb?rlkey=2qp4og3atuh3uiiwvd1a4yrzv&st=jw507sbr&dl=0"
+        "tt_model.glb"
+        "tt_model"
+
+
 )
 
 set(archive_extensions zip tar "tar.gz" tgz "tar.bz2" tbz2)

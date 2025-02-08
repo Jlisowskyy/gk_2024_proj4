@@ -204,13 +204,14 @@ void LibGcp::DebugOverlay::DrawLiveObjectsInspectorWindow_()
 void LibGcp::DebugOverlay::DrawSpawnModelsWindow_()
 {
     ImGui::Begin("Spawn models:");
+    ImGui::Checkbox("Flip textures", &flip_textures_);
 
-    DisplayFileDialog_("ModelFileDlg", "Choose File", ".glb,.obj,.fbx", [](const std::string &filePath) {
+    DisplayFileDialog_("ModelFileDlg", "Choose File", ".glb,.obj,.fbx,.blend", [&](const std::string &filePath) {
         ResourceMgr::GetInstance().GetModel({
             .paths        = {filePath},
             .type         = ResourceType::kModel,
             .load_type    = LoadType::kExternal,
-            .flip_texture = 1,
+            .flip_texture = static_cast<int8_t>(flip_textures_),
         });
     });
 

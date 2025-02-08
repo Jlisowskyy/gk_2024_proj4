@@ -1,7 +1,12 @@
 #include <libcgp/main.hpp>
 
+#include <libcgp/rc.hpp>
 #include <libcgp/serialization/scene_serializer.hpp>
 #include <libcgp/utils/files.hpp>
+
+#include <cstdlib>
+#include <iostream>
+#include <string>
 
 static constexpr const char *kDebugSceneDefault = "./scenes/test_scene_1.libgcp_scene";
 using namespace LibGcp;

@@ -13,7 +13,7 @@ LibGcp::Texture::Texture(
 ) noexcept
     : type_(type)
 {
-    R_ASSERT(channels == 3 || channels == 4 || channels == 2);
+    R_ASSERT(channels == 3 || channels == 4 || channels == 2 || channels == 1);
 
     static constexpr std::array kDescTable = {
         0, GL_RED, GL_RG, GL_RGB, GL_RGBA,

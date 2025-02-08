@@ -120,6 +120,7 @@ class DebugOverlay
         .rotation = {},
         .scale    = {1.0f, 1.0f, 1.0f},
     };
+    bool flip_textures_{};
 
     /* Event data */
     int add_model_listener_{};
