@@ -34,13 +34,13 @@ void LibGcp::ResourceMgrBase::LoadResourceFromScene(const Scene &scene)
     for (const auto &resource : scene.resources) {
         switch (resource.type) {
             case ResourceType::kTexture:
-                R_ASSERT(IsSuccess(LoadTextureUnlocked_(resource)));
+                GetTexture(resource);
                 break;
             case ResourceType::kShader:
-                R_ASSERT(IsSuccess(LoadShaderUnlocked_(resource)));
+                GetShader(resource);
                 break;
             case ResourceType::kModel:
-                R_ASSERT(IsSuccess(LoadModelUnlocked_(resource)));
+                GetModel(resource);
                 break;
             case ResourceType::kLast:
                 R_ASSERT(false);

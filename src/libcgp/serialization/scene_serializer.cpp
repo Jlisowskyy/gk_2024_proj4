@@ -336,72 +336,62 @@ std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneShallow_
     }
 
     Scene scene{};
-    // std::vec
+
+    /* read whole scene -> we assume scene file are not that big */
+    std::vector<char> payload{};
+    payload.resize(header.base_header.payload_bytes);
+    file.read(payload.data(), header.base_header.payload_bytes);
+    file.close();
+
+    /* prepare pointers */
+    auto settings_table = reinterpret_cast<const SceneSerialized::SettingsSerialized *>(payload.data());
+    auto resource_table =
+        reinterpret_cast<const SceneSerialized::ResourceSerialized *>(&settings_table[header.num_settings]);
+    auto static_objects =
+        reinterpret_cast<const SceneSerialized::StaticObjectSerialized *>(&resource_table[header.num_resources]);
+    auto string_table = reinterpret_cast<const SceneSerialized::StringTable *>(&static_objects[header.num_statics]);
+    auto string_data  = reinterpret_cast<const char *>(&string_table[header.num_strings]);
 
     /* load settings */
-    std::vector<SceneSerialized::SettingsSerialized> settings{};
-    settings.resize(header.num_settings);
-    file.read(
-        reinterpret_cast<char *>(settings.data()), header.num_settings * sizeof(SceneSerialized::SettingsSerialized)
-    );
-
-    /* convert settings */
     scene.settings.reserve(header.num_settings);
-    for (const auto &setting : settings) {
-        scene.settings.emplace_back(static_cast<Setting>(setting.setting), setting.value);
+    for (size_t idx = 0; idx < header.num_settings; ++idx) {
+        scene.settings.emplace_back(settings_table[idx].setting, settings_table[idx].value);
     }
 
-    /* load resources */
-    std::vector<SceneSerialized::ResourceSerialized> resources{};
-    resources.resize(header.num_resources);
-    file.read(
-        reinterpret_cast<char *>(resources.data()), header.num_resources * sizeof(SceneSerialized::ResourceSerialized)
-    );
-
-    /* load static objects */
-    std::vector<SceneSerialized::StaticObjectSerialized> static_objects{};
-    static_objects.resize(header.num_statics);
-    file.read(
-        reinterpret_cast<char *>(static_objects.data()),
-        header.num_statics * sizeof(SceneSerialized::StaticObjectSerialized)
-    );
-
-    /* load string table */
-    std::vector<size_t> string_table{};
-    string_table.resize(header.num_strings);
-    file.read(reinterpret_cast<char *>(string_table.data()), header.num_strings * sizeof(size_t));
-
     /* load strings */
-    std::vector<char> string_data{};
-    string_data.resize(header.base_header.payload_bytes);
-    file.read(string_data.data(), header.base_header.payload_bytes);
-
     std::vector<std::string> strings{};
     strings.reserve(header.num_strings);
 
-    /* convert strings */
     for (size_t idx = 0; idx < header.num_strings; ++idx) {
-        const auto offset = string_table[idx];
-        const auto length = *reinterpret_cast<size_t *>(&string_data[offset]);
+        const auto string_struct =
+            reinterpret_cast<const SceneSerialized::StringSerialized *>(&string_data[string_table[idx].idx]);
+        const size_t length = string_struct->length;
 
-        strings.emplace_back(&string_data[offset + sizeof(size_t)], length);
+        strings.emplace_back(&string_data[string_table[idx].idx + sizeof(SceneSerialized::StringSerialized)], length);
     }
 
-    /* convert resources */
+    /* load resources */
     scene.resources.reserve(header.num_resources);
-    for (const auto &resource : resources) {
+    for (size_t idx = 0; idx < header.num_resources; ++idx) {
+        const auto &resource = resource_table[idx];
+
         scene.resources.push_back({
             {strings[resource.paths[0]], strings[resource.paths[1]]},
-            static_cast<ResourceType>(resource.type),
-            static_cast<LoadType>(resource.load_type),
-            resource.flip_texture
+            resource.type,
+            resource.load_type,
+            resource.flip_texture,
         });
     }
 
-    /* convert static objects */
+    /* load static objects */
     scene.static_objects.reserve(header.num_statics);
-    for (const auto &object : static_objects) {
-        scene.static_objects.push_back({object.position, strings[object.name]});
+    for (size_t idx = 0; idx < header.num_statics; ++idx) {
+        const auto &object = static_objects[idx];
+
+        scene.static_objects.push_back({
+            object.position,
+            strings[object.name],
+        });
     }
 
     return {Rc::kSuccess, scene};

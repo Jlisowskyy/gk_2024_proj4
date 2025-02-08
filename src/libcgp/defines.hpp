@@ -35,4 +35,6 @@
 #define TRACE(stream)
 #endif  // USE_TRACES_
 
+#define PACK __attribute__((packed))
+
 #endif  // LIBGCP_DEFINES_HPP_

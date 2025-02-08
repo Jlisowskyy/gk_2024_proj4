@@ -109,6 +109,7 @@ struct ResourceSpec {
     ResourceType type{};
     LoadType load_type{};
     int8_t flip_texture{-1};
+    bool was_introduced_by_model{false};
 };
 
 using resource_t = std::vector<ResourceSpec>;
@@ -229,10 +230,10 @@ enum class SerializationType : std::uint8_t {
     kLast,
 };
 
-struct SceneSerialized {
+struct PACK SceneSerialized {
     static constexpr uint64_t kMagic = 0xC4A1234BFEAE341;
 
-    struct BaseHeader {
+    struct PACK BaseHeader {
         Version source_version;
         SceneVersion scene_version;
         TextureVersion texture_version;
@@ -243,7 +244,7 @@ struct SceneSerialized {
         uint64_t magic = kMagic;
     };
 
-    struct SceneHeader {
+    struct PACK SceneHeader {
         BaseHeader base_header;
 
         size_t num_strings;
@@ -252,24 +253,28 @@ struct SceneSerialized {
         size_t num_statics;
     };
 
-    struct SettingsSerialized {
+    struct PACK SettingsSerialized {
         Setting setting;
         uint64_t value;
     };
 
-    struct ResourceSerialized {
+    struct PACK ResourceSerialized {
         size_t paths[2];
         ResourceType type;
         LoadType load_type;
         int8_t flip_texture;
     };
 
-    struct StaticObjectSerialized {
+    struct PACK StaticObjectSerialized {
         size_t name;
         ObjectPosition position;
     };
 
-    struct StringSerialized {
+    struct PACK StringTable {
+        size_t idx;
+    };
+
+    struct PACK StringSerialized {
         size_t length;
         /* char data[0]; */
     };
