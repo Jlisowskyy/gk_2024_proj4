@@ -70,7 +70,7 @@ class DebugOverlay
 
     void DrawSelectedModelSpawnSection_();
 
-    void DrawDeleteObjectButton_();
+    void DrawStaticObjectButtons_();
 
     void SetSelectedObject_(int idx);
 

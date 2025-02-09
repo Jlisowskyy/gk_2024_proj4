@@ -48,6 +48,8 @@ class View
 
     void UpdateCameraPosition();
 
+    void SetWindowAspectRatio(float aspect_ratio);
+
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------

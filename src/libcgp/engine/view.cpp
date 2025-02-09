@@ -71,3 +71,8 @@ void LibGcp::View::UpdateCameraPosition()
     const auto up     = camera_object_info_->up;
     view_matrix_      = glm::lookAt(pos, center, up);
 }
+
+void LibGcp::View::SetWindowAspectRatio(const float aspect_ratio)
+{
+    projection_matrix_ = glm::perspective(glm::radians(45.0F), aspect_ratio, 0.1F, 1000000.0F);
+}

@@ -2,14 +2,15 @@
 #define ENGINE_ENGINE_HPP_
 
 #include <libcgp/defines.hpp>
+#include <libcgp/engine/view.hpp>
+#include <libcgp/primitives/shader.hpp>
 
 #include <CxxUtils/static_singleton.hpp>
-
-#include <libcgp/engine/view.hpp>
 
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <memory>
 
 // clang-format off
 #include <glad/gl.h>
@@ -47,7 +48,10 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
 
     void ReloadScene(const Scene &scene);
 
-    NDSCRD const CameraInfo &GetFreeCamera() const noexcept { return free_camera_; }
+    /* camera */
+    NDSCRD FAST_CALL const CameraInfo &GetFreeCamera() const noexcept { return free_camera_; }
+
+    FAST_CALL void MoveFreeCameraTo(const glm::vec3 &position) { free_camera_.position = position; }
 
     // ---------------------------------
     // Class implementation methods

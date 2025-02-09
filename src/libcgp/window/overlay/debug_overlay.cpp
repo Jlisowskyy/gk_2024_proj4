@@ -343,7 +343,7 @@ void LibGcp::DebugOverlay::DrawStaticObjectsSection_()
 
     ImGui::Separator();
 
-    DrawDeleteObjectButton_();
+    DrawStaticObjectButtons_();
     if (selected_static_object_idx_ == -1) {
         ImGui::Text("No object selected...");
     } else {
@@ -426,7 +426,7 @@ void LibGcp::DebugOverlay::DrawSelectedModelSpawnSection_()
     }
 }
 
-void LibGcp::DebugOverlay::DrawDeleteObjectButton_()
+void LibGcp::DebugOverlay::DrawStaticObjectButtons_()
 {
     if (selected_static_object_idx_ == -1) {
         return;
@@ -438,6 +438,10 @@ void LibGcp::DebugOverlay::DrawDeleteObjectButton_()
         ObjectMgr::GetInstance().RemoveStaticObject(ident);
 
         return;
+    }
+
+    if (ImGui::Button("Move to")) {
+        Engine::GetInstance().MoveFreeCameraTo(static_object_->GetPosition().position);
     }
 }
 
