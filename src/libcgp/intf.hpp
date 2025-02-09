@@ -134,6 +134,40 @@ struct Resource {
 };
 
 // ------------------------------
+// Lights
+// ------------------------------
+
+struct LightInfo {
+    glm::vec3 position;
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+};
+
+struct PointLight {
+    double constant;
+    double linear;
+    double quadratic;
+};
+
+struct SpotLight {
+    glm::vec3 direction;
+    double constant;
+    double linear;
+    double quadratic;
+    double cut_off;
+    double outer_cut_off;
+};
+
+struct GlobalLightSpec {
+    LightInfo light_info;
+    bool is_moving;
+    uint64_t rise_time;
+    uint64_t down_time;
+    double angle;
+};
+
+// ------------------------------
 // Settings
 // ------------------------------
 

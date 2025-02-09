@@ -72,6 +72,8 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
 
     static void OnDefaultShaderChanged_(uint64_t new_value);
 
+    static void OnWordTimeChanged_(uint64_t new_value);
+
     static std::shared_ptr<Shader> FindShaderWithId(uint64_t id);
 
     // ------------------------------
@@ -79,6 +81,7 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
     // ------------------------------
 
     WordTime word_time_{};
+    GlobalLights global_light_{};
 
     // TODO: temp object
     CameraInfo flowing_camera_{};

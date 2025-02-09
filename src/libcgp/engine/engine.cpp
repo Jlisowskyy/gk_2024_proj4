@@ -12,6 +12,7 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
 
     /* connect with settings */
     SettingsMgr::GetInstance().AddListener(Setting::kCameraType, OnCameraTypeChanged_);
+    SettingsMgr::GetInstance().AddListener(Setting::kCurrentWordTime, OnWordTimeChanged_);
 
     /* Adjust camera type based on default settings - intentional cast */
     OnCameraTypeChanged_(SettingsMgr::GetInstance().GetSetting<uint64_t>(Setting::kCameraType));
@@ -179,6 +180,11 @@ void LibGcp::EngineBase::OnDefaultShaderChanged_(const uint64_t new_value)
 
     Engine::GetInstance().default_shader_ = FindShaderWithId(new_value);
     R_ASSERT(Engine::GetInstance().default_shader_ && "Default shader not found");
+}
+
+void LibGcp::EngineBase::OnWordTimeChanged_(const uint64_t new_value)
+{
+    Engine::GetInstance().global_light_.UpdatePosition();
 }
 
 std::shared_ptr<LibGcp::Shader> LibGcp::EngineBase::FindShaderWithId(const uint64_t id)

@@ -32,3 +32,14 @@ std::string LibGcp::WordTime::GetTime() noexcept
     ss << std::put_time(&time_info, "%Y-%m-%d %H:%M:%S");
     return ss.str();
 }
+
+uint64_t LibGcp::WordTime::GetDayTimeSeconds()
+{
+    const uint64_t time = SettingsMgr::GetInstance().GetSetting<Setting::kCurrentWordTime, uint64_t>();
+    const auto time_t   = static_cast<std::time_t>(time);
+
+    tm timeInfo;
+    gmtime_r(&time_t, &timeInfo);
+
+    return timeInfo.tm_hour * 3600 + timeInfo.tm_min * 60 + timeInfo.tm_sec;
+}

@@ -20,6 +20,8 @@ class WordTime
     static constexpr uint64_t kTicksToHour   = 60 * kTicksToMinute;
     static constexpr uint64_t kTicksToDay    = 24 * kTicksToHour;
 
+    static constexpr uint64_t kSecondsInDay = 24 * 60 * 60;
+
     // ------------------------------
     // Object creation
     // ------------------------------
@@ -31,6 +33,8 @@ class WordTime
     void UpdateTime(uint64_t delta_time) noexcept;
 
     NDSCRD static std::string GetTime() noexcept;
+
+    NDSCRD static uint64_t GetDayTimeSeconds();
 
     // ------------------------------
     // Class fields
