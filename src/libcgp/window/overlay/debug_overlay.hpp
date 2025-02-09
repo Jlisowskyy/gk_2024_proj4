@@ -24,9 +24,11 @@ class DebugOverlay
     // Class interaction
     // ------------------------------
 
-    void Init();
+    void Init(GLFWwindow *window);
 
-    void DestroyOverlay();
+    void Destroy();
+
+    void DisableOverlay();
 
     void EnableOverlay(GLFWwindow *window);
 
@@ -37,7 +39,7 @@ class DebugOverlay
     void FAST_CALL SwitchOverlay(GLFWwindow *window)
     {
         if (IsEnabled()) {
-            DestroyOverlay();
+            DisableOverlay();
         } else {
             EnableOverlay(window);
         }
@@ -86,10 +88,13 @@ class DebugOverlay
     )
     {
         if (ImGui::Button(title.c_str())) {
-            ImGuiFileDialog::Instance()->OpenDialog(key, title, extensions.c_str());
+            IGFD::FileDialogConfig config;
+            config.path = ".";
+
+            ImGuiFileDialog::Instance()->OpenDialog(key, title, extensions.c_str(), config);
         }
 
-        if (ImGuiFileDialog::Instance()->Display(key)) {
+        if (ImGuiFileDialog::Instance()->Display(key, ImGuiWindowFlags_NoCollapse, ImVec2(500, 600))) {
             if (ImGuiFileDialog::Instance()->IsOk()) {
                 func(GetFullPath(ImGuiFileDialog::Instance()->GetFilePathName()));
             }

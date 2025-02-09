@@ -59,12 +59,18 @@ static void DisplaySetting()
 LibGcp::DebugOverlay::~DebugOverlay()
 {
     if (window_ != nullptr) {
-        DestroyOverlay();
+        DisableOverlay();
     }
 }
 
-void LibGcp::DebugOverlay::Init()
+void LibGcp::DebugOverlay::Init(GLFWwindow *window)
 {
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 460");
+
     shader_ = ResourceMgr::GetInstance().GetShader({
         .paths           = {"contours", "contours"},
         .type            = ResourceType::kShader,
@@ -73,11 +79,16 @@ void LibGcp::DebugOverlay::Init()
     });
 }
 
-void LibGcp::DebugOverlay::DestroyOverlay()
+void LibGcp::DebugOverlay::Destroy()
 {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+}
+
+void LibGcp::DebugOverlay::DisableOverlay()
+{
+    ImGuiFileDialog::Instance()->Close();
 
     /* remove events */
     ResourceMgr::GetInstance().GetModels().GetListeners().RemoveListener<CxxUtils::ContainerEvents::kAdd>(
@@ -106,12 +117,6 @@ void LibGcp::DebugOverlay::EnableOverlay(GLFWwindow *window)
 {
     assert(window != nullptr);
     assert(window_ == nullptr);
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 460");
 
     FillObjectNames_();
     model_names_ = ResourceMgr::GetInstance().GetModels().GetKeys();
@@ -399,6 +404,12 @@ void LibGcp::DebugOverlay::DrawSelectedModelSpawnSection_()
 {
     if (selected_model_idx_ == -1) {
         return;
+    }
+
+    if (ImGui::Button("Center to camera")) {
+        auto info = Engine::GetInstance().GetFreeCamera();
+
+        spawn_model_pos_.position = info.position;
     }
 
     ImGui::DragFloat3("Position", &spawn_model_pos_.position.x, 0.01f);

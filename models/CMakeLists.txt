@@ -7,7 +7,7 @@ set(model_entries
         "https://learnopengl.com/data/models/backpack.zip"
         "backpack.zip"
         "backpack"
-        
+
         "https://www.dropbox.com/scl/fi/go86pw2h7vpjjjykzfmrv/low_poly_light_bulb.glb?rlkey=hq4l2qot5kws9v2rsbgqxd547&st=lf858qq3&dl=0"
         "bulb.glb"
         "bulb"
@@ -24,7 +24,9 @@ set(model_entries
         "tt_model.glb"
         "tt_model"
 
-
+        "https://www.dropbox.com/scl/fi/p0oc2dcrg6j6pca3dxucs/cs_office_with_real_light.glb?rlkey=690ycsaqkql9aaj20g3m9oiyn&st=zn3tqyyj&dl=0"
+        "office.glb"
+        "office"
 )
 
 set(archive_extensions zip tar "tar.gz" tgz "tar.bz2" tbz2)

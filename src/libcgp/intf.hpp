@@ -36,7 +36,7 @@ struct TextureSpec {
 // Objects
 // ------------------------------
 
-struct ObjectPosition {
+struct PACK ObjectPosition {
     glm::vec3 position{};
     glm::vec3 rotation{};
     glm::vec3 scale{};

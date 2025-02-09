@@ -47,6 +47,8 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
 
     void ReloadScene(const Scene &scene);
 
+    NDSCRD const CameraInfo &GetFreeCamera() const noexcept { return free_camera_; }
+
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------

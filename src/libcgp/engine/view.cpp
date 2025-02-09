@@ -57,6 +57,7 @@ void LibGcp::View::PrepareModelMatrices(Shader &shader, const ObjectPosition &po
     model_matrix           = glm::rotate(model_matrix, position.rotation.x, glm::vec3(1.0F, 0.0F, 0.0F));
     model_matrix           = glm::rotate(model_matrix, position.rotation.y, glm::vec3(0.0F, 1.0F, 0.0F));
     model_matrix           = glm::rotate(model_matrix, position.rotation.z, glm::vec3(0.0F, 0.0F, 1.0F));
+    model_matrix           = glm::scale(model_matrix, position.scale);
 
     shader.SetMat4("model", model_matrix);
 }

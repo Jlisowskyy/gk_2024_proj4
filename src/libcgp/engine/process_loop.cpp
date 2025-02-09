@@ -37,4 +37,6 @@ void LibGcp::ProcessLoopApp()
         // TRACE("Time spent for last frame: " << delta_time_ms / 1000 << " ms");
         Engine::GetInstance().ProcessProgress(delta_time_ms);
     });
+
+    Window::GetInstance().DestroyDebug();
 }

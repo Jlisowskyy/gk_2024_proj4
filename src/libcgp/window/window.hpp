@@ -42,7 +42,8 @@ class Window : public CxxUtils::Singleton<Window>
 
     void Init();
 
-    FAST_CALL void InitDebug() { debug_overlay_.Init(); }
+    FAST_CALL void InitDebug() { debug_overlay_.Init(window_); }
+    FAST_CALL void DestroyDebug() { debug_overlay_.Destroy(); }
 
     FAST_CALL void SwitchDebugOverlay()
     {
