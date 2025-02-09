@@ -2,7 +2,9 @@
 #define ENGINE_ENGINE_HPP_
 
 #include <libcgp/defines.hpp>
+#include <libcgp/engine/global_light.hpp>
 #include <libcgp/engine/view.hpp>
+#include <libcgp/engine/word_time.hpp>
 #include <libcgp/primitives/shader.hpp>
 
 #include <CxxUtils/static_singleton.hpp>
@@ -40,7 +42,7 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
 
     FAST_CALL View &GetView() noexcept { return view_; }
 
-    void ProcessProgress(long delta);
+    void ProcessProgress(uint64_t delta);
 
     FAST_CALL void ButtonPressed(const int key) { ++keys_[key]; }
 
@@ -58,13 +60,13 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
     // ---------------------------------
 
     protected:
-    void ProcessInput_(long delta);
+    void ProcessInput_(uint64_t delta);
 
-    void ProcessUserMovement_(long delta);
+    void ProcessUserMovement_(uint64_t delta);
 
-    void ProcessFreeCameraMovement_(long delta);
+    void ProcessFreeCameraMovement_(uint64_t delta);
 
-    void ProcessDynamicObjects_(long delta);
+    void ProcessDynamicObjects_(uint64_t delta);
 
     static void OnCameraTypeChanged_(uint64_t new_value);
 
@@ -75,6 +77,8 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
     // ------------------------------
     // Class fields
     // ------------------------------
+
+    WordTime word_time_{};
 
     // TODO: temp object
     CameraInfo flowing_camera_{};

@@ -1,11 +1,11 @@
 #include <libcgp/engine/engine.hpp>
+#include <libcgp/engine/word_time.hpp>
 #include <libcgp/intf.hpp>
 #include <libcgp/mgr/object_mgr.hpp>
 #include <libcgp/mgr/resource_mgr.hpp>
 #include <libcgp/mgr/settings_mgr.hpp>
 #include <libcgp/rc.hpp>
 #include <libcgp/serialization/scene_serializer.hpp>
-#include <libcgp/todo.hpp>
 #include <libcgp/window/overlay/debug_overlay.hpp>
 
 #include <CxxUtils/type_list.hpp>
@@ -184,6 +184,7 @@ void LibGcp::DebugOverlay::Draw()
     DrawSpawnModelsWindow_();
     DrawSceneWindow_();
     DrawFailure_();
+    DrawInfoWindow_();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -274,6 +275,16 @@ void LibGcp::DebugOverlay::DrawSceneWindow_()
     if (ImGui::Button("Load empty scene")) {
         Engine::GetInstance().ReloadScene(kEmptyScene);
     }
+
+    ImGui::End();
+}
+
+void LibGcp::DebugOverlay::DrawInfoWindow_()
+{
+    ImGui::Begin("Game state info:");
+
+    const std::string time_str = "Current time: " + WordTime::GetTime();
+    ImGui::Text(time_str.c_str());
 
     ImGui::End();
 }

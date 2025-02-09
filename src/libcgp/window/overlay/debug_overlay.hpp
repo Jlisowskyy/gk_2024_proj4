@@ -58,6 +58,8 @@ class DebugOverlay
 
     void DrawSceneWindow_();
 
+    void DrawInfoWindow_();
+
     void DrawFailure_();
 
     void DrawStaticObjectsSection_();

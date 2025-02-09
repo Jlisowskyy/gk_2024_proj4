@@ -20,7 +20,7 @@ void LibGcp::ProcessLoopApp()
     Window::GetInstance().RunLoop([&] {
         // Render
         // Clear the color buffer
-        glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
+        glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //  Render objects
@@ -30,11 +30,11 @@ void LibGcp::ProcessLoopApp()
 
         // Process progress
         const auto new_frame = std::chrono::steady_clock::now();
-        const auto delta_time_ms =
+        const uint64_t delta_time_ms =
             std::chrono::duration_cast<std::chrono::microseconds>(new_frame - last_frame).count();
         last_frame = new_frame;
 
-        // TRACE("Time spent for last frame: " << delta_time_ms / 1000 << " ms");
+        TRACE("Curr fps: " << 1000000.0F / delta_time_ms);
         Engine::GetInstance().ProcessProgress(delta_time_ms);
     });
 

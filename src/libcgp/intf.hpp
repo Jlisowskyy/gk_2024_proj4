@@ -143,6 +143,8 @@ enum class Setting : std::uint16_t {
     kClockTicking,
     kFreeCameraSpeed,
     kBaseShader,
+    kCurrentWordTime,
+    kWordTimeCoef,
     kLast,
 };
 
@@ -192,11 +194,17 @@ struct SettingContainer {
 using setting_t = std::vector<std::tuple<Setting, SettingContainer> >;
 
 template <size_t N>
-using SettingTypes = CxxUtils::TypeList<N, CameraType, double, bool, double, uint64_t>;
+using SettingTypes = CxxUtils::TypeList<N, CameraType, double, bool, double, uint64_t, uint64_t, double>;
 static_assert(SettingTypes<0>::size == static_cast<size_t>(Setting::kLast), "Setting types list is incomplete");
 
 static constexpr std::array kSettingsDescriptions{
-    "Camera type", "Mouse sensitivity", "Is clock enabled", "Free camera speed", "ID of the base render shader",
+    "Camera type",
+    "Mouse sensitivity",
+    "Is clock enabled",
+    "Free camera speed",
+    "ID of the base render shader",
+    "Current word time",
+    "Word time coefficient",
 };
 static_assert(
     kSettingsDescriptions.size() == static_cast<size_t>(Setting::kLast), "Setting descriptions list is incomplete"

@@ -56,6 +56,9 @@ void LibGcp::Window::Init()
 
     glEnable(GL_DEPTH_TEST);
 
+    /* disable vsync */
+    // glfwSwapInterval(0);
+
     SyncMousePositionWithWindow_();
 }
 
@@ -78,11 +81,6 @@ void LibGcp::Window::KeyCallback(
 )
 {
     TRACE("Key pressed " << key << " scancode " << scancode << " mode " << mode);
-
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GL_TRUE);
-        return;
-    }
 
     if (key != GLFW_DONT_CARE && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         Engine::GetInstance().ButtonPressed(key);

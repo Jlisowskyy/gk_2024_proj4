@@ -35,11 +35,12 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
     R_ASSERT(Engine::GetInstance().default_shader_ && "Default shader not found");
 }
 
-void LibGcp::EngineBase::ProcessProgress(const long delta)
+void LibGcp::EngineBase::ProcessProgress(const uint64_t delta)
 {
     ProcessInput_(delta);
 
     if (SettingsMgr::GetInstance().GetSetting<Setting::kClockTicking, bool>()) {
+        word_time_.UpdateTime(delta);
         ProcessDynamicObjects_(delta);
     }
 
@@ -79,7 +80,7 @@ void LibGcp::EngineBase::ReloadScene(const Scene &scene)
     }
 }
 
-void LibGcp::EngineBase::ProcessInput_(const long delta)
+void LibGcp::EngineBase::ProcessInput_(const uint64_t delta)
 {
     /* first process camera change */
     if (keys_[GLFW_KEY_F1]) {
@@ -104,9 +105,9 @@ void LibGcp::EngineBase::ProcessInput_(const long delta)
     ProcessUserMovement_(is_clock_enabled * delta);
 }
 
-void LibGcp::EngineBase::ProcessUserMovement_(UNUSED const long delta) {}
+void LibGcp::EngineBase::ProcessUserMovement_(UNUSED const uint64_t delta) {}
 
-void LibGcp::EngineBase::ProcessFreeCameraMovement_(const long delta)
+void LibGcp::EngineBase::ProcessFreeCameraMovement_(const uint64_t delta)
 {
     const double free_cam_speed = SettingsMgr::GetInstance().GetSetting<Setting::kFreeCameraSpeed, double>();
     const double distance       = free_cam_speed * static_cast<double>(delta) / 1e+6;
@@ -114,7 +115,7 @@ void LibGcp::EngineBase::ProcessFreeCameraMovement_(const long delta)
     free_camera_.MoveFreeCamera(static_cast<float>(distance), keys_);
 }
 
-void LibGcp::EngineBase::ProcessDynamicObjects_(const long delta)
+void LibGcp::EngineBase::ProcessDynamicObjects_(const uint64_t delta)
 {
     /* TODO: temporary, bind object movement to camera movement later */
     const double radius = 30.0f;
