@@ -435,6 +435,19 @@ void LibGcp::DebugOverlay::DrawSelectedModelSpawnSection_()
             .name     = model_names_[selected_model_idx_],
         });
     }
+
+    ImGui::RadioButton("Point light", &selected_light_type_, kPointLightRadioIdx);
+    ImGui::RadioButton("Spotlight", &selected_light_type_, kSpotLightRadioIdx);
+
+    if (ImGui::Button("Add light")) {
+        auto model = ResourceMgr::GetInstance().GetModel(model_names_[selected_model_idx_], LoadType::kExternal);
+
+        if (selected_light_type_ == kPointLightRadioIdx) {
+            Engine::GetInstance().GetLightMgr().AddLight(*model, kDefaultPointLight);
+        } else {
+            Engine::GetInstance().GetLightMgr().AddLight(*model, kDefaultSpotLight);
+        }
+    }
 }
 
 void LibGcp::DebugOverlay::DrawStaticObjectButtons_()

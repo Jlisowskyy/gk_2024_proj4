@@ -11,6 +11,9 @@ struct GLFWwindow;
 LIBGCP_DECL_START_
 class DebugOverlay
 {
+    static constexpr int kPointLightRadioIdx = 0;
+    static constexpr int kSpotLightRadioIdx  = 1;
+
     public:
     // ------------------------------
     // Object creation
@@ -140,6 +143,9 @@ class DebugOverlay
     /* failure */
     bool show_failure_{};
     std::string failure_message_{};
+
+    /* add light */
+    int selected_light_type_{};
 
     /* Window info */
     GLFWwindow *window_{};

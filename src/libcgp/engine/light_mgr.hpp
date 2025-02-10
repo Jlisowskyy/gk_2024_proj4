@@ -3,6 +3,9 @@
 
 #include <libcgp/defines.hpp>
 #include <libcgp/intf.hpp>
+#include <libcgp/utils/macros.hpp>
+
+#include <libcgp/primitives/model.hpp>
 
 LIBGCP_DECL_START_
 
@@ -28,6 +31,22 @@ class LightMgr
     void LoadLightsFromScene(const Scene &scene);
 
     void PrepareLights(Shader &shader) const;
+
+    template <typename T>
+    void AddLight(Model &model, const T &light)
+    {
+        model.GetLights().push_back(light);
+
+        if constexpr (std::is_same_v<T, SpotLight>) {
+            spot_light_count_++;
+        } else if constexpr (std::is_same_v<T, PointLight>) {
+            point_light_count_++;
+        }
+
+        R_ASSERT(point_light_count_ <= kMaxTypeLightObjects && "Too many point lights");
+        R_ASSERT(spot_light_count_ <= kMaxTypeLightObjects && "Too many spot lights");
+        R_ASSERT(point_light_count_ + spot_light_count_ <= kMaxLightObjects && "Too many lights");
+    }
 
     // ---------------------------------
     // Class implementation methods

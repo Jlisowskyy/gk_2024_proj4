@@ -77,7 +77,7 @@ class Model : public Resource
     // ------------------------------
 
     LightContainer lights_{};
-    std::vector<std::shared_ptr<Mesh>> meshes_;
+    std::vector<std::shared_ptr<Mesh>> meshes_{};
 };
 
 // ------------------------------
