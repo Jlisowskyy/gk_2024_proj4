@@ -26,6 +26,7 @@ class Texture : public Resource
     enum class Type : std::uint8_t {
         kDiffuse,
         kSpecular,
+        kNormal,
         kLast,
     };
 

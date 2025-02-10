@@ -34,6 +34,34 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
 
     default_shader_ = FindShaderWithId(default_id);
     R_ASSERT(Engine::GetInstance().default_shader_ && "Default shader not found");
+
+    /* TODO: load global lights from scene */
+    global_light_.LoadLights({
+        // sun
+        GlobalLightSpec{
+                        .light_info =
+                        {
+                        .ambient  = {0.2F, 0.2F, 0.2F},
+                        .diffuse  = {0.5F, 0.5F, 0.5F},
+                        .specular = {1.0F, 1.0F, 1.0F},
+                        }, .is_moving = true,
+                        .rise_time = WordTime::ConvertToSeconds(6, 0, 0),
+                        .down_time = WordTime::ConvertToSeconds(22, 30, 0),
+                        .angle     = 0.25,
+                        },
+        // Moon
+        GlobalLightSpec{
+                        .light_info =
+                        {
+                        .ambient  = {0.1F, 0.1F, 0.1F},
+                        .diffuse  = {0.3F, 0.3F, 0.3F},
+                        .specular = {0.5F, 0.5F, 0.5F},
+                        }, .is_moving = true,
+                        .rise_time = WordTime::ConvertToSeconds(21, 0, 0),
+                        .down_time = WordTime::ConvertToSeconds(7,  0, 0),
+                        .angle     = 0.6,
+                        }
+    });
 }
 
 void LibGcp::EngineBase::ProcessProgress(const uint64_t delta)
@@ -184,7 +212,7 @@ void LibGcp::EngineBase::OnDefaultShaderChanged_(const uint64_t new_value)
 
 void LibGcp::EngineBase::OnWordTimeChanged_(const uint64_t new_value)
 {
-    Engine::GetInstance().global_light_.UpdatePosition();
+    Engine::GetInstance().global_light_.UpdatePosition(new_value);
 }
 
 std::shared_ptr<LibGcp::Shader> LibGcp::EngineBase::FindShaderWithId(const uint64_t id)

@@ -1,6 +1,7 @@
 #include <libcgp/engine/global_light.hpp>
 #include <libcgp/engine/word_time.hpp>
 #include <libcgp/intf.hpp>
+#include <libcgp/utils/macros.hpp>
 
 #include <cassert>
 #include <cstdint>
@@ -10,7 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-LibGcp::GlobalLights::GlobalLight::GlobalLight(const GlobalLightSpec &spec) : spec_(spec)
+LibGcp::GlobalLights::GlobalLight::GlobalLight(const GlobalLightSpec &spec) noexcept : spec_(spec)
 {
     assert(spec.down_time < WordTime::kSecondsInDay && "Down time is out of range");
     assert(spec.rise_time < WordTime::kSecondsInDay && "Rise time is out of range");
@@ -50,21 +51,23 @@ bool LibGcp::GlobalLights::GlobalLight::IsBelowHorizon(const uint64_t time) cons
 double LibGcp::GlobalLights::GlobalLight::GetDayAngle(const uint64_t time) const
 {
     if (spec_.rise_time > spec_.down_time) {
-        const double len = static_cast<double>(WordTime::kSecondsInDay - spec_.rise_time + spec_.down_time);
-        const double time_passed =
-            time < spec_.rise_time ? WordTime::kSecondsInDay - spec_.rise_time + time : time - spec_.rise_time;
+        const auto len         = static_cast<double>(WordTime::kSecondsInDay - spec_.rise_time + spec_.down_time);
+        const auto time_passed = static_cast<double>(
+            time < spec_.rise_time ? WordTime::kSecondsInDay - spec_.rise_time + time : time - spec_.rise_time
+        );
 
         return M_PI * (time_passed / len);
     }
 
-    const double len         = static_cast<double>(spec_.down_time - spec_.rise_time);
-    const double time_passed = time - spec_.rise_time;
+    const auto len         = static_cast<double>(spec_.down_time - spec_.rise_time);
+    const auto time_passed = static_cast<double>(time - spec_.rise_time);
 
     return M_PI * (time_passed / len);
 }
 
 void LibGcp::GlobalLights::LoadLights(const std::vector<GlobalLightSpec> &lights)
 {
+    R_ASSERT(lights.size() < GlobalLights::kMaxLights && "Too many global lights");
     lights_.clear();
 
     for (const auto &light : lights) {

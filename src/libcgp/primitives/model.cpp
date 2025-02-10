@@ -15,6 +15,75 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 
+// ------------------------------
+// Static helpers
+// ------------------------------
+
+L_FAST_CALL void TraceSceneInfo(const aiScene *scene)
+{
+    if (scene->HasLights()) {
+        TRACE("[SCENE INFO] Scene has lights!");
+    }
+
+    if (scene->HasAnimations()) {
+        TRACE("[SCENE INFO] Scene has animations!");
+    }
+
+    if (scene->HasCameras()) {
+        TRACE("[SCENE INFO] Scene has cameras!");
+    }
+
+    if (scene->hasSkeletons()) {
+        TRACE("[SCENE INFO] Scene has skeletons!");
+    }
+
+    if (scene->HasMaterials()) {
+        TRACE("[SCENE INFO] Scene has materials!");
+    }
+
+    for (size_t idx = 0; idx < scene->mMetaData->mNumProperties; ++idx) {
+        TRACE("[SCENE INFO] " << scene->mMetaData->mKeys[idx].C_Str());
+    }
+}
+
+L_FAST_CALL void TraceMeshInfo(const aiMesh *mesh)
+{
+    if (mesh->HasBones()) {
+        TRACE("[MESH INFO] Mesh has bones!");
+    }
+
+    if (mesh->HasFaces()) {
+        TRACE("[MESH INFO] Mesh has faces!");
+    }
+
+    if (mesh->HasNormals()) {
+        TRACE("[MESH INFO] Mesh has normals!");
+    }
+
+    if (mesh->HasTangentsAndBitangents()) {
+        TRACE("[MESH INFO] Mesh has tangents and bitangents!");
+    }
+}
+
+L_FAST_CALL void TraceMaterialInfo(aiMaterial *material)
+{
+    if (material->GetTextureCount(aiTextureType_NORMALS) > 0) {
+        TRACE("[MATERIAL INFO] Material has normal maps!");
+    }
+
+    if (material->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION) > 0) {
+        TRACE("[MATERIAL INFO] Material has ambient occlusion maps!");
+    }
+
+    for (size_t idx = 0; idx < material->mNumProperties; ++idx) {
+        TRACE("[MATERIAL INFO] " << material->mProperties[idx]->mKey.C_Str());
+    }
+}
+
+// ------------------------------
+// Implementations
+// ------------------------------
+
 LibGcp::Model::Model(std::vector<std::shared_ptr<Mesh> > &&meshes) : meshes_(std::move(meshes)) {}
 
 void LibGcp::Model::Draw(Shader &shader) const
@@ -45,6 +114,7 @@ std::shared_ptr<LibGcp::Model> LibGcp::ModelSerializer::LoadModelFromExternalFor
     full_path_ = path;
     directory_ = path.substr(0, path.find_last_of('/'));
 
+    TraceSceneInfo(scene);
     ProcessNode_(scene->mRootNode, scene);
     timer.StopAndPrint(0);
 
@@ -83,6 +153,8 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
     std::vector<GLuint> indices{};
     std::vector<std::shared_ptr<Texture> > textures{};
 
+    TraceMeshInfo(mesh);
+
     // process vertices
     vertices.reserve(mesh->mNumVertices);
     for (size_t idx = 0; idx < mesh->mNumVertices; ++idx) {
@@ -110,6 +182,8 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
     }
 
     aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+    TraceMaterialInfo(material);
+
     // precalculate the number of textures
     const size_t num_textures =
         material->GetTextureCount(aiTextureType_DIFFUSE) + material->GetTextureCount(aiTextureType_SPECULAR);
@@ -118,8 +192,21 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
     textures.reserve(num_textures);
     LoadMaterialTextures_(textures, scene, material, aiTextureType_DIFFUSE, Texture::Type::kDiffuse);
     LoadMaterialTextures_(textures, scene, material, aiTextureType_SPECULAR, Texture::Type::kSpecular);
+    LoadMaterialTextures_(textures, scene, material, aiTextureType_NORMALS, Texture::Type::kNormal);
 
-    return std::make_shared<Mesh>(std::move(vertices), std::move(indices), std::move(textures));
+    auto mesh = std::make_shared<Mesh>(std::move(vertices), std::move(indices), std::move(textures));
+
+    /* process properties */
+    float shininess;
+    R_ASSERT(material->Get(AI_MATKEY_SHININESS, shininess) == aiReturn_SUCCESS);
+
+    float opacity;
+    R_ASSERT(material->Get(AI_MATKEY_OPACITY, opacity) == aiReturn_SUCCESS);
+
+    mesh->GetShininess() = shininess;
+    mesh->GetOpacity()   = opacity;
+
+    return mesh;
 }
 
 void LibGcp::ModelSerializer::LoadMaterialTextures_(

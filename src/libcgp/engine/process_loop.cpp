@@ -34,7 +34,7 @@ void LibGcp::ProcessLoopApp()
             std::chrono::duration_cast<std::chrono::microseconds>(new_frame - last_frame).count();
         last_frame = new_frame;
 
-        TRACE("Curr fps: " << 1000000.0F / delta_time_ms);
+        // TRACE("Curr fps: " << 1000000.0F / delta_time_ms);
         Engine::GetInstance().ProcessProgress(delta_time_ms);
     });
 

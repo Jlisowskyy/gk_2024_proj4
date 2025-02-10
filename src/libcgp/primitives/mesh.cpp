@@ -27,11 +27,12 @@ void LibGcp::Mesh::Draw(Shader &shader) const
     static constexpr uint8_t kMaxTextures = 16;
 
     std::array<std::string, static_cast<size_t>(Texture::Type::kLast)> texture_names = {
-        "texture_diffuse00",
-        "texture_specular00",
+        "material.texture_diffuse00",
+        "material.texture_specular00",
+        "material.texture_normal00",
     };  // leave space for numbers
 
-    std::array counters = {static_cast<uint8_t>(0), static_cast<uint8_t>(0)};
+    std::array<uint8_t, static_cast<size_t>(Texture::Type::kLast)> counters{};
 
     for (size_t idx = 0; idx < textures_.size(); ++idx) {
         const size_t type_idx = static_cast<size_t>(textures_[idx]->GetType());
@@ -49,6 +50,9 @@ void LibGcp::Mesh::Draw(Shader &shader) const
         }
     }
     glActiveTexture(GL_TEXTURE0);
+
+    shader.SetGLfloatUnsafe("material.shininess", static_cast<GLfloat>(shininess_));
+    shader.SetGLfloatUnsafe("material.opacity", static_cast<GLfloat>(opacity_));
 
     glBindVertexArray(VAO_);
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices_.size()), GL_UNSIGNED_INT, nullptr);

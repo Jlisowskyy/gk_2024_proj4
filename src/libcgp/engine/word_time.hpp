@@ -7,7 +7,6 @@
 #include <string>
 
 LIBGCP_DECL_START_
-
 class WordTime
 {
     // ------------------------------
@@ -22,6 +21,9 @@ class WordTime
 
     static constexpr uint64_t kSecondsInDay = 24 * 60 * 60;
 
+    static constexpr uint64_t kSecondsInMinute = 60;
+    static constexpr uint64_t kSecondsInHour   = 60 * kSecondsInMinute;
+
     // ------------------------------
     // Object creation
     // ------------------------------
@@ -35,6 +37,13 @@ class WordTime
     NDSCRD static std::string GetTime() noexcept;
 
     NDSCRD static uint64_t GetDayTimeSeconds();
+
+    NDSCRD FAST_CALL static constexpr uint64_t ConvertToSeconds(
+        const uint64_t hours, const uint64_t minutes, const uint64_t seconds
+    ) noexcept
+    {
+        return hours * kSecondsInHour + minutes * kSecondsInMinute + seconds;
+    }
 
     // ------------------------------
     // Class fields

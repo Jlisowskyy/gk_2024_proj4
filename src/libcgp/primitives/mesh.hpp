@@ -50,6 +50,9 @@ class Mesh
 
     void Draw(Shader &shader) const;
 
+    NDSCRD double &GetOpacity() noexcept { return opacity_; }
+    NDSCRD double &GetShininess() noexcept { return shininess_; }
+
     // ------------------------------
     // Implementation methods
     // ------------------------------
@@ -60,6 +63,9 @@ class Mesh
     // ------------------------------
     // Class fields
     // ------------------------------
+
+    double opacity_{1.0};
+    double shininess_{32.0};
 
     std::vector<Vertex> vertices_;
     std::vector<GLuint> indices_;
