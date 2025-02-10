@@ -31,21 +31,21 @@ void LightGetFunc<>(Shader &shader, uint64_t *counter, const PointLight &light, 
 
     const std::string prefix = "lightning.point_lights[" + std::to_string(counter[kPointLightIdx]++) + "].";
 
-    shader.SetVec3Unsafe((prefix + "info.position").c_str(), word_pos);
+    shader.SetVec3((prefix + "info.position").c_str(), word_pos);
 
-    shader.SetVec3Unsafe((prefix + "info.ambient").c_str(), light.light_info.ambient);
+    shader.SetVec3((prefix + "info.ambient").c_str(), light.light_info.ambient);
 
-    shader.SetVec3Unsafe((prefix + "info.diffuse").c_str(), light.light_info.diffuse);
+    shader.SetVec3((prefix + "info.diffuse").c_str(), light.light_info.diffuse);
 
-    shader.SetVec3Unsafe((prefix + "info.specular").c_str(), light.light_info.specular);
+    shader.SetVec3((prefix + "info.specular").c_str(), light.light_info.specular);
 
-    shader.SetGLfloatUnsafe((prefix + "info.intensity").c_str(), light.light_info.intensity);
+    shader.SetGLfloat((prefix + "info.intensity").c_str(), light.light_info.intensity);
 
-    shader.SetGLfloatUnsafe((prefix + "constant").c_str(), light.point_light.constant);
+    shader.SetGLfloat((prefix + "constant").c_str(), light.point_light.constant);
 
-    shader.SetGLfloatUnsafe((prefix + "linear").c_str(), light.point_light.linear);
+    shader.SetGLfloat((prefix + "linear").c_str(), light.point_light.linear);
 
-    shader.SetGLfloatUnsafe((prefix + "quadratic").c_str(), light.point_light.quadratic);
+    shader.SetGLfloat((prefix + "quadratic").c_str(), light.point_light.quadratic);
 }
 
 template <>
@@ -56,22 +56,22 @@ void LightGetFunc<>(Shader &shader, uint64_t *counter, const SpotLight &light, c
 
     const std::string prefix = "lightning.spot_lights[" + std::to_string(counter[kSpotLightIdx]++) + "].";
 
-    shader.SetVec3Unsafe((prefix + "info.position").c_str(), word_pos);
+    shader.SetVec3((prefix + "info.position").c_str(), word_pos);
 
-    shader.SetVec3Unsafe((prefix + "info.ambient").c_str(), light.light_info.ambient);
+    shader.SetVec3((prefix + "info.ambient").c_str(), light.light_info.ambient);
 
-    shader.SetVec3Unsafe((prefix + "info.diffuse").c_str(), light.light_info.diffuse);
+    shader.SetVec3((prefix + "info.diffuse").c_str(), light.light_info.diffuse);
 
-    shader.SetVec3Unsafe((prefix + "info.specular").c_str(), light.light_info.specular);
+    shader.SetVec3((prefix + "info.specular").c_str(), light.light_info.specular);
 
-    shader.SetGLfloatUnsafe((prefix + "info.intensity").c_str(), light.light_info.intensity);
+    shader.SetGLfloat((prefix + "info.intensity").c_str(), light.light_info.intensity);
 
-    shader.SetVec3Unsafe((prefix + "direction").c_str(), word_dir);
-    shader.SetGLfloatUnsafe((prefix + "constant").c_str(), light.spot_light.constant);
-    shader.SetGLfloatUnsafe((prefix + "linear").c_str(), light.spot_light.linear);
-    shader.SetGLfloatUnsafe((prefix + "quadratic").c_str(), light.spot_light.quadratic);
-    shader.SetGLfloatUnsafe((prefix + "cut_off").c_str(), light.spot_light.cut_off);
-    shader.SetGLfloatUnsafe((prefix + "outer_cut_off").c_str(), light.spot_light.outer_cut_off);
+    shader.SetVec3((prefix + "direction").c_str(), word_dir);
+    shader.SetGLfloat((prefix + "constant").c_str(), light.spot_light.constant);
+    shader.SetGLfloat((prefix + "linear").c_str(), light.spot_light.linear);
+    shader.SetGLfloat((prefix + "quadratic").c_str(), light.spot_light.quadratic);
+    shader.SetGLfloat((prefix + "cut_off").c_str(), light.spot_light.cut_off);
+    shader.SetGLfloat((prefix + "outer_cut_off").c_str(), light.spot_light.outer_cut_off);
 }
 
 LIBGCP_DECL_END_
@@ -107,8 +107,8 @@ void LibGcp::LightMgr::LoadLightsFromScene(const Scene &scene)
 
 void LibGcp::LightMgr::PrepareLights(Shader &shader) const
 {
-    shader.SetGLuintUnsafe("lightning.num_point_lights", point_light_count_);
-    shader.SetGLuintUnsafe("lightning.num_spot_lights", spot_light_count_);
+    shader.SetGLuint("lightning.num_point_lights", point_light_count_);
+    shader.SetGLuint("lightning.num_spot_lights", spot_light_count_);
 
     uint64_t counters[2]{};
     for (const auto &obj : ObjectMgr::GetInstance().GetStaticObjects()) {

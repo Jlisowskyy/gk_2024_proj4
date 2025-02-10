@@ -70,7 +70,7 @@ double LibGcp::GlobalLights::GlobalLight::GetDayAngleAndUpdateIntensity(const ui
         );
 
         const auto mid_point       = len / 2;
-        spec_.light_info.intensity = std::abs(time_passed - mid_point) / mid_point;
+        spec_.light_info.intensity = 1.0F - (std::abs(time_passed - mid_point) / mid_point);
 
         return M_PI * (time_passed / len);
     }
@@ -78,7 +78,7 @@ double LibGcp::GlobalLights::GlobalLight::GetDayAngleAndUpdateIntensity(const ui
     const auto len             = static_cast<double>(spec_.down_time - spec_.rise_time);
     const auto time_passed     = static_cast<double>(time - spec_.rise_time);
     const auto mid_point       = len / 2;
-    spec_.light_info.intensity = std::abs(time_passed - mid_point) / mid_point;
+    spec_.light_info.intensity = 1.0F - (std::abs(time_passed - mid_point) / mid_point);
 
     return M_PI * (time_passed / len);
 }

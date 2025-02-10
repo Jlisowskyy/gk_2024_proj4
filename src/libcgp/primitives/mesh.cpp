@@ -51,8 +51,8 @@ void LibGcp::Mesh::Draw(Shader &shader) const
     }
     glActiveTexture(GL_TEXTURE0);
 
-    shader.SetGLfloatUnsafe("material.shininess", static_cast<GLfloat>(shininess_));
-    shader.SetGLfloatUnsafe("material.opacity", static_cast<GLfloat>(opacity_));
+    shader.SetGLfloat("material.shininess", static_cast<GLfloat>(shininess_));
+    // shader.SetGLfloat("material.opacity", static_cast<GLfloat>(opacity_));
 
     glBindVertexArray(VAO_);
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices_.size()), GL_UNSIGNED_INT, nullptr);
