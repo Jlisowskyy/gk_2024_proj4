@@ -33,7 +33,7 @@ class LightMgr
     void PrepareLights(Shader &shader) const;
 
     template <typename T>
-    void AddLight(Model &model, const T &light)
+    FAST_CALL void AddLight(Model &model, const T &light)
     {
         model.GetLights().push_back(light);
 

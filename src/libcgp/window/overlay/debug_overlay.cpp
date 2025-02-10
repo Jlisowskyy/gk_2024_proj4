@@ -225,7 +225,7 @@ void LibGcp::DebugOverlay::DrawSpawnModelsWindow_()
         for (int i = 0; i < static_cast<int>(model_names_.size()); i++) {
             const bool is_selected = (selected_model_idx_ == i);
             if (ImGui::Selectable(model_names_[i].c_str(), is_selected)) {
-                SetSelectedMode_(i);
+                SetSelectedModel_(i);
             }
             if (is_selected) {
                 ImGui::SetItemDefaultFocus();
@@ -308,14 +308,126 @@ void LibGcp::DebugOverlay::DrawFailure_()
     }
 }
 
-void LibGcp::DebugOverlay::SetSelectedMode_(const int idx)
+void LibGcp::DebugOverlay::DrawLightEditor_()
 {
+    ImGui::Separator();
+
+    if (ImGui::BeginListBox("Point lights")) {
+        for (int i = 0; i < static_cast<int>(selected_model_point_lights_.size()); i++) {
+            const bool is_selected = (selected_point_light_idx_ == i);
+            if (ImGui::Selectable(selected_model_point_lights_[i].c_str(), is_selected)) {
+                SetSelectedPointLight_(i);
+            }
+            if (is_selected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndListBox();
+    }
+
+    DrawEditPointLight_();
+
+    ImGui::Separator();
+    if (ImGui::BeginListBox("Spotlights")) {
+        for (int i = 0; i < static_cast<int>(selected_model_spotlights_.size()); i++) {
+            const bool is_selected = (selected_spotlight_idx_ == i);
+            if (ImGui::Selectable(selected_model_spotlights_[i].c_str(), is_selected)) {
+                SetSelectedSpotlight_(i);
+            }
+            if (is_selected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndListBox();
+    }
+
+    DrawEditSpotlight_();
+}
+
+void LibGcp::DebugOverlay::DrawEditPointLight_()
+{
+    if (selected_point_light_idx_ == -1) {
+        return;
+    }
+
+    ImGui::DragFloat3("Light position", &selected_point_light_->light_info.position.x, 0.01f);
+    ImGui::DragFloat3("Ambient", &selected_point_light_->light_info.ambient.x, 0.01f);
+    ImGui::DragFloat3("Diffuse", &selected_point_light_->light_info.diffuse.x, 0.01f);
+    ImGui::DragFloat3("Specular", &selected_point_light_->light_info.specular.x, 0.01f);
+    ImGui::DragFloat("Intensity", &selected_point_light_->light_info.intensity, 0.01f);
+    ImGui::DragFloat("Constant", &selected_point_light_->point_light.constant, 0.01f);
+    ImGui::DragFloat("Linear", &selected_point_light_->point_light.linear, 0.01f);
+    ImGui::DragFloat("Quadratic", &selected_point_light_->point_light.quadratic, 0.01f);
+}
+
+void LibGcp::DebugOverlay::DrawEditSpotlight_()
+{
+    if (selected_spotlight_idx_ == -1) {
+        return;
+    }
+
+    ImGui::DragFloat3("light position", &selected_spotlight_->light_info.position.x, 0.01f);
+    ImGui::DragFloat3("ambient", &selected_spotlight_->light_info.ambient.x, 0.01f);
+    ImGui::DragFloat3("diffuse", &selected_spotlight_->light_info.diffuse.x, 0.01f);
+    ImGui::DragFloat3("specular", &selected_spotlight_->light_info.specular.x, 0.01f);
+    ImGui::DragFloat("intensity", &selected_spotlight_->light_info.intensity, 0.01f);
+    ImGui::DragFloat3("Direction", &selected_spotlight_->spot_light.direction.x, 0.01f);
+    ImGui::DragFloat("constant", &selected_spotlight_->spot_light.constant, 0.01f);
+    ImGui::DragFloat("linear", &selected_spotlight_->spot_light.linear, 0.01f);
+    ImGui::DragFloat("quadratic", &selected_spotlight_->spot_light.quadratic, 0.01f);
+    ImGui::DragFloat("Cut off", &selected_spotlight_->spot_light.cut_off, 0.01f);
+    ImGui::DragFloat("Outer cut off", &selected_spotlight_->spot_light.outer_cut_off, 0.01f);
+}
+
+void LibGcp::DebugOverlay::SetSelectedModel_(const int idx)
+{
+    selected_model_point_lights_.clear();
+    selected_model_spotlights_.clear();
+    selected_point_light_idx_ = -1;
+    selected_spotlight_idx_   = -1;
+
     if (idx == selected_model_idx_) {
         selected_model_idx_ = -1;
+        selected_model_     = nullptr;
         return;
     }
 
     selected_model_idx_ = idx;
+    selected_model_     = ResourceMgr::GetInstance().GetModel(model_names_[idx], LoadType::kExternal);
+
+    for (size_t idx = 0; idx < selected_model_->GetLights().size<SpotLight>(); ++idx) {
+        selected_model_spotlights_.push_back("Spotlight " + std::to_string(idx));
+    }
+
+    for (size_t idx = 0; idx < selected_model_->GetLights().size<PointLight>(); ++idx) {
+        selected_model_point_lights_.push_back("Point light " + std::to_string(idx));
+    }
+}
+
+void LibGcp::DebugOverlay::SetSelectedPointLight_(const int idx)
+{
+    if (selected_point_light_idx_ == idx) {
+        selected_point_light_idx_ = -1;
+        selected_point_light_     = nullptr;
+        return;
+    }
+
+    assert(idx < static_cast<int>(selected_model_->GetLights().size<PointLight>()));
+    selected_point_light_idx_ = idx;
+    selected_point_light_     = &selected_model_->GetLights().GetUnderlyingData<PointLight>()[idx];
+}
+
+void LibGcp::DebugOverlay::SetSelectedSpotlight_(const int idx)
+{
+    if (selected_spotlight_idx_ == idx) {
+        selected_spotlight_idx_ = -1;
+        selected_spotlight_     = nullptr;
+        return;
+    }
+
+    assert(idx < static_cast<int>(selected_model_->GetLights().size<SpotLight>()));
+    selected_spotlight_idx_ = idx;
+    selected_spotlight_     = &selected_model_->GetLights().GetUnderlyingData<SpotLight>()[idx];
 }
 
 void LibGcp::DebugOverlay::FillObjectNames_()
@@ -440,14 +552,18 @@ void LibGcp::DebugOverlay::DrawSelectedModelSpawnSection_()
     ImGui::RadioButton("Spotlight", &selected_light_type_, kSpotLightRadioIdx);
 
     if (ImGui::Button("Add light")) {
-        auto model = ResourceMgr::GetInstance().GetModel(model_names_[selected_model_idx_], LoadType::kExternal);
-
         if (selected_light_type_ == kPointLightRadioIdx) {
-            Engine::GetInstance().GetLightMgr().AddLight(*model, kDefaultPointLight);
+            Engine::GetInstance().GetLightMgr().AddLight(*selected_model_, kDefaultPointLight);
+            selected_model_point_lights_.push_back(
+                "Point light " + std::to_string(selected_model_point_lights_.size())
+            );
         } else {
-            Engine::GetInstance().GetLightMgr().AddLight(*model, kDefaultSpotLight);
+            Engine::GetInstance().GetLightMgr().AddLight(*selected_model_, kDefaultSpotLight);
+            selected_model_spotlights_.push_back("Spotlight " + std::to_string(selected_model_spotlights_.size()));
         }
     }
+
+    DrawLightEditor_();
 }
 
 void LibGcp::DebugOverlay::DrawStaticObjectButtons_()

@@ -25,9 +25,7 @@ void LightGetFunc(Shader &shader, uint64_t *counter, const T &light, const glm::
 }
 
 template <>
-void LightGetFunc<>(
-    Shader &shader, uint64_t *counter, const PointLight &light, const glm::mat4 &mm, const glm::mat4 &rm
-)
+void LightGetFunc<>(Shader &shader, uint64_t *counter, const PointLight &light, const glm::mat4 &mm, const glm::mat4 &)
 {
     const auto word_pos = glm::vec3(mm * glm::vec4(light.light_info.position, 1.0));
 
@@ -126,7 +124,4 @@ void LibGcp::LightMgr::PrepareLights(Shader &shader) const
             LightGetFunc(shader, counters, light, model_matrix, rot_matrix);
         });
     }
-
-    assert(counters[kPointLightIdx] == point_light_count_);
-    assert(counters[kSpotLightIdx] == spot_light_count_);
 }

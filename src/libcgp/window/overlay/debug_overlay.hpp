@@ -65,6 +65,12 @@ class DebugOverlay
 
     void DrawFailure_();
 
+    void DrawLightEditor_();
+
+    void DrawEditPointLight_();
+
+    void DrawEditSpotlight_();
+
     void DrawStaticObjectsSection_();
 
     void DrawDynamicObjectsSection_();
@@ -81,7 +87,11 @@ class DebugOverlay
 
     void SetSelectedMesh_(int idx);
 
-    void SetSelectedMode_(int idx);
+    void SetSelectedModel_(int idx);
+
+    void SetSelectedPointLight_(int idx);
+
+    void SetSelectedSpotlight_(int idx);
 
     void FillObjectNames_();
 
@@ -146,6 +156,17 @@ class DebugOverlay
 
     /* add light */
     int selected_light_type_{};
+
+    /* model info */
+    std::shared_ptr<Model> selected_model_{};
+
+    int selected_point_light_idx_{};
+    std::vector<std::string> selected_model_point_lights_{};
+    PointLight *selected_point_light_{};
+
+    int selected_spotlight_idx_{};
+    std::vector<std::string> selected_model_spotlights_{};
+    SpotLight *selected_spotlight_{};
 
     /* Window info */
     GLFWwindow *window_{};

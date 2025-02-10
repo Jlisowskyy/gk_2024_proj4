@@ -147,22 +147,22 @@ struct LightInfo {
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
-    double intensity;
+    float intensity;
 };
 
 struct PointLightInfo {
-    double constant;
-    double linear;
-    double quadratic;
+    float constant;
+    float linear;
+    float quadratic;
 };
 
 struct SpotLightInfo {
     glm::vec3 direction;
-    double constant;
-    double linear;
-    double quadratic;
-    double cut_off;
-    double outer_cut_off;
+    float constant;
+    float linear;
+    float quadratic;
+    float cut_off;
+    float outer_cut_off;
 };
 
 struct GlobalLightSpec {
