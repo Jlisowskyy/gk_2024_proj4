@@ -53,6 +53,8 @@ class DebugOverlay
     // ------------------------------
 
     protected:
+    void DrawSelectedObjects_();
+
     void DrawSettingsEditorWindow_();
 
     void DrawLiveObjectsInspectorWindow_();
@@ -96,6 +98,8 @@ class DebugOverlay
     void FillObjectNames_();
 
     void TriggerFailure_(const std::string &message);
+
+    void DrawDebugPoint(const glm::vec3 &position, float size);
 
     template <class FuncT>
     static void DisplayFileDialog_(

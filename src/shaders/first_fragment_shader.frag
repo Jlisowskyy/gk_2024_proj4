@@ -45,6 +45,7 @@ struct SpotLight {
 };
 
 #define MAX_LIGHTS 512
+#define MAX_GLOBAL_LIGHTS 8
 
 struct Lightning {
     uint num_point_lights;
@@ -52,6 +53,9 @@ struct Lightning {
 
     uint num_spot_lights;
     SpotLight spot_lights[MAX_LIGHTS];
+
+    uint num_global_lights;
+    LightInfo global_lights[MAX_GLOBAL_LIGHTS];
 };
 
 uniform Material material;

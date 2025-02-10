@@ -275,14 +275,19 @@ struct Scene {
 };
 
 static inline const Scene kEmptyScene{
-    {},
-    {ResourceSpec{
-        .paths     = {"first_vertex_shader", "first_fragment_shader"},
-        .type      = ResourceType::kShader,
-        .load_type = LoadType::kMemory,
-    }},
-    {},
-    {},
+    {   },
+    {
+     ResourceSpec{
+            .paths     = {"first_vertex_shader", "first_fragment_shader"},
+            .type      = ResourceType::kShader,
+            .load_type = LoadType::kMemory,
+        },ResourceSpec{
+            .paths     = {"./models/sphere.glb", ""},
+            .type      = ResourceType::kModel,
+            .load_type = LoadType::kExternal,
+        }, },
+    { },
+    {   },
     {},
     {},
 };

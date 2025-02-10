@@ -13,6 +13,10 @@
  */
 
 LIBGCP_DECL_START_
+
+/* Forward declarations */
+class Shader;
+
 class GlobalLights
 {
     // ------------------------------
@@ -25,6 +29,7 @@ class GlobalLights
         void UpdatePosition(uint64_t time);
         NDSCRD bool IsBelowHorizon(uint64_t time) const;
         NDSCRD double GetDayAngle(uint64_t time) const;
+        void PrepareLight(Shader &shader, size_t idx);
 
         protected:
         GlobalLightSpec spec_;
@@ -44,6 +49,8 @@ class GlobalLights
     void LoadLights(const std::vector<GlobalLightSpec> &lights);
 
     void UpdatePosition(uint64_t time);
+
+    void PrepareLights(Shader &shader);
 
     // ---------------------------------
     // Class implementation methods

@@ -70,6 +70,7 @@ void LibGcp::EngineBase::Draw()
     shader->Activate();
 
     light_mgr_.PrepareLights(*shader);
+    global_light_.PrepareLights(*shader);
     ObjectMgr::GetInstance().DrawStaticObjects(*shader);
 }
 

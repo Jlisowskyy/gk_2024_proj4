@@ -27,6 +27,10 @@ set(model_entries
         "https://www.dropbox.com/scl/fi/p0oc2dcrg6j6pca3dxucs/cs_office_with_real_light.glb?rlkey=690ycsaqkql9aaj20g3m9oiyn&st=zn3tqyyj&dl=0"
         "office.glb"
         "office"
+
+        "https://www.dropbox.com/scl/fi/zs5t9xiwz5h8gixlor8xo/sphere.fbx.glb?rlkey=n1xo7qek87bxody3askuh78aj&st=8kb590cs&dl=0"
+        "sphere.glb"
+        "sphere"
 )
 
 set(archive_extensions zip tar "tar.gz" tgz "tar.bz2" tbz2)

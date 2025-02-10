@@ -1,10 +1,13 @@
 #include <libcgp/engine/global_light.hpp>
 #include <libcgp/engine/word_time.hpp>
 #include <libcgp/intf.hpp>
+#include <libcgp/primitives/shader.hpp>
 #include <libcgp/utils/macros.hpp>
 
 #include <cassert>
 #include <cstdint>
+#include <cstdlib>
+#include <string>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -65,6 +68,17 @@ double LibGcp::GlobalLights::GlobalLight::GetDayAngle(const uint64_t time) const
     return M_PI * (time_passed / len);
 }
 
+void LibGcp::GlobalLights::GlobalLight::PrepareLight(Shader &shader, const size_t idx)
+{
+    const std::string prefix = "lightning.global_lights[" + std::to_string(idx) + "].";
+
+    shader.SetVec3((prefix + "position").c_str(), spec_.light_info.position);
+    shader.SetVec3((prefix + "ambient").c_str(), spec_.light_info.ambient);
+    shader.SetVec3((prefix + "diffuse").c_str(), spec_.light_info.diffuse);
+    shader.SetVec3((prefix + "specular").c_str(), spec_.light_info.specular);
+    shader.SetGLfloat((prefix + "intensity").c_str(), spec_.light_info.intensity);
+}
+
 void LibGcp::GlobalLights::LoadLights(const std::vector<GlobalLightSpec> &lights)
 {
     R_ASSERT(lights.size() < GlobalLights::kMaxLights && "Too many global lights");
@@ -79,5 +93,14 @@ void LibGcp::GlobalLights::UpdatePosition(const uint64_t time)
 {
     for (auto &light : lights_) {
         light.UpdatePosition(time);
+    }
+}
+
+void LibGcp::GlobalLights::PrepareLights(Shader &shader)
+{
+    shader.SetGLuint("lightning.num_global_lights", static_cast<GLuint>(lights_.size()));
+
+    for (size_t idx = 0; idx < lights_.size(); ++idx) {
+        lights_[idx].PrepareLight(shader, idx);
     }
 }

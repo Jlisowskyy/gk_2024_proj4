@@ -170,6 +170,7 @@ void LibGcp::DebugOverlay::EnableOverlay(GLFWwindow *window)
 void LibGcp::DebugOverlay::Draw()
 {
     HighlightedSelectedMesh_();
+    DrawSelectedObjects_();
 
     if (window_ == nullptr) {
         return;
@@ -188,6 +189,13 @@ void LibGcp::DebugOverlay::Draw()
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void LibGcp::DebugOverlay::DrawSelectedObjects_()
+{
+    if (selected_static_object_idx_ != -1) {
+        DrawDebugPoint(static_object_->GetPosition().position, 0.1f);
+    }
 }
 
 void LibGcp::DebugOverlay::DrawSettingsEditorWindow_()
@@ -445,6 +453,26 @@ void LibGcp::DebugOverlay::TriggerFailure_(const std::string &message)
 {
     show_failure_    = true;
     failure_message_ = message;
+}
+
+void LibGcp::DebugOverlay::DrawDebugPoint(const glm::vec3 &position, const float size)
+{
+    const auto sphere_model = ResourceMgr::GetInstance().GetModel("./models/sphere.glb", LoadType::kExternal);
+
+    ObjectPosition pos{};
+    pos.position = position;
+    pos.scale    = glm::vec3(size);
+    pos.rotation = glm::vec3(0.0f);
+
+    shader_->Activate();
+    Engine::GetInstance().GetView().PrepareViewMatrices(*shader_);
+    Engine::GetInstance().GetView().PrepareModelMatrices(*shader_, pos);
+
+    glDisable(GL_DEPTH_TEST);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    sphere_model->Draw(*shader_);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void LibGcp::DebugOverlay::DrawStaticObjectsSection_()
