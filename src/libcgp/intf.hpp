@@ -138,16 +138,16 @@ struct Resource {
 // Lights
 // ------------------------------
 
-static constexpr size_t kMaxLightPerObject   = 32;
-static constexpr size_t kMaxLightObjects     = 1024;
-static constexpr size_t kMaxTypeLightObjects = 512;
+static constexpr size_t kMaxLightPerObject   = 4;
+static constexpr size_t kMaxLightObjects     = 64;
+static constexpr size_t kMaxTypeLightObjects = 32;
 
 struct LightInfo {
     glm::vec3 position;
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
-    float intensity;
+    float intensity{1.0};
 };
 
 struct PointLightInfo {

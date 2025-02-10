@@ -28,7 +28,7 @@ class GlobalLights
 
         void UpdatePosition(uint64_t time);
         NDSCRD bool IsBelowHorizon(uint64_t time) const;
-        NDSCRD double GetDayAngle(uint64_t time) const;
+        NDSCRD double GetDayAngleAndUpdateIntensity(uint64_t time);
         void PrepareLight(Shader &shader, size_t idx);
 
         protected:

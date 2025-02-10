@@ -36,7 +36,7 @@ class WordTime
 
     NDSCRD static std::string GetTime() noexcept;
 
-    NDSCRD static uint64_t GetDayTimeSeconds();
+    NDSCRD static uint64_t GetDayTimeSeconds(uint64_t time);
 
     NDSCRD FAST_CALL static constexpr uint64_t ConvertToSeconds(
         const uint64_t hours, const uint64_t minutes, const uint64_t seconds

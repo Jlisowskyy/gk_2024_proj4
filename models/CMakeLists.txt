@@ -31,6 +31,10 @@ set(model_entries
         "https://www.dropbox.com/scl/fi/zs5t9xiwz5h8gixlor8xo/sphere.fbx.glb?rlkey=n1xo7qek87bxody3askuh78aj&st=8kb590cs&dl=0"
         "sphere.glb"
         "sphere"
+
+        "https://www.dropbox.com/scl/fi/xtt28kxheo1t0fevp26lz/sci-fi_modular_floor_tiles.glb?rlkey=zc4cfoy0lbg3862ij30wrgccu&st=9feey0yw&dl=0"
+        "floor.glb"
+        "floor"
 )
 
 set(archive_extensions zip tar "tar.gz" tgz "tar.bz2" tbz2)

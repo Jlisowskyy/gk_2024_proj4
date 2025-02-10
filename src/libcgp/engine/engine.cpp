@@ -53,9 +53,9 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
         GlobalLightSpec{
                         .light_info =
                         {
-                        .ambient  = {0.1F, 0.1F, 0.1F},
-                        .diffuse  = {0.3F, 0.3F, 0.3F},
-                        .specular = {0.5F, 0.5F, 0.5F},
+                        .ambient  = {0.05F, 0.05F, 0.05F},
+                        .diffuse  = {0.2F, 0.2F, 0.2F},
+                        .specular = {0.1F, 0.1F, 0.1F},
                         }, .is_moving = true,
                         .rise_time = WordTime::ConvertToSeconds(21, 0, 0),
                         .down_time = WordTime::ConvertToSeconds(7,  0, 0),
