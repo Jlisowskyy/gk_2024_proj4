@@ -3,6 +3,7 @@
 
 #include <libcgp/defines.hpp>
 #include <libcgp/engine/global_light.hpp>
+#include <libcgp/engine/light_mgr.hpp>
 #include <libcgp/engine/view.hpp>
 #include <libcgp/engine/word_time.hpp>
 #include <libcgp/primitives/shader.hpp>
@@ -39,6 +40,8 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
     // ------------------------------
 
     void Init(const Scene &scene) noexcept;
+
+    void Draw();
 
     FAST_CALL View &GetView() noexcept { return view_; }
 
@@ -82,6 +85,7 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
 
     WordTime word_time_{};
     GlobalLights global_light_{};
+    LightMgr light_mgr_{};
 
     // TODO: temp object
     CameraInfo flowing_camera_{};

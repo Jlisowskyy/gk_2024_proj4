@@ -194,7 +194,7 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
     LoadMaterialTextures_(textures, scene, material, aiTextureType_SPECULAR, Texture::Type::kSpecular);
     LoadMaterialTextures_(textures, scene, material, aiTextureType_NORMALS, Texture::Type::kNormal);
 
-    auto mesh = std::make_shared<Mesh>(std::move(vertices), std::move(indices), std::move(textures));
+    auto mesh_ptr = std::make_shared<Mesh>(std::move(vertices), std::move(indices), std::move(textures));
 
     /* process properties */
     float shininess;
@@ -203,10 +203,10 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
     float opacity;
     R_ASSERT(material->Get(AI_MATKEY_OPACITY, opacity) == aiReturn_SUCCESS);
 
-    mesh->GetShininess() = shininess;
-    mesh->GetOpacity()   = opacity;
+    mesh_ptr->GetShininess() = shininess;
+    mesh_ptr->GetOpacity()   = opacity;
 
-    return mesh;
+    return mesh_ptr;
 }
 
 void LibGcp::ModelSerializer::LoadMaterialTextures_(

@@ -24,9 +24,7 @@ void LibGcp::ProcessLoopApp()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //  Render objects
-        const auto shader = Engine::GetInstance().GetDefaultShader();
-        shader->Activate();
-        ObjectMgr::GetInstance().DrawStaticObjects(*shader);
+        Engine::GetInstance().Draw();
 
         // Process progress
         const auto new_frame = std::chrono::steady_clock::now();

@@ -17,7 +17,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 LIBGCP_DECL_START_
-
 class View
 {
     // ------------------------------
@@ -30,19 +29,24 @@ class View
 
     public:
     View();
+
     ~View() = default;
 
     // ------------------------------
     // Class interaction
     // ------------------------------
 
-    void PrepareViewMatrices(Shader& shader);
+    void PrepareViewMatrices(Shader &shader);
 
-    void PrepareModelMatrices(Shader& shader, const ObjectPosition& position);
+    void PrepareModelMatrices(Shader &shader, const ObjectPosition &position);
 
-    FAST_CALL void BindCameraWithObjet(const CameraInfo* camera_info) { camera_object_info_ = camera_info; }
+    NDSCRD static glm::mat4 PrepareModelMatrices(const ObjectPosition &position);
 
-    FAST_CALL const CameraInfo& GetBindObject() const noexcept { return *camera_object_info_; }
+    NDSCRD static glm::mat4 PrepareRotMatrix(const ObjectPosition &position);
+
+    FAST_CALL void BindCameraWithObjet(const CameraInfo *camera_info) { camera_object_info_ = camera_info; }
+
+    FAST_CALL const CameraInfo &GetBindObject() const noexcept { return *camera_object_info_; }
 
     void UpdateCameraPosition();
 
@@ -57,7 +61,7 @@ class View
     // Class fields
     // ------------------------------
 
-    const CameraInfo* camera_object_info_;
+    const CameraInfo *camera_object_info_;
 
     glm::mat4 view_matrix_{};
     glm::mat4 projection_matrix_{};

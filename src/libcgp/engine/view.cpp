@@ -52,6 +52,13 @@ void LibGcp::View::PrepareViewMatrices(Shader &shader)
 
 void LibGcp::View::PrepareModelMatrices(Shader &shader, const ObjectPosition &position)
 {
+    const auto model_matrix = PrepareModelMatrices(position);
+
+    shader.SetMat4("model", model_matrix);
+}
+
+glm::mat4 LibGcp::View::PrepareModelMatrices(const ObjectPosition &position)
+{
     glm::mat4 model_matrix = glm::mat4(1.0F);
     model_matrix           = glm::translate(model_matrix, position.position);
     model_matrix           = glm::rotate(model_matrix, position.rotation.x, glm::vec3(1.0F, 0.0F, 0.0F));
@@ -59,7 +66,15 @@ void LibGcp::View::PrepareModelMatrices(Shader &shader, const ObjectPosition &po
     model_matrix           = glm::rotate(model_matrix, position.rotation.z, glm::vec3(0.0F, 0.0F, 1.0F));
     model_matrix           = glm::scale(model_matrix, position.scale);
 
-    shader.SetMat4("model", model_matrix);
+    return model_matrix;
+}
+
+glm::mat4 LibGcp::View::PrepareRotMatrix(const ObjectPosition &position)
+{
+    glm::mat4 model_matrix = glm::rotate(glm::mat4(1.0f), position.rotation.x, glm::vec3(1.0F, 0.0F, 0.0F));
+    model_matrix           = glm::rotate(model_matrix, position.rotation.y, glm::vec3(0.0F, 1.0F, 0.0F));
+    model_matrix           = glm::rotate(model_matrix, position.rotation.z, glm::vec3(0.0F, 0.0F, 1.0F));
+    return model_matrix;
 }
 
 void LibGcp::View::UpdateCameraPosition()

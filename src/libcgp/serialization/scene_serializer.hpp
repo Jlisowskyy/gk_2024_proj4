@@ -51,6 +51,9 @@ class SceneSerializer
 
     std::vector<SceneSerialized::StaticObjectSerialized> SerializeStaticObjects_();
 
+    CxxUtils::MultiVector<SceneSerialized::PointLightSerialized, SceneSerialized::SpotLightSerialized> SerializeLights_(
+    );
+
     void SaveStringTable(std::ofstream &file);
 
     size_t GetStringId_(const std::string &name);

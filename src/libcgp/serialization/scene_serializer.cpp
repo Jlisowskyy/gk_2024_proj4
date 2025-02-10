@@ -95,6 +95,10 @@ LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneShallow_(const std::string &sc
     serial_struct.header.num_statics = static_objects.size();
     total_bytes += static_objects.size() * sizeof(SceneSerialized::StaticObjectSerialized);
 
+    const auto lights                     = SerializeLights_();
+    serial_struct.header.num_point_lights = lights.size<SceneSerialized::PointLightSerialized>();
+    serial_struct.header.num_spot_lights  = lights.size<SceneSerialized::SpotLightSerialized>();
+
     serial_struct.header.num_strings = string_map_.size();
     total_bytes += string_map_.size() * sizeof(uint64_t);
     total_bytes += string_map_.size() * sizeof(SceneSerialized::StringSerialized);
@@ -126,6 +130,18 @@ LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneShallow_(const std::string &sc
     file.write(
         reinterpret_cast<const char *>(static_objects.data()),
         static_objects.size() * sizeof(SceneSerialized::StaticObjectSerialized)
+    );
+
+    /* write point lights */
+    file.write(
+        reinterpret_cast<const char *>(lights.GetUnderlyingData<SceneSerialized::PointLightSerialized>().data()),
+        lights.size<SceneSerialized::PointLightSerialized>() * sizeof(SceneSerialized::PointLightSerialized)
+    );
+
+    /* write spotlights */
+    file.write(
+        reinterpret_cast<const char *>(lights.GetUnderlyingData<SceneSerialized::SpotLightSerialized>().data()),
+        lights.size<SceneSerialized::SpotLightSerialized>() * sizeof(SceneSerialized::SpotLightSerialized)
     );
 
     /* write string table */
@@ -277,6 +293,26 @@ std::vector<LibGcp::SceneSerialized::StaticObjectSerialized> LibGcp::SceneSerial
     return object_serialized;
 }
 
+CxxUtils::MultiVector<LibGcp::SceneSerialized::PointLightSerialized, LibGcp::SceneSerialized::SpotLightSerialized>
+LibGcp::SceneSerializer::SerializeLights_()
+{
+    CxxUtils::MultiVector<SceneSerialized::PointLightSerialized, SceneSerialized::SpotLightSerialized> vec{};
+
+    ResourceMgr::GetInstance().GetModels().Lock();
+
+    for (const auto &[name, model] : ResourceMgr::GetInstance().GetModels()) {
+        const size_t id = GetStringId_(name);
+
+        const auto func = [&]<class T>(const T &light) {
+            vec.push_back(light.Serialize(id));
+        };
+
+        model->GetLights().Foreach(func);
+    }
+
+    ResourceMgr::GetInstance().GetModels().Unlock();
+}
+
 void LibGcp::SceneSerializer::SaveStringTable(std::ofstream &file)
 {
     size_t offset{};
@@ -359,6 +395,10 @@ std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneShallow_
         reinterpret_cast<const SceneSerialized::ResourceSerialized *>(&settings_table[header.num_settings]);
     auto static_objects =
         reinterpret_cast<const SceneSerialized::StaticObjectSerialized *>(&resource_table[header.num_resources]);
+    auto point_lights =
+        reinterpret_cast<const SceneSerialized::PointLightSerialized *>(&static_objects[header.num_statics]);
+    auto spot_lights =
+        reinterpret_cast<const SceneSerialized::SpotLightSerialized *>(&point_lights[header.num_point_lights]);
     auto string_table = reinterpret_cast<const SceneSerialized::StringTable *>(&static_objects[header.num_statics]);
     auto string_data  = reinterpret_cast<const char *>(&string_table[header.num_strings]);
 
@@ -401,6 +441,30 @@ std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneShallow_
         scene.static_objects.push_back({
             object.position,
             strings[object.name],
+        });
+    }
+
+    /* load point lights */
+    scene.point_lights.reserve(header.num_point_lights);
+    for (size_t idx = 0; idx < header.num_point_lights; ++idx) {
+        const auto &light = point_lights[idx];
+
+        scene.point_lights.push_back({
+            strings[light.model],
+            light.light_info,
+            light.point_light,
+        });
+    }
+
+    /* load spotlights */
+    scene.spot_lights.reserve(header.num_spot_lights);
+    for (size_t idx = 0; idx < header.num_spot_lights; ++idx) {
+        const auto &light = spot_lights[idx];
+
+        scene.spot_lights.push_back({
+            strings[light.model],
+            light.light_info,
+            light.spot_light,
         });
     }
 

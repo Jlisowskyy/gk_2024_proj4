@@ -2,9 +2,12 @@
 #define LIBGCP_MODEL_HPP_
 
 #include <libcgp/defines.hpp>
+#include <libcgp/engine/lights.hpp>
 #include <libcgp/intf.hpp>
 #include <libcgp/primitives/mesh.hpp>
 #include <libcgp/primitives/texture.hpp>
+
+#include <CxxUtils/data_types/multi_vector.hpp>
 
 #include <memory>
 #include <string>
@@ -22,6 +25,8 @@ LIBGCP_DECL_START_
 
 /* Forward declarations */
 class Shader;
+
+using LightContainer = CxxUtils::MultiVector<PointLight, SpotLight>;
 
 // ------------------------------
 // Model class
@@ -58,6 +63,10 @@ class Model : public Resource
 
     NDSCRD FAST_CALL std::shared_ptr<Mesh> GetMesh(const size_t idx) const { return meshes_[idx]; }
 
+    NDSCRD FAST_CALL LightContainer &GetLights() { return lights_; }
+
+    NDSCRD FAST_CALL const LightContainer &GetLights() const { return lights_; }
+
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------
@@ -67,6 +76,7 @@ class Model : public Resource
     // Class fields
     // ------------------------------
 
+    LightContainer lights_{};
     std::vector<std::shared_ptr<Mesh>> meshes_;
 };
 

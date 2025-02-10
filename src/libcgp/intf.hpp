@@ -4,6 +4,7 @@
 #include <libcgp/defines.hpp>
 #include <libcgp/version.hpp>
 
+#include <CxxUtils/data_types/multi_vector.hpp>
 #include <CxxUtils/type_list.hpp>
 
 #include <glm/glm.hpp>
@@ -36,7 +37,7 @@ struct TextureSpec {
 // Objects
 // ------------------------------
 
-struct PACK ObjectPosition {
+struct ObjectPosition {
     glm::vec3 position{};
     glm::vec3 rotation{};
     glm::vec3 scale{};
@@ -137,20 +138,25 @@ struct Resource {
 // Lights
 // ------------------------------
 
+static constexpr size_t kMaxLightPerObject   = 32;
+static constexpr size_t kMaxLightObjects     = 1024;
+static constexpr size_t kMaxTypeLightObjects = 512;
+
 struct LightInfo {
     glm::vec3 position;
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
+    double intensity;
 };
 
-struct PointLight {
+struct PointLightInfo {
     double constant;
     double linear;
     double quadratic;
 };
 
-struct SpotLight {
+struct SpotLightInfo {
     glm::vec3 direction;
     double constant;
     double linear;
@@ -166,6 +172,21 @@ struct GlobalLightSpec {
     uint64_t down_time;
     double angle;
 };
+
+struct PointLightSpec {
+    std::string model_name;
+    LightInfo light_info;
+    PointLightInfo point_light;
+};
+
+struct SpotLightSpec {
+    std::string model_name;
+    LightInfo light_info;
+    SpotLightInfo spot_light;
+};
+
+using point_lights_t = std::vector<PointLightSpec>;
+using spot_lights_t  = std::vector<SpotLightSpec>;
 
 // ------------------------------
 // Settings
@@ -249,6 +270,8 @@ struct Scene {
     resource_t resources;
     dynamic_objects_t dynamic_objects;
     static_objects_t static_objects;
+    point_lights_t point_lights;
+    spot_lights_t spot_lights;
 };
 
 static inline const Scene kEmptyScene{
@@ -258,6 +281,8 @@ static inline const Scene kEmptyScene{
         .type      = ResourceType::kShader,
         .load_type = LoadType::kMemory,
     }},
+    {},
+    {},
     {},
     {},
 };
@@ -295,6 +320,8 @@ struct PACK SceneSerialized {
         size_t num_settings;
         size_t num_resources;
         size_t num_statics;
+        size_t num_point_lights;
+        size_t num_spot_lights;
     };
 
     struct PACK SettingsSerialized {
@@ -318,6 +345,18 @@ struct PACK SceneSerialized {
         size_t idx;
     };
 
+    struct PACK PointLightSerialized {
+        size_t model;
+        LightInfo light_info;
+        PointLightInfo point_light;
+    };
+
+    struct PACK SpotLightSerialized {
+        size_t model;
+        LightInfo light_info;
+        SpotLightInfo spot_light;
+    };
+
     struct PACK StringSerialized {
         size_t length;
         /* char data[0]; */
@@ -328,6 +367,8 @@ struct PACK SceneSerialized {
     /* SettingsSerialized settings[]; */
     /* ResourceSerialized resources[]; */
     /* StaticObjectSerialized static_objects[]; */
+    /* PointLightSerialized point_lights[]; */
+    /* SpotLightSerialized spot_lights[]; */
     /* size_t string_table[]; */
     /* StringSerialized string_data[]; */
 };

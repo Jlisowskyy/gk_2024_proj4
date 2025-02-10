@@ -64,6 +64,15 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
     });
 }
 
+void LibGcp::EngineBase::Draw()
+{
+    const auto shader = Engine::GetInstance().GetDefaultShader();
+    shader->Activate();
+
+    light_mgr_.PrepareLights(*shader);
+    ObjectMgr::GetInstance().DrawStaticObjects(*shader);
+}
+
 void LibGcp::EngineBase::ProcessProgress(const uint64_t delta)
 {
     ProcessInput_(delta);
@@ -98,6 +107,9 @@ void LibGcp::EngineBase::ReloadScene(const Scene &scene)
 
     /* load objects */
     ObjectMgr::GetInstance().LoadObjectsFromScene(scene);
+
+    /* load lights */
+    light_mgr_.LoadLightsFromScene(scene);
 
     /* Note that settings must be loaded after all objects as there may be some events to fire */
     /* ensure default are loaded */

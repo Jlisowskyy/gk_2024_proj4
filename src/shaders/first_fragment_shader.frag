@@ -19,7 +19,43 @@ struct Material {
     float shininess;
 };
 
+struct LightInfo {
+    vec3 position;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float intensity;
+};
+
+struct PointLight {
+    LightInfo info;
+    float constant;
+    float linear;
+    float quadratic;
+};
+
+struct SpotLight {
+    LightInfo info;
+    vec3 direction;
+    float constant;
+    float linear;
+    float quadratic;
+    float cut_off;
+    float outer_cut_off;
+};
+
+#define MAX_LIGHTS 512
+
+struct Lightning {
+    uint num_point_lights;
+    PointLight point_lights[MAX_LIGHTS];
+
+    uint num_spot_lights;
+    SpotLight spot_lights[MAX_LIGHTS];
+};
+
 uniform Material material;
+uniform Lightning lightning;
 
 void main()
 {
