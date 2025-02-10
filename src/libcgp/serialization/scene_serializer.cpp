@@ -311,6 +311,8 @@ LibGcp::SceneSerializer::SerializeLights_()
     }
 
     ResourceMgr::GetInstance().GetModels().Unlock();
+
+    return vec;
 }
 
 void LibGcp::SceneSerializer::SaveStringTable(std::ofstream &file)
