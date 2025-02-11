@@ -330,6 +330,9 @@ void LibGcp::DebugOverlay::DrawGlobalLightEditorWindow_()
 
     if (ImGui::Button("Add global light")) {
         Engine::GetInstance().GetGlobalLight().AddLight(kDefaultGlobalLight);
+        global_light_names_.push_back(
+            "Global light " + std::to_string(Engine::GetInstance().GetGlobalLight().GetLightsCount() - 1)
+        );
     }
 
     if (ImGui::BeginListBox("Global lights")) {
@@ -355,6 +358,15 @@ void LibGcp::DebugOverlay::DrawGlobalLightEditorWindow_()
 void LibGcp::DebugOverlay::DrawGlobalLightEditSection_()
 {
     if (global_light_idx_ == -1) {
+        return;
+    }
+
+    if (ImGui::Button("Delete global light")) {
+        Engine::GetInstance().GetGlobalLight().RemoveLight(global_light_idx_);
+        global_light_idx_ = -1;
+        global_light_     = nullptr;
+        global_light_names_.pop_back();
+
         return;
     }
 
@@ -440,6 +452,17 @@ void LibGcp::DebugOverlay::DrawEditPointLight_()
         return;
     }
 
+    if (ImGui::Button("Delete point light")) {
+        selected_model_->GetLights().GetUnderlyingData<PointLight>().erase(
+            selected_model_->GetLights().GetUnderlyingData<PointLight>().begin() + selected_point_light_idx_
+        );
+        selected_model_point_lights_.pop_back();
+
+        selected_point_light_idx_ = -1;
+        selected_point_light_     = nullptr;
+        return;
+    }
+
     ImGui::DragFloat3("Light position", &selected_point_light_->light_info.position.x, 0.01f);
     ImGui::DragFloat3("Ambient", &selected_point_light_->light_info.ambient.x, 0.01f);
     ImGui::DragFloat3("Diffuse", &selected_point_light_->light_info.diffuse.x, 0.01f);
@@ -453,6 +476,17 @@ void LibGcp::DebugOverlay::DrawEditPointLight_()
 void LibGcp::DebugOverlay::DrawEditSpotlight_()
 {
     if (selected_spotlight_idx_ == -1) {
+        return;
+    }
+
+    if (ImGui::Button("Delete spotlight")) {
+        selected_model_->GetLights().GetUnderlyingData<SpotLight>().erase(
+            selected_model_->GetLights().GetUnderlyingData<SpotLight>().begin() + selected_spotlight_idx_
+        );
+        selected_model_spotlights_.pop_back();
+
+        selected_spotlight_idx_ = -1;
+        selected_spotlight_     = nullptr;
         return;
     }
 
