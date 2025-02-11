@@ -18,4 +18,7 @@ void LibGcp::SettingsMgrBase::LoadDefaultSettings()
     SetSetting<Setting::kCurrentWordTime, uint64_t>(1328819760);  // 09.02.2012 idk why this date
     SetSetting<Setting::kWordTimeCoef, double>(5.0);
     SetSetting<Setting::kHighlightLightSources>(false);
+    SetSetting<Setting::kFov, float>(45.0f);
+    SetSetting<Setting::kNear, float>(0.1f);
+    SetSetting<Setting::kFar, float>(10000.0f);
 }

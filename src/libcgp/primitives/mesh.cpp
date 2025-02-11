@@ -35,6 +35,10 @@ void LibGcp::Mesh::Draw(Shader &shader) const
     std::array<uint8_t, static_cast<size_t>(Texture::Type::kLast)> counters{};
 
     for (size_t idx = 0; idx < textures_.size(); ++idx) {
+        if (idx >= kMaxTextures) {
+            break;
+        }
+
         const size_t type_idx = static_cast<size_t>(textures_[idx]->GetType());
         const uint8_t counter = ++counters[type_idx];
         std::string &name     = texture_names[type_idx];
@@ -44,10 +48,6 @@ void LibGcp::Mesh::Draw(Shader &shader) const
 
         shader.SetGLfloatUnsafe(name.c_str(), static_cast<GLfloat>(idx));
         textures_[idx]->Bind(idx);
-
-        if (idx >= kMaxTextures) {
-            break;
-        }
     }
     glActiveTexture(GL_TEXTURE0);
 
@@ -57,6 +57,9 @@ void LibGcp::Mesh::Draw(Shader &shader) const
     glBindVertexArray(VAO_);
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices_.size()), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
+
+    assert(counters[static_cast<size_t>(Texture::Type::kDiffuse)] > 0);
+    assert(counters[static_cast<size_t>(Texture::Type::kNormal)] > 0);
 }
 
 void LibGcp::Mesh::SetupMesh_()

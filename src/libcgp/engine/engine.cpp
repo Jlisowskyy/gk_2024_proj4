@@ -20,6 +20,11 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
     /* Add reaction on shader change */
     SettingsMgr::GetInstance().AddListener(Setting::kBaseShader, OnDefaultShaderChanged_);
 
+    /* Add reaction on perspective change */
+    SettingsMgr::GetInstance().AddListener(Setting::kFov, OnPerspectiveChanged_);
+    SettingsMgr::GetInstance().AddListener(Setting::kNear, OnPerspectiveChanged_);
+    SettingsMgr::GetInstance().AddListener(Setting::kFar, OnPerspectiveChanged_);
+
     /* init flowing TEMP object */
     flowing_camera_.position = glm::vec3{};
     flowing_camera_.front    = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -227,6 +232,11 @@ void LibGcp::EngineBase::OnDefaultShaderChanged_(const uint64_t new_value)
 void LibGcp::EngineBase::OnWordTimeChanged_(const uint64_t new_value)
 {
     Engine::GetInstance().global_light_.UpdatePosition(new_value);
+}
+
+void LibGcp::EngineBase::OnPerspectiveChanged_([[maybe_unused]] uint64_t new_value)
+{
+    Engine::GetInstance().view_.SyncProjectionMatrixWithSettings();
 }
 
 std::shared_ptr<LibGcp::Shader> LibGcp::EngineBase::FindShaderWithId(const uint64_t id)

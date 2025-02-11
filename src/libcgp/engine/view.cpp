@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <libcgp/mgr/settings_mgr.hpp>
 
 void LibGcp::CameraInfo::MoveFreeCamera(const float distance, const buttons_t &buttons)
 {
@@ -38,11 +39,7 @@ void LibGcp::CameraInfo::ConvertVectorToYawPitch()
     pitch = glm::degrees(asin(front.y));
 }
 
-LibGcp::View::View()
-    : projection_matrix_(glm::perspective(glm::radians(45.0F), Window::GetInstance().GetAspectRatio(), 0.1F, 1000000.0F)
-      )
-{
-}
+LibGcp::View::View() { SyncProjectionMatrixWithSettings(); }
 
 void LibGcp::View::PrepareViewMatrices(Shader &shader)
 {
@@ -90,4 +87,13 @@ void LibGcp::View::UpdateCameraPosition()
 void LibGcp::View::SetWindowAspectRatio(const float aspect_ratio)
 {
     projection_matrix_ = glm::perspective(glm::radians(45.0F), aspect_ratio, 0.1F, 1000000.0F);
+}
+
+void LibGcp::View::SyncProjectionMatrixWithSettings()
+{
+    projection_matrix_ = glm::perspective(
+        glm::radians(SettingsMgr::GetInstance().GetSetting<Setting::kFov, float>()),
+        Window::GetInstance().GetAspectRatio(), SettingsMgr::GetInstance().GetSetting<Setting::kNear, float>(),
+        SettingsMgr::GetInstance().GetSetting<Setting::kFar, float>()
+    );
 }

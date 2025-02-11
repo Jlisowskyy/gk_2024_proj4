@@ -2,8 +2,6 @@
 #define MAIN_HPP_
 
 #include <libcgp/defines.hpp>
-#include <libcgp/mgr/object_mgr.hpp>
-#include <libcgp/mgr/resource_mgr.hpp>
 #include <libcgp/mgr/settings_mgr.hpp>
 
 LIBGCP_DECL_START_

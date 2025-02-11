@@ -76,6 +76,14 @@ L_FAST_CALL void TraceMaterialInfo(aiMaterial *material)
         TRACE("[MATERIAL INFO] Material has ambient occlusion maps!");
     }
 
+    if (material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS) > 0) {
+        TRACE("[MATERIAL INFO] Material has diffuse roughness maps!");
+    }
+
+    if (material->GetTextureCount(aiTextureType_HEIGHT) > 0) {
+        TRACE("[MATERIAL INFO] Material has height maps!");
+    }
+
     for (size_t idx = 0; idx < material->mNumProperties; ++idx) {
         TRACE("[MATERIAL INFO] " << material->mProperties[idx]->mKey.C_Str());
     }
@@ -190,7 +198,8 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
 
     // precalculate the number of textures
     const size_t num_textures =
-        material->GetTextureCount(aiTextureType_DIFFUSE) + material->GetTextureCount(aiTextureType_SPECULAR);
+        material->GetTextureCount(aiTextureType_DIFFUSE) + material->GetTextureCount(aiTextureType_SPECULAR) +
+        material->GetTextureCount(aiTextureType_NORMALS) + material->GetTextureCount(aiTextureType_HEIGHT);
 
     // process textures
     textures.reserve(num_textures);

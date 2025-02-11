@@ -81,6 +81,8 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
 
     static void OnWordTimeChanged_(uint64_t new_value);
 
+    static void OnPerspectiveChanged_(uint64_t new_value);
+
     static std::shared_ptr<Shader> FindShaderWithId(uint64_t id);
 
     // ------------------------------

@@ -52,6 +52,8 @@ class View
 
     void SetWindowAspectRatio(float aspect_ratio);
 
+    void SyncProjectionMatrixWithSettings();
+
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------
