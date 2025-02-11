@@ -208,10 +208,10 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
         /* for .obj format use HEIGHT_MAP as a fallback */
         if (format_ == "obj") {
             LoadMaterialTextures_(textures, scene, material, aiTextureType_HEIGHT, Texture::Type::kNormal);
+        } else {
+            /* use back up normal map */
+            FallBackNormal(textures);
         }
-
-        /* use back up normal map */
-        FallBackNormal(textures);
     } else {
         LoadMaterialTextures_(textures, scene, material, aiTextureType_NORMALS, Texture::Type::kNormal);
     }

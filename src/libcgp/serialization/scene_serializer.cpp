@@ -97,7 +97,9 @@ LibGcp::Rc LibGcp::SceneSerializer::SerializeSceneShallow_(const std::string &sc
 
     const auto lights                     = SerializeLights_();
     serial_struct.header.num_point_lights = lights.size<SceneSerialized::PointLightSerialized>();
-    serial_struct.header.num_spot_lights  = lights.size<SceneSerialized::SpotLightSerialized>();
+    total_bytes += serial_struct.header.num_point_lights * sizeof(SceneSerialized::PointLightSerialized);
+    serial_struct.header.num_spot_lights = lights.size<SceneSerialized::SpotLightSerialized>();
+    total_bytes += serial_struct.header.num_spot_lights * sizeof(SceneSerialized::SpotLightSerialized);
 
     serial_struct.header.num_strings = string_map_.size();
     total_bytes += string_map_.size() * sizeof(uint64_t);
@@ -401,7 +403,7 @@ std::tuple<LibGcp::Rc, LibGcp::Scene> LibGcp::SceneSerializer::LoadSceneShallow_
         reinterpret_cast<const SceneSerialized::PointLightSerialized *>(&static_objects[header.num_statics]);
     auto spot_lights =
         reinterpret_cast<const SceneSerialized::SpotLightSerialized *>(&point_lights[header.num_point_lights]);
-    auto string_table = reinterpret_cast<const SceneSerialized::StringTable *>(&static_objects[header.num_statics]);
+    auto string_table = reinterpret_cast<const SceneSerialized::StringTable *>(&spot_lights[header.num_spot_lights]);
     auto string_data  = reinterpret_cast<const char *>(&string_table[header.num_strings]);
 
     /* load settings */
