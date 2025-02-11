@@ -87,11 +87,11 @@ void LibGcp::GlobalLights::GlobalLight::PrepareLight(Shader &shader, const size_
 {
     const std::string prefix = "lightning.global_lights[" + std::to_string(idx) + "].";
 
-    shader.SetVec3((prefix + "position").c_str(), spec_.light_info.position);
-    shader.SetVec3((prefix + "ambient").c_str(), spec_.light_info.ambient);
-    shader.SetVec3((prefix + "diffuse").c_str(), spec_.light_info.diffuse);
-    shader.SetVec3((prefix + "specular").c_str(), spec_.light_info.specular);
-    shader.SetGLfloat((prefix + "intensity").c_str(), spec_.light_info.intensity);
+    shader.SetVec3Unsafe((prefix + "position").c_str(), spec_.light_info.position);
+    shader.SetVec3Unsafe((prefix + "ambient").c_str(), spec_.light_info.ambient);
+    shader.SetVec3Unsafe((prefix + "diffuse").c_str(), spec_.light_info.diffuse);
+    shader.SetVec3Unsafe((prefix + "specular").c_str(), spec_.light_info.specular);
+    shader.SetGLfloatUnsafe((prefix + "intensity").c_str(), spec_.light_info.intensity);
 }
 
 void LibGcp::GlobalLights::LoadLights(const std::vector<GlobalLightSpec> &lights)
@@ -106,7 +106,6 @@ void LibGcp::GlobalLights::LoadLights(const std::vector<GlobalLightSpec> &lights
 
 void LibGcp::GlobalLights::UpdatePosition(const uint64_t time)
 {
-    int idx{};
     for (auto &light : lights_) {
         light.UpdatePosition(WordTime::GetDayTimeSeconds(time));
     }
@@ -114,7 +113,7 @@ void LibGcp::GlobalLights::UpdatePosition(const uint64_t time)
 
 void LibGcp::GlobalLights::PrepareLights(Shader &shader)
 {
-    shader.SetGLuint("lightning.num_global_lights", static_cast<GLuint>(lights_.size()));
+    shader.SetGLuintUnsafe("lightning.num_global_lights", static_cast<GLuint>(lights_.size()));
 
     for (size_t idx = 0; idx < lights_.size(); ++idx) {
         lights_[idx].PrepareLight(shader, idx);

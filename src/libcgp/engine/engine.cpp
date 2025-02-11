@@ -41,8 +41,8 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
         GlobalLightSpec{
                         .light_info =
                         {
-                        .ambient  = {0.2F, 0.2F, 0.2F},
-                        .diffuse  = {0.8F, 0.8F, 0.8F},
+                        .ambient  = {0.1F, 0.1F, 0.1F},
+                        .diffuse  = {0.5F, 0.5F, 0.5F},
                         .specular = {1.0F, 1.0F, 1.0F},
                         }, .is_moving = true,
                         .rise_time = WordTime::ConvertToSeconds(6, 0, 0),
@@ -53,8 +53,8 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
         GlobalLightSpec{
                         .light_info =
                         {
-                        .ambient  = {0.06F, 0.06F, 0.06F},
-                        .diffuse  = {0.3F, 0.3F, 0.3F},
+                        .ambient  = {0.03F, 0.03F, 0.03F},
+                        .diffuse  = {0.2F, 0.2F, 0.2F},
                         .specular = {0.05F, 0.05F, 0.05F},
                         }, .is_moving = true,
                         .rise_time = WordTime::ConvertToSeconds(21, 0, 0),
@@ -69,7 +69,7 @@ void LibGcp::EngineBase::Draw()
     const auto shader = Engine::GetInstance().GetDefaultShader();
     shader->Activate();
 
-    shader->SetVec3("viewPos", view_.GetBindObject().position);
+    shader->SetVec3Unsafe("viewPos", view_.GetBindObject().position);
     light_mgr_.PrepareLights(*shader);
     global_light_.PrepareLights(*shader);
     ObjectMgr::GetInstance().DrawStaticObjects(*shader);

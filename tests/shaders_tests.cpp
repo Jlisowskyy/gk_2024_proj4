@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <libcgp/shader.hpp>
+#include <libcgp/primitives/shader.hpp>
 #include <open_gl_test.hpp>
 
 #include <utility>

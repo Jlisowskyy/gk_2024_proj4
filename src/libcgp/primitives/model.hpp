@@ -115,6 +115,8 @@ class ModelSerializer
         aiTextureType type, Texture::Type texture_type
     );
 
+    void FallBackToColor(std::vector<std::shared_ptr<Texture>> &textures, const aiMaterial *material);
+
     // ------------------------------
     // Class fields
     // ------------------------------

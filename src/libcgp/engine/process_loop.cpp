@@ -20,7 +20,7 @@ void LibGcp::ProcessLoopApp()
     Window::GetInstance().RunLoop([&] {
         // Render
         // Clear the color buffer
-        glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
+        glClearColor(0.2F, 0.2F, 0.2F, 1.0F);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //  Render objects

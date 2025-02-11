@@ -84,7 +84,7 @@ L_FAST_CALL void TraceMaterialInfo(aiMaterial *material)
 // Implementations
 // ------------------------------
 
-LibGcp::Model::Model(std::vector<std::shared_ptr<Mesh> > &&meshes) : meshes_(std::move(meshes)) {}
+LibGcp::Model::Model(std::vector<std::shared_ptr<Mesh>> &&meshes) : meshes_(std::move(meshes)) {}
 
 void LibGcp::Model::Draw(Shader &shader) const
 {
@@ -151,7 +151,7 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
 
     std::vector<Vertex> vertices{};
     std::vector<GLuint> indices{};
-    std::vector<std::shared_ptr<Texture> > textures{};
+    std::vector<std::shared_ptr<Texture>> textures{};
 
     TraceMeshInfo(mesh);
 
@@ -190,8 +190,15 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
 
     // process textures
     textures.reserve(num_textures);
-    LoadMaterialTextures_(textures, scene, material, aiTextureType_DIFFUSE, Texture::Type::kDiffuse);
+
+    if (material->GetTextureCount(aiTextureType_DIFFUSE) == 0) {
+        FallBackToColor(textures, material);
+    } else {
+        LoadMaterialTextures_(textures, scene, material, aiTextureType_DIFFUSE, Texture::Type::kDiffuse);
+    }
+
     LoadMaterialTextures_(textures, scene, material, aiTextureType_SPECULAR, Texture::Type::kSpecular);
+
     LoadMaterialTextures_(textures, scene, material, aiTextureType_NORMALS, Texture::Type::kNormal);
 
     auto mesh_ptr = std::make_shared<Mesh>(std::move(vertices), std::move(indices), std::move(textures));
@@ -210,10 +217,15 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
 }
 
 void LibGcp::ModelSerializer::LoadMaterialTextures_(
-    std::vector<std::shared_ptr<Texture> > &textures, const aiScene *scene, const aiMaterial *material,
+    std::vector<std::shared_ptr<Texture>> &textures, const aiScene *scene, const aiMaterial *material,
     const aiTextureType type, const Texture::Type texture_type
 )
 {
+    TRACE(
+        "[MATERIAL INFO] Loading: " << material->GetTextureCount(type)
+                                    << " textures of type: " << Texture::kTypeNames[static_cast<size_t>(texture_type)]
+    );
+
     const std::filesystem::path dir_path = std::filesystem::absolute(directory_);
 
     for (size_t idx = 0; idx < material->GetTextureCount(type); ++idx) {
@@ -250,4 +262,34 @@ void LibGcp::ModelSerializer::LoadMaterialTextures_(
         texture->SetType(texture_type);
         textures.push_back(texture);
     }
+}
+
+void LibGcp::ModelSerializer::FallBackToColor(
+    std::vector<std::shared_ptr<Texture>> &textures, const aiMaterial *material
+)
+{
+    TRACE("Falling back to material color");
+
+    /* Use material color as a fallback */
+    aiColor3D color;
+    R_ASSERT(material->Get(AI_MATKEY_COLOR_DIFFUSE, color) == aiReturn_SUCCESS);
+
+    /* Create a 1x1 texture with the color */
+    unsigned char color_data[4] = {
+        static_cast<unsigned char>(color.r * 255), static_cast<unsigned char>(color.g * 255),
+        static_cast<unsigned char>(color.b * 255), 255
+    };
+
+    const auto texture = ResourceMgr::GetInstance().GetTextureExternalSourceRaw(
+        "fallback_texture_" + std::to_string(color.r) + "_" + std::to_string(color.g) + "_" + std::to_string(color.b),
+        {
+            .texture_data = color_data,
+            .width        = 1,
+            .height       = 1,
+            .channels     = 4,
+        }
+    );
+    texture->SetType(Texture::Type::kDiffuse);
+
+    textures.push_back(texture);
 }

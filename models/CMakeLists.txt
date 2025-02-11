@@ -35,6 +35,10 @@ set(model_entries
         "https://www.dropbox.com/scl/fi/xtt28kxheo1t0fevp26lz/sci-fi_modular_floor_tiles.glb?rlkey=zc4cfoy0lbg3862ij30wrgccu&st=9feey0yw&dl=0"
         "floor.glb"
         "floor"
+
+        "https://www.dropbox.com/scl/fi/5tuwk397gtnj4gflip5em/full_gameready_city_buildings_ii.glb?rlkey=1hgrvpl6if4xo9fjgtndj1k4d&st=psfrv4pa&dl=0"
+        "town.glb"
+        "town"
 )
 
 set(archive_extensions zip tar "tar.gz" tgz "tar.bz2" tbz2)

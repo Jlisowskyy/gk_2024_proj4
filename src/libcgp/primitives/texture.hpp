@@ -30,6 +30,12 @@ class Texture : public Resource
         kLast,
     };
 
+    static constexpr std::array<std::string_view, static_cast<std::size_t>(Type::kLast)> kTypeNames = {
+        "diffuse",
+        "specular",
+        "normal",
+    };
+
     // ------------------------------
     // Object creation
     // ------------------------------
