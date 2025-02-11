@@ -47,6 +47,8 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
 
     FAST_CALL LightMgr &GetLightMgr() noexcept { return light_mgr_; }
 
+    FAST_CALL GlobalLights &GetGlobalLight() noexcept { return global_light_; }
+
     void ProcessProgress(uint64_t delta);
 
     FAST_CALL void ButtonPressed(const int key) { ++keys_[key]; }

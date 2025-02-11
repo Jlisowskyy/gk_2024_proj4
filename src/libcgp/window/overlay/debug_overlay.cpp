@@ -119,6 +119,7 @@ void LibGcp::DebugOverlay::EnableOverlay(GLFWwindow *window)
     assert(window_ == nullptr);
 
     FillObjectNames_();
+    FillLightNames_();
     model_names_ = ResourceMgr::GetInstance().GetModels().GetKeys();
 
     /* Events */
@@ -186,6 +187,7 @@ void LibGcp::DebugOverlay::Draw()
     DrawSceneWindow_();
     DrawFailure_();
     DrawInfoWindow_();
+    DrawGlobalLightEditorWindow_();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -294,7 +296,86 @@ void LibGcp::DebugOverlay::DrawInfoWindow_()
     const std::string time_str = "Current time: " + WordTime::GetTime();
     ImGui::Text(time_str.c_str());
 
+    ImGui::SameLine();
+
+    if (ImGui::SmallButton("+")) {
+        const uint64_t curr_time = SettingsMgr::GetInstance().GetSetting<Setting::kCurrentWordTime, uint64_t>();
+        SettingsMgr::GetInstance().SetSetting<Setting::kCurrentWordTime>(curr_time + WordTime::kSecondsInHour);
+    }
+    ImGui::SameLine();
+    if (ImGui::SmallButton("-")) {
+        const uint64_t curr_time = SettingsMgr::GetInstance().GetSetting<Setting::kCurrentWordTime, uint64_t>();
+        SettingsMgr::GetInstance().SetSetting<Setting::kCurrentWordTime>(curr_time - WordTime::kSecondsInHour);
+    }
+
     ImGui::End();
+}
+
+void LibGcp::DebugOverlay::SetSelectedGlobalLight_(const int idx)
+{
+    if (idx == global_light_idx_) {
+        global_light_idx_ = -1;
+        global_light_     = nullptr;
+        return;
+    }
+
+    global_light_idx_ = idx;
+    global_light_     = &Engine::GetInstance().GetGlobalLight().GetLight(idx);
+}
+
+void LibGcp::DebugOverlay::DrawGlobalLightEditorWindow_()
+{
+    ImGui::Begin("Global light editor");
+
+    if (ImGui::Button("Add global light")) {
+        Engine::GetInstance().GetGlobalLight().AddLight(kDefaultGlobalLight);
+    }
+
+    if (ImGui::BeginListBox("Global lights")) {
+        for (int i = 0; i < static_cast<int>(global_light_names_.size()); i++) {
+            const bool is_selected = (global_light_idx_ == i);
+            if (ImGui::Selectable(global_light_names_[i].c_str(), is_selected)) {
+                SetSelectedGlobalLight_(i);
+            }
+            if (is_selected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndListBox();
+    }
+
+    ImGui::Separator();
+
+    DrawGlobalLightEditSection_();
+
+    ImGui::End();
+}
+
+void LibGcp::DebugOverlay::DrawGlobalLightEditSection_()
+{
+    if (global_light_idx_ == -1) {
+        return;
+    }
+
+    ImGui::DragFloat3("Light position ", &global_light_->light_info.position.x, 0.01f);
+    ImGui::DragFloat3("Ambient ", &global_light_->light_info.ambient.x, 0.01f);
+    ImGui::DragFloat3("Diffuse ", &global_light_->light_info.diffuse.x, 0.01f);
+    ImGui::DragFloat3("Specular ", &global_light_->light_info.specular.x, 0.01f);
+    ImGui::DragFloat("Intensity ", &global_light_->light_info.intensity, 0.01f);
+
+    ImGui::Checkbox("Is moving ", &global_light_->is_moving);
+
+    int drag1 = global_light_->rise_time;
+    ImGui::DragInt("Rise time ", &drag1, 1);
+    global_light_->rise_time = drag1;
+
+    int drag2 = global_light_->down_time;
+    ImGui::DragInt("Down time ", &drag2, 1);
+    global_light_->down_time = drag2;
+
+    float drag3 = global_light_->angle;
+    ImGui::DragFloat("Angle ", &drag3, 0.01f);
+    global_light_->angle = drag3;
 }
 
 void LibGcp::DebugOverlay::DrawFailure_()
@@ -446,6 +527,16 @@ void LibGcp::DebugOverlay::FillObjectNames_()
     static_object_names_.reserve(ObjectMgr::GetInstance().GetStaticObjects().size());
     for (const auto &object : ObjectMgr::GetInstance().GetStaticObjects()) {
         static_object_names_.push_back("Object " + std::to_string(object.GetId()));
+    }
+}
+
+void LibGcp::DebugOverlay::FillLightNames_()
+{
+    global_light_names_.clear();
+    global_light_names_.reserve(Engine::GetInstance().GetGlobalLight().GetLightsCount());
+
+    for (size_t i = 0; i < Engine::GetInstance().GetGlobalLight().GetLightsCount(); ++i) {
+        global_light_names_.push_back("Global light " + std::to_string(i));
     }
 }
 

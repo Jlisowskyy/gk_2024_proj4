@@ -65,6 +65,10 @@ class DebugOverlay
 
     void DrawInfoWindow_();
 
+    void DrawGlobalLightEditorWindow_();
+
+    void DrawGlobalLightEditSection_();
+
     void DrawFailure_();
 
     void DrawLightEditor_();
@@ -95,7 +99,11 @@ class DebugOverlay
 
     void SetSelectedSpotlight_(int idx);
 
+    void SetSelectedGlobalLight_(int idx);
+
     void FillObjectNames_();
+
+    void FillLightNames_();
 
     void TriggerFailure_(const std::string &message);
 
@@ -171,6 +179,11 @@ class DebugOverlay
     int selected_spotlight_idx_{};
     std::vector<std::string> selected_model_spotlights_{};
     SpotLight *selected_spotlight_{};
+
+    /* Global light */
+    GlobalLightSpec *global_light_{};
+    int global_light_idx_{-1};
+    std::vector<std::string> global_light_names_{};
 
     /* Window info */
     GLFWwindow *window_{};

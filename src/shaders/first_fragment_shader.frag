@@ -104,7 +104,7 @@ vec3 CalcGlobalLight(LightInfo light, vec3 normal, vec3 viewDir)
     vec3 diffuse = light.diffuse * diff * vec3(texture(material.texture_diffuse01, TexCoords));
     vec3 specular = light.specular * spec * vec3(texture(material.texture_specular01, TexCoords));
 
-    return ambient + (diffuse + specular) * light.intensity;
+    return (ambient + diffuse + specular) * light.intensity;
 }
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
