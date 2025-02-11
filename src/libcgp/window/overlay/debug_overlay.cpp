@@ -172,6 +172,7 @@ void LibGcp::DebugOverlay::Draw()
 {
     HighlightedSelectedMesh_();
     DrawSelectedObjects_();
+    DrawLightHighlights_();
 
     if (window_ == nullptr) {
         return;
@@ -196,7 +197,7 @@ void LibGcp::DebugOverlay::Draw()
 void LibGcp::DebugOverlay::DrawSelectedObjects_()
 {
     if (selected_static_object_idx_ != -1) {
-        DrawDebugPoint(static_object_->GetPosition().position, 0.1f);
+        DrawDebugPoint(static_object_->GetPosition().position, 0.1f, glm::vec3(0.5f, 0.2f, 1.0f));
     }
 }
 
@@ -546,7 +547,7 @@ void LibGcp::DebugOverlay::TriggerFailure_(const std::string &message)
     failure_message_ = message;
 }
 
-void LibGcp::DebugOverlay::DrawDebugPoint(const glm::vec3 &position, const float size)
+void LibGcp::DebugOverlay::DrawDebugPoint(const glm::vec3 &position, const float size, const glm::vec3 color)
 {
     const auto sphere_model = ResourceMgr::GetInstance().GetModel("./models/sphere.glb", LoadType::kExternal);
 
@@ -558,12 +559,33 @@ void LibGcp::DebugOverlay::DrawDebugPoint(const glm::vec3 &position, const float
     shader_->Activate();
     Engine::GetInstance().GetView().PrepareViewMatrices(*shader_);
     Engine::GetInstance().GetView().PrepareModelMatrices(*shader_, pos);
+    shader_->SetVec3("color", color);
 
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     sphere_model->Draw(*shader_);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
+}
+
+void LibGcp::DebugOverlay::DrawLightHighlights_()
+{
+    if (!SettingsMgr::GetInstance().GetSetting<Setting::kHighlightLightSources, bool>()) {
+        return;
+    }
+
+    for (auto &object : ObjectMgr::GetInstance().GetStaticObjects()) {
+        const auto mm = View::PrepareModelMatrices(object.GetPosition());
+        for (const auto &light : object.GetModel()->GetLights().GetUnderlyingData<PointLight>()) {
+            const auto world_pos = mm * glm::vec4(light.light_info.position, 1.0f);
+            DrawDebugPoint(world_pos, 0.1f);
+        }
+
+        for (const auto &light : object.GetModel()->GetLights().GetUnderlyingData<SpotLight>()) {
+            const auto world_pos = mm * glm::vec4(light.light_info.position, 1.0f);
+            DrawDebugPoint(world_pos, 0.1f);
+        }
+    }
 }
 
 void LibGcp::DebugOverlay::DrawStaticObjectsSection_()
@@ -619,6 +641,8 @@ void LibGcp::DebugOverlay::HighlightedSelectedMesh_()
     shader_->Activate();
     Engine::GetInstance().GetView().PrepareViewMatrices(*shader_);
     Engine::GetInstance().GetView().PrepareModelMatrices(*shader_, static_object_->GetPosition());
+    /* pink */
+    shader_->SetVec3("color", glm::vec3(1.0f, 0.0f, 1.0f));
 
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

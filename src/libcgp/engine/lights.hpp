@@ -44,7 +44,7 @@ static inline PointLight kDefaultPointLight{
                    .model_name = "",
                    .light_info =
             {
-                .position  = {0.0f, 5.0f, 0.0f},
+                .position  = {0.0f, 0.0f, 0.0f},
                 .ambient   = {0.2f, 0.2f, 0.2f},
                 .diffuse   = {0.5f, 0.5f, 0.5f},
                 .specular  = {1.0f, 1.0f, 1.0f},
@@ -63,7 +63,7 @@ static inline SpotLight kDefaultSpotLight{
                   .model_name = "",
                   .light_info =
             {
-                .position  = {0.0f, 10.0f, 0.0f},
+                .position  = {0.0f, 0.0f, 0.0f},
                 .ambient   = {0.1f, 0.1f, 0.1f},
                 .diffuse   = {0.8f, 0.8f, 0.8f},
                 .specular  = {1.0f, 1.0f, 1.0f},

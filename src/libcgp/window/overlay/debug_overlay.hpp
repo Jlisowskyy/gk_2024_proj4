@@ -107,7 +107,9 @@ class DebugOverlay
 
     void TriggerFailure_(const std::string &message);
 
-    void DrawDebugPoint(const glm::vec3 &position, float size);
+    void DrawDebugPoint(const glm::vec3 &position, float size, glm::vec3 color = glm::vec3(1.0f));
+
+    void DrawLightHighlights_();
 
     template <class FuncT>
     static void DisplayFileDialog_(

@@ -200,6 +200,7 @@ enum class Setting : std::uint16_t {
     kBaseShader,
     kCurrentWordTime,
     kWordTimeCoef,
+    kHighlightLightSources,
     kLast,
 };
 
@@ -249,7 +250,7 @@ struct SettingContainer {
 using setting_t = std::vector<std::tuple<Setting, SettingContainer> >;
 
 template <size_t N>
-using SettingTypes = CxxUtils::TypeList<N, CameraType, double, bool, double, uint64_t, uint64_t, double>;
+using SettingTypes = CxxUtils::TypeList<N, CameraType, double, bool, double, uint64_t, uint64_t, double, bool>;
 static_assert(SettingTypes<0>::size == static_cast<size_t>(Setting::kLast), "Setting types list is incomplete");
 
 static constexpr std::array kSettingsDescriptions{
@@ -260,6 +261,7 @@ static constexpr std::array kSettingsDescriptions{
     "ID of the base render shader",
     "Current word time",
     "Word time coefficient",
+    "Highlight light sources",
 };
 static_assert(
     kSettingsDescriptions.size() == static_cast<size_t>(Setting::kLast), "Setting descriptions list is incomplete"
