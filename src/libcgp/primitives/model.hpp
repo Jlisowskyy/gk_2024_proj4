@@ -117,6 +117,8 @@ class ModelSerializer
 
     void FallBackToColor(std::vector<std::shared_ptr<Texture>> &textures, const aiMaterial *material);
 
+    void FallBackNormal(std::vector<std::shared_ptr<Texture>> &textures);
+
     // ------------------------------
     // Class fields
     // ------------------------------
@@ -124,6 +126,7 @@ class ModelSerializer
     std::vector<std::shared_ptr<Mesh>> meshes_{};
     std::string directory_{};
     std::string full_path_{};
+    std::string format_{"unknown"};
 };
 
 LIBGCP_DECL_END_

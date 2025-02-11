@@ -1,6 +1,7 @@
 #include <libcgp/mgr/resource_mgr.hpp>
 #include <libcgp/primitives/mesh.hpp>
 #include <libcgp/primitives/model.hpp>
+#include <libcgp/utils/files.hpp>
 #include <libcgp/utils/macros.hpp>
 #include <libcgp/utils/timer.hpp>
 
@@ -84,7 +85,7 @@ L_FAST_CALL void TraceMaterialInfo(aiMaterial *material)
 // Implementations
 // ------------------------------
 
-LibGcp::Model::Model(std::vector<std::shared_ptr<Mesh>> &&meshes) : meshes_(std::move(meshes)) {}
+LibGcp::Model::Model(std::vector<std::shared_ptr<Mesh> > &&meshes) : meshes_(std::move(meshes)) {}
 
 void LibGcp::Model::Draw(Shader &shader) const
 {
@@ -103,7 +104,8 @@ std::shared_ptr<LibGcp::Model> LibGcp::ModelSerializer::LoadModelFromExternalFor
 
     const auto *scene = importer.ReadFile(
         path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices |
-                  aiProcess_ImproveCacheLocality | aiProcess_RemoveRedundantMaterials | aiProcess_OptimizeMeshes
+                  aiProcess_ImproveCacheLocality | aiProcess_RemoveRedundantMaterials | aiProcess_OptimizeMeshes |
+                  aiProcess_CalcTangentSpace
     );
 
     if (scene == nullptr || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || scene->mRootNode == nullptr) {
@@ -111,6 +113,7 @@ std::shared_ptr<LibGcp::Model> LibGcp::ModelSerializer::LoadModelFromExternalFor
         return nullptr;
     }
 
+    format_    = GetFileFormat(path);
     full_path_ = path;
     directory_ = path.substr(0, path.find_last_of('/'));
 
@@ -151,7 +154,7 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
 
     std::vector<Vertex> vertices{};
     std::vector<GLuint> indices{};
-    std::vector<std::shared_ptr<Texture>> textures{};
+    std::vector<std::shared_ptr<Texture> > textures{};
 
     TraceMeshInfo(mesh);
 
@@ -161,8 +164,9 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
         vertices.emplace_back(
             glm::vec3{mesh->mVertices[idx].x, mesh->mVertices[idx].y, mesh->mVertices[idx].z},
             glm::vec3{mesh->mNormals[idx].x, mesh->mNormals[idx].y, mesh->mNormals[idx].z},
-            mesh->mTextureCoords[0] ? glm::vec2{mesh->mTextureCoords[0][idx].x, mesh->mTextureCoords[0][idx].y}
-                                    : glm::vec2{0.0F, 0.0F}
+            (mesh->mTextureCoords[0] ? glm::vec2{mesh->mTextureCoords[0][idx].x, mesh->mTextureCoords[0][idx].y}
+                                     : glm::vec2{0.0F, 0.0F}),
+            glm::vec3{mesh->mTangents[idx].x, mesh->mTangents[idx].y, mesh->mTangents[idx].z}
         );
     }
 
@@ -199,7 +203,18 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
 
     LoadMaterialTextures_(textures, scene, material, aiTextureType_SPECULAR, Texture::Type::kSpecular);
 
-    LoadMaterialTextures_(textures, scene, material, aiTextureType_NORMALS, Texture::Type::kNormal);
+    if (material->GetTextureCount(aiTextureType_NORMALS) == 0) {
+        TRACE("[TEXTURE INFO] Number of height maps: " << material->GetTextureCount(aiTextureType_HEIGHT));
+        /* for .obj format use HEIGHT_MAP as a fallback */
+        if (format_ == "obj") {
+            LoadMaterialTextures_(textures, scene, material, aiTextureType_HEIGHT, Texture::Type::kNormal);
+        }
+
+        /* use back up normal map */
+        FallBackNormal(textures);
+    } else {
+        LoadMaterialTextures_(textures, scene, material, aiTextureType_NORMALS, Texture::Type::kNormal);
+    }
 
     auto mesh_ptr = std::make_shared<Mesh>(std::move(vertices), std::move(indices), std::move(textures));
 
@@ -217,7 +232,7 @@ std::shared_ptr<LibGcp::Mesh> LibGcp::ModelSerializer::ProcessMesh_(const aiMesh
 }
 
 void LibGcp::ModelSerializer::LoadMaterialTextures_(
-    std::vector<std::shared_ptr<Texture>> &textures, const aiScene *scene, const aiMaterial *material,
+    std::vector<std::shared_ptr<Texture> > &textures, const aiScene *scene, const aiMaterial *material,
     const aiTextureType type, const Texture::Type texture_type
 )
 {
@@ -265,7 +280,7 @@ void LibGcp::ModelSerializer::LoadMaterialTextures_(
 }
 
 void LibGcp::ModelSerializer::FallBackToColor(
-    std::vector<std::shared_ptr<Texture>> &textures, const aiMaterial *material
+    std::vector<std::shared_ptr<Texture> > &textures, const aiMaterial *material
 )
 {
     TRACE("Falling back to material color");
@@ -290,6 +305,25 @@ void LibGcp::ModelSerializer::FallBackToColor(
         }
     );
     texture->SetType(Texture::Type::kDiffuse);
+
+    textures.push_back(texture);
+}
+
+void LibGcp::ModelSerializer::FallBackNormal(std::vector<std::shared_ptr<Texture> > &textures)
+{
+    static constexpr unsigned char normal_data[4] = {128, 128, 255, 255};
+    TRACE("Loading fallback normal map...");
+
+    const auto texture = ResourceMgr::GetInstance().GetTextureExternalSourceRaw(
+        "fallback_normals",
+        {
+            .texture_data = const_cast<unsigned char *>(normal_data),
+            .width        = 1,
+            .height       = 1,
+            .channels     = 4,
+        }
+    );
+    texture->SetType(Texture::Type::kNormal);
 
     textures.push_back(texture);
 }
