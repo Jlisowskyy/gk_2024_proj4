@@ -75,10 +75,10 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main()
 {
-//    vec3 normal = texture(material.texture_normal01, vertex_out.tex_coords).rgb;
-//    normal = normal * 2.0 - 1.0;
-//    normal = normalize(vertex_out.tbn * normal);
-    vec3 normal = vertex_out.normal;
+    vec3 normal = texture(material.texture_normal01, vertex_out.tex_coords).rgb;
+    normal = normal * 2.0 - 1.0;
+    normal = normalize(vertex_out.tbn * normal);
+//    vec3 normal = vertex_out.normal;
 
     vec3 viewDir = normalize(viewPos - vertex_out.frag_pos);
 
