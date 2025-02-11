@@ -88,28 +88,18 @@ void LibGcp::LightMgr::LoadLightsFromScene(const Scene &scene)
         R_ASSERT(model != nullptr && "Model not found for light object!");
 
         model->GetLights().emplace_back<PointLight>(point_light_spec);
-        ++point_light_count_;
     }
 
     /* Load spotlights */
     for (const auto &spot_light_spec : scene.spot_lights) {
         auto model = ResourceMgr::GetInstance().GetModel(spot_light_spec.model_name, LoadType::kExternal);
         R_ASSERT(model != nullptr && "Model not found for light object!");
-
         model->GetLights().emplace_back<SpotLight>(spot_light_spec);
-        ++spot_light_count_;
     }
-
-    R_ASSERT(point_light_count_ <= kMaxTypeLightObjects && "Too many point lights");
-    R_ASSERT(spot_light_count_ <= kMaxTypeLightObjects && "Too many spot lights");
-    R_ASSERT(point_light_count_ + spot_light_count_ <= kMaxLightObjects && "Too many lights");
 }
 
 void LibGcp::LightMgr::PrepareLights(Shader &shader) const
 {
-    shader.SetGLuintUnsafe("lightning.num_point_lights", point_light_count_);
-    shader.SetGLuintUnsafe("lightning.num_spot_lights", spot_light_count_);
-
     uint64_t counters[2]{};
     for (const auto &obj : ObjectMgr::GetInstance().GetStaticObjects()) {
         const auto model = obj.GetModel();
@@ -124,4 +114,11 @@ void LibGcp::LightMgr::PrepareLights(Shader &shader) const
             LightGetFunc(shader, counters, light, model_matrix, rot_matrix);
         });
     }
+
+    R_ASSERT(counters[kPointLightIdx] < kMaxTypeLightObjects && "Too many point lights");
+    R_ASSERT(counters[kSpotLightIdx] < kMaxTypeLightObjects && "Too many spot lights");
+    R_ASSERT(counters[kPointLightIdx] + counters[kSpotLightIdx] < kMaxLightObjects && "Too many lights");
+
+    shader.SetGLuintUnsafe("lightning.num_point_lights", counters[kPointLightIdx]);
+    shader.SetGLuintUnsafe("lightning.num_spot_lights", counters[kSpotLightIdx]);
 }

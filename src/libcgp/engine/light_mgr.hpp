@@ -14,7 +14,6 @@ class Shader;
 
 class LightMgr
 {
-    public:
     // ------------------------------
     // Class internals
     // ------------------------------
@@ -33,19 +32,10 @@ class LightMgr
     void PrepareLights(Shader &shader) const;
 
     template <typename T>
-    FAST_CALL void AddLight(Model &model, const T &light)
+    FAST_CALL static void AddLight(Model &model, const T &light)
     {
         model.GetLights().push_back(light);
-
-        if constexpr (std::is_same_v<T, SpotLight>) {
-            spot_light_count_++;
-        } else if constexpr (std::is_same_v<T, PointLight>) {
-            point_light_count_++;
-        }
-
-        R_ASSERT(point_light_count_ <= kMaxTypeLightObjects && "Too many point lights");
-        R_ASSERT(spot_light_count_ <= kMaxTypeLightObjects && "Too many spot lights");
-        R_ASSERT(point_light_count_ + spot_light_count_ <= kMaxLightObjects && "Too many lights");
+        R_ASSERT(model.GetLights().size<T>() < kMaxLightPerObject && "Too many lights");
     }
 
     // ---------------------------------
@@ -56,9 +46,6 @@ class LightMgr
     // ------------------------------
     // Class fields
     // ------------------------------
-
-    uint16_t spot_light_count_  = 0;
-    uint16_t point_light_count_ = 0;
 };
 
 LIBGCP_DECL_END_
