@@ -45,3 +45,12 @@ std::string LibGcp::GetFileFormat(const std::string &path) noexcept
     }
     return path.substr(pos + 1);
 }
+
+std::string LibGcp::ConvertFullPathToRelative(const std::string &path) noexcept
+{
+    const std::filesystem::path basePath     = std::filesystem::current_path();
+    const std::filesystem::path fullPath     = std::filesystem::absolute(path);
+    const std::filesystem::path relativePath = std::filesystem::relative(fullPath, basePath);
+
+    return relativePath.string();
+}

@@ -186,7 +186,7 @@ std::vector<LibGcp::SceneSerialized::ResourceSerialized> LibGcp::SceneSerializer
     ResourceMgr::GetInstance().GetModels().Lock();
 
     for (const auto &[name, model] : ResourceMgr::GetInstance().GetModels()) {
-        const size_t id = GetStringId_(name);
+        const size_t id = GetStringId_(model->load_type == LoadType::kMemory ? name : ConvertFullPathToRelative(name));
 
         resources.push_back({
             .paths        = {id, 0},
@@ -215,7 +215,8 @@ std::vector<LibGcp::SceneSerialized::ResourceSerialized> LibGcp::SceneSerializer
             continue;
         }
 
-        const size_t id = GetStringId_(name);
+        const size_t id =
+            GetStringId_(texture->load_type == LoadType::kMemory ? name : ConvertFullPathToRelative(name));
 
         resources.push_back({
             .paths        = {id, 0},
@@ -274,9 +275,9 @@ std::vector<LibGcp::SceneSerialized::StaticObjectSerialized> LibGcp::SceneSerial
         std::string name;
         ResourceMgr::GetInstance().GetModels().Lock();
 
-        for (const auto &model : ResourceMgr::GetInstance().GetModels()) {
-            if (model.second->resource_id == model_id) {
-                name = model.first;
+        for (const auto &[model_name, model] : ResourceMgr::GetInstance().GetModels()) {
+            if (model->resource_id == model_id) {
+                name = model->load_type == LoadType::kMemory ? model_name : ConvertFullPathToRelative(model_name);
                 break;
             }
         }
@@ -303,7 +304,7 @@ LibGcp::SceneSerializer::SerializeLights_()
     ResourceMgr::GetInstance().GetModels().Lock();
 
     for (const auto &[name, model] : ResourceMgr::GetInstance().GetModels()) {
-        const size_t id = GetStringId_(name);
+        const size_t id = GetStringId_(model->load_type == LoadType::kMemory ? name : ConvertFullPathToRelative(name));
 
         const auto func = [&]<class T>(const T &light) {
             vec.push_back(light.Serialize(id));

@@ -28,6 +28,8 @@ NDSCRD bool IsGivenFormat(const std::string& path, const std::string& format) no
 
 NDSCRD std::string GetFileFormat(const std::string& path) noexcept;
 
+NDSCRD std::string ConvertFullPathToRelative(const std::string& path) noexcept;
+
 LIBGCP_DECL_END_
 
 #endif  // UTILS_FILES_HPP_
