@@ -106,6 +106,9 @@ void LibGcp::EngineBase::Draw()
     global_light_.PrepareLights(*lighting_pass_shader_);
 
     quad_.Draw();
+
+    /* copy depth buffer */
+    g_buffer_.SyncDepthBufferWithDefaultFramebuffer();
 }
 
 void LibGcp::EngineBase::ProcessProgress(const uint64_t delta)

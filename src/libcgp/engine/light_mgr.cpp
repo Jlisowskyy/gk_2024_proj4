@@ -45,7 +45,7 @@ void LightGetFunc<>(Shader &shader, uint64_t *counter, const PointLight &light, 
 
     shader.SetGLfloat((prefix + "linear").c_str(), light.point_light.linear);
 
-    shader.SetGLfloatUnsafe((prefix + "quadratic").c_str(), light.point_light.quadratic);
+    shader.SetGLfloat((prefix + "quadratic").c_str(), light.point_light.quadratic);
 }
 
 template <>

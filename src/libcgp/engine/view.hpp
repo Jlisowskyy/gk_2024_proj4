@@ -38,7 +38,7 @@ class View
 
     void PrepareViewMatrices(Shader &shader);
 
-    void PrepareModelMatrices(Shader &shader, const ObjectPosition &position);
+    static void PrepareModelMatrices(Shader &shader, const ObjectPosition &position);
 
     NDSCRD static glm::mat4 PrepareModelMatrices(const ObjectPosition &position);
 

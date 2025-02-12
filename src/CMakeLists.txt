@@ -91,3 +91,5 @@ if (DEFINED USE_TIMERS AND USE_TIMERS)
     message(STATUS "Enabling timers...")
     target_compile_definitions(${LIB_NAME} PUBLIC USE_TIMERS_=1)
 endif ()
+
+#target_compile_definitions(${LIB_NAME} PUBLIC UNIFORMS_DROPS_WHEN_NOT_FOUND_=1)

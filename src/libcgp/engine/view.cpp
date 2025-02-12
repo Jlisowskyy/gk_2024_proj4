@@ -50,7 +50,6 @@ void LibGcp::View::PrepareViewMatrices(Shader &shader)
 void LibGcp::View::PrepareModelMatrices(Shader &shader, const ObjectPosition &position)
 {
     const auto model_matrix = PrepareModelMatrices(position);
-
     shader.SetMat4("un_model", model_matrix);
 }
 

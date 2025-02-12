@@ -1,10 +1,6 @@
 #version 460 core
 out vec4 FragColor;
 
-in vec3 FragPos;
-in vec3 Normal;
-in vec2 TexCoords;
-
 struct Material {
     sampler2D texture_diffuse01;
     sampler2D texture_diffuse02;
@@ -59,14 +55,14 @@ struct Lightning {
     LightInfo global_lights[MAX_GLOBAL_LIGHTS];
 };
 
-uniform vec3 viewPos;
-uniform Material material;
-uniform Lightning lightning;
+uniform vec3 un_view_pos;
+uniform Material un_material;
+uniform Lightning un_lightning;
 
-uniform vec3 color;
+uniform vec3 un_color;
 
 void main()
 {
     // pink color
-    FragColor = vec4(color, 1.0);
+    FragColor = vec4(un_color, 1.0);
 }

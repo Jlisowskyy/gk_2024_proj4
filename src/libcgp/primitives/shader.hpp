@@ -26,7 +26,7 @@
     void Set##TypeName(const char *name, const TypeName &value) const       \
     {                                                                       \
         const GLint location = glGetUniformLocation(shader_program_, name); \
-        assert(true || location != -1);                                     \
+        assert(!kUniformsDropsWhenNotFound || location != -1);              \
         UniformFunc(location, value);                                       \
     }
 
@@ -34,7 +34,7 @@
     void Set##funcName(const char *name, const TypeName &values, GLsizei count = 1) const \
     {                                                                                     \
         const GLint location = glGetUniformLocation(shader_program_, name);               \
-        assert(true || location != -1);                                                   \
+        assert(!kUniformsDropsWhenNotFound || location != -1);                            \
         UniformFunc(location, count, GL_FALSE, glm::value_ptr(values));                   \
     }
 
@@ -42,39 +42,17 @@
     void Set##funcName(const char *name, const TypeName &value, GLsizei count = 1) const \
     {                                                                                    \
         const GLint location = glGetUniformLocation(shader_program_, name);              \
-        assert(true || location != -1);                                                  \
+        assert(!kUniformsDropsWhenNotFound || location != -1);                           \
         UniformFunc(location, count, glm::value_ptr(value));                             \
     }
 
-#define GENERATE_UNIFORM_SETTER_UNSAFE_(TypeName, UniformFunc)                \
-    void Set##TypeName##Unsafe(const char *name, const TypeName &value) const \
-    {                                                                         \
-        UniformFunc(glGetUniformLocation(shader_program_, name), value);      \
-    }
+#define GENERATE_UNIFORM_SETTER_(TypeName, UniformFunc) GENERATE_UNIFORM_SETTER_SAFE_(TypeName, UniformFunc)
 
-#define GENERATE_MATRIX_UNIFORM_SETTER_UNSAFE_(funcName, TypeName, UniformFunc)                            \
-    void Set##funcName##Unsafe(const char *name, const TypeName &values, GLsizei count = 1) const          \
-    {                                                                                                      \
-        UniformFunc(glGetUniformLocation(shader_program_, name), count, GL_FALSE, glm::value_ptr(values)); \
-    }
+#define GENERATE_MATRIX_UNIFORM_SETTER_(funcName, TypeName, UniformFunc) \
+    GENERATE_MATRIX_UNIFORM_SETTER_SAFE_(funcName, TypeName, UniformFunc)
 
-#define GENERATE_VECTOR_UNIFORM_SETTER_UNSAFE_(funcName, TypeName, UniformFunc)                  \
-    void Set##funcName##Unsafe(const char *name, const TypeName &value, GLsizei count = 1) const \
-    {                                                                                            \
-        UniformFunc(glGetUniformLocation(shader_program_, name), count, glm::value_ptr(value));  \
-    }
-
-#define GENERATE_UNIFORM_SETTER_(TypeName, UniformFunc)  \
-    GENERATE_UNIFORM_SETTER_SAFE_(TypeName, UniformFunc) \
-    GENERATE_UNIFORM_SETTER_UNSAFE_(TypeName, UniformFunc)
-
-#define GENERATE_MATRIX_UNIFORM_SETTER_(funcName, TypeName, UniformFunc)  \
-    GENERATE_MATRIX_UNIFORM_SETTER_SAFE_(funcName, TypeName, UniformFunc) \
-    GENERATE_MATRIX_UNIFORM_SETTER_UNSAFE_(funcName, TypeName, UniformFunc)
-
-#define GENERATE_VECTOR_UNIFORM_SETTER_(funcName, TypeName, UniformFunc)  \
-    GENERATE_VECTOR_UNIFORM_SETTER_SAFE_(funcName, TypeName, UniformFunc) \
-    GENERATE_VECTOR_UNIFORM_SETTER_UNSAFE_(funcName, TypeName, UniformFunc)
+#define GENERATE_VECTOR_UNIFORM_SETTER_(funcName, TypeName, UniformFunc) \
+    GENERATE_VECTOR_UNIFORM_SETTER_SAFE_(funcName, TypeName, UniformFunc)
 
 LIBGCP_DECL_START_
 // ------------------------------

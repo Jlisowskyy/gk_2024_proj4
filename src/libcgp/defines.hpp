@@ -3,6 +3,12 @@
 
 #include <iostream>
 
+#ifdef UNIFORMS_DROPS_WHEN_NOT_FOUND_
+static constexpr bool kUniformsDropsWhenNotFound = true;
+#else
+static constexpr bool kUniformsDropsWhenNotFound = false;
+#endif  // UNIFORMS_DROPS_WHEN_NOT_FOUND_
+
 #ifdef __GNUC__
 #define FORCE_INLINE_ __attribute__((always_inline))
 #elif defined(_MSC_VER)

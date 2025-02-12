@@ -592,8 +592,8 @@ void LibGcp::DebugOverlay::DrawDebugPoint(const glm::vec3 &position, const float
 
     shader_->Activate();
     Engine::GetInstance().GetView().PrepareViewMatrices(*shader_);
-    Engine::GetInstance().GetView().PrepareModelMatrices(*shader_, pos);
-    shader_->SetVec3("color", color);
+    View::PrepareModelMatrices(*shader_, pos);
+    shader_->SetVec3("un_color", color);
 
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -674,9 +674,9 @@ void LibGcp::DebugOverlay::HighlightedSelectedMesh_()
 
     shader_->Activate();
     Engine::GetInstance().GetView().PrepareViewMatrices(*shader_);
-    Engine::GetInstance().GetView().PrepareModelMatrices(*shader_, static_object_->GetPosition());
+    View::PrepareModelMatrices(*shader_, static_object_->GetPosition());
     /* pink */
-    shader_->SetVec3("color", glm::vec3(1.0f, 0.0f, 1.0f));
+    shader_->SetVec3("un_color", glm::vec3(1.0f, 0.0f, 1.0f));
 
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

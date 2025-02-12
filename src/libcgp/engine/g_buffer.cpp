@@ -104,6 +104,16 @@ void LibGcp::GBuffer::BindShaderWithBuffers(Shader &shader)
     shader.SetGLint("un_g_buffer.albedo_spec", 2);
 }
 
+void LibGcp::GBuffer::SyncDepthBufferWithDefaultFramebuffer()
+{
+    const auto [w, h] = Window::GetInstance().GetWindowSize();
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, g_buffer_);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void LibGcp::GBuffer::BindTexturesForReading() const
 {
     glActiveTexture(GL_TEXTURE0);

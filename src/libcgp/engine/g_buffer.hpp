@@ -37,6 +37,8 @@ class GBuffer
 
     void BindShaderWithBuffers(Shader& shader);
 
+    void SyncDepthBufferWithDefaultFramebuffer();
+
     // ---------------------------------
     // Class implementation methods
     // ---------------------------------
