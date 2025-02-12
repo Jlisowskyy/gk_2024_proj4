@@ -67,17 +67,6 @@ struct alignas(32) Vertex {
 };
 
 // ------------------------------
-// Rendering
-// ------------------------------
-
-enum class RenderPass : std::uint8_t {
-    kGeometry,
-    kLighting,
-    kPostProcessing,
-    kLast,
-};
-
-// ------------------------------
 // Engine
 // ------------------------------
 
