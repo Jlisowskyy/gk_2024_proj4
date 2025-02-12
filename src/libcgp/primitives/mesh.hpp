@@ -50,12 +50,9 @@ class Mesh
     // Class interaction
     // ------------------------------
 
-    FAST_CALL void Draw(Shader &shader, const RenderPass pass) const
+    FAST_CALL void Draw(Shader &shader) const
     {
-        if (pass == RenderPass::kGeometry) {
-            BindMaterial_(shader);
-        }
-
+        BindMaterial_(shader);
         glBindVertexArray(VAO_);
         glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices_.size()), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);

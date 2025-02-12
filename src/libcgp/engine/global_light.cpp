@@ -46,11 +46,6 @@ void LibGcp::GlobalLights::GlobalLight::UpdatePosition(const uint64_t time)
     light_vec           = -glm::vec3(rot_day_angle * rot_light_angle * glm::vec4(light_vec, 1.0F));
 
     spec_.light_info.position = -light_vec;
-
-    TRACE(
-        "light position: " << spec_.light_info.position.x << " " << spec_.light_info.position.y << " "
-                           << spec_.light_info.position.z
-    );
 }
 
 bool LibGcp::GlobalLights::GlobalLight::IsBelowHorizon(const uint64_t time) const

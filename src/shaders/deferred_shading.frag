@@ -85,8 +85,7 @@ void main()
         result += CalcSpotLight(un_lightning.spot_lights[i], normal, diffuse, specular, frag_pos, view_dir);
     }
 
-//    FragColor = vec4(result, 1.0);
-    FragColor = vec4(diffuse, 1.0);
+    FragColor = vec4(result, 1.0);
 }
 
 vec3 CalcGlobalLight(LightInfo light, vec3 normal, vec3 diffuse, float specular, vec3 view_dir)

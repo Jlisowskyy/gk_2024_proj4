@@ -18,11 +18,6 @@ void LibGcp::ProcessLoopApp()
     /* At this point all events should be connected */
     auto last_frame = std::chrono::steady_clock::now();
     Window::GetInstance().RunLoop([&] {
-        // Render
-        // Clear the color buffer
-        glClearColor(0.2F, 0.2F, 0.2F, 1.0F);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         //  Render objects
         Engine::GetInstance().Draw();
 

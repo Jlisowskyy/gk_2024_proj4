@@ -36,7 +36,7 @@ class ObjectMgrBase : public CxxUtils::StaticSingletonHelper
 
     void LoadObjectsFromScene(const Scene &scene);
 
-    void DrawStaticObjects(Shader &shader, RenderPass pass) const;
+    void DrawStaticObjects(Shader &shader) const;
 
     void ProcessProgress(long delta_time_micros);
 

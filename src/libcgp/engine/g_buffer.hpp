@@ -25,6 +25,8 @@ class GBuffer
     // Class interaction
     // ------------------------------
 
+    void RegenerateBuffers();
+
     void DestroyBuffers();
 
     void PrepareBuffers();

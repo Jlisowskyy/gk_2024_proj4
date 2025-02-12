@@ -57,10 +57,10 @@ class Model : public Resource
     // Class interaction
     // ------------------------------
 
-    FAST_CALL void Draw(Shader &shader, const RenderPass pass) const
+    FAST_CALL void Draw(Shader &shader) const
     {
         for (const auto &mesh : meshes_) {
-            mesh->Draw(shader, pass);
+            mesh->Draw(shader);
         }
     }
 

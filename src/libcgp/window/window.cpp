@@ -93,8 +93,7 @@ void LibGcp::Window::FrameBufferSizeCallback(UNUSED GLFWwindow *window, const in
 
     glViewport(0, 0, width, height);
     GetInstance().SyncMousePositionWithWindow_();
-
-    Engine::GetInstance().GetView().SetWindowAspectRatio(GetInstance().GetAspectRatio());
+    Engine::GetInstance().OnFrameBufferResized();
 }
 
 void LibGcp::Window::MouseCallback(UNUSED GLFWwindow *window, const double xpos, const double ypos)

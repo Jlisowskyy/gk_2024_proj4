@@ -79,6 +79,9 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
     /* prepare g_buffer uniforms */
     lighting_pass_shader_->Activate();
     g_buffer_.BindShaderWithBuffers(*lighting_pass_shader_);
+
+    /* prepare quad */
+    quad_.Init();
 }
 
 void LibGcp::EngineBase::Draw()
@@ -87,10 +90,11 @@ void LibGcp::EngineBase::Draw()
     geometry_pass_shader_->Activate();
     g_buffer_.BindForWriting();
     Engine::GetInstance().GetView().PrepareViewMatrices(*geometry_pass_shader_);
-    ObjectMgr::GetInstance().DrawStaticObjects(*geometry_pass_shader_, RenderPass::kGeometry);
+    ObjectMgr::GetInstance().DrawStaticObjects(*geometry_pass_shader_);
 
     /* switch to default framebuffer */
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClearColor(0.2F, 0.2F, 0.2F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     /* lighting pass */
@@ -101,7 +105,7 @@ void LibGcp::EngineBase::Draw()
     light_mgr_.PrepareLights(*lighting_pass_shader_);
     global_light_.PrepareLights(*lighting_pass_shader_);
 
-    ObjectMgr::GetInstance().DrawStaticObjects(*lighting_pass_shader_, RenderPass::kLighting);
+    quad_.Draw();
 }
 
 void LibGcp::EngineBase::ProcessProgress(const uint64_t delta)
@@ -150,6 +154,12 @@ void LibGcp::EngineBase::ReloadScene(const Scene &scene)
     for (const auto &[setting, obj] : scene.settings) {
         SettingsMgr::GetInstance().SetSetting<uint64_t>(setting, obj.GetRaw());
     }
+}
+
+void LibGcp::EngineBase::OnFrameBufferResized()
+{
+    g_buffer_.RegenerateBuffers();
+    view_.SetWindowAspectRatio(Window::GetInstance().GetAspectRatio());
 }
 
 void LibGcp::EngineBase::ProcessInput_(const uint64_t delta)

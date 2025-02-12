@@ -10,6 +10,12 @@
 
 LibGcp::GBuffer::~GBuffer() { DestroyBuffers(); }
 
+void LibGcp::GBuffer::RegenerateBuffers()
+{
+    DestroyBuffers();
+    PrepareBuffers();
+}
+
 void LibGcp::GBuffer::DestroyBuffers()
 {
     if (g_depth_ != 0) {
@@ -44,6 +50,7 @@ void LibGcp::GBuffer::PrepareBuffers()
     glBindFramebuffer(GL_FRAMEBUFFER, g_buffer_);
 
     const auto [w, h] = Window::GetInstance().GetWindowSize();
+    TRACE("Preparing GBuffer with size: " << w << "x" << h);
 
     /* position buffer */
     glGenTextures(1, &g_position_);
@@ -86,6 +93,7 @@ void LibGcp::GBuffer::PrepareBuffers()
 void LibGcp::GBuffer::BindForWriting()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, g_buffer_);
+    glClearColor(0.2F, 0.2F, 0.2F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

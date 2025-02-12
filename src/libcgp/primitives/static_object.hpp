@@ -48,7 +48,7 @@ class StaticObject
     // Class interaction
     // ------------------------------
 
-    WRAP_CALL void Draw(Shader &shader, const RenderPass pass) const { model_->Draw(shader, pass); }
+    WRAP_CALL void Draw(Shader &shader) const { model_->Draw(shader); }
 
     const ObjectPosition &GetPosition() const { return position_; }
 

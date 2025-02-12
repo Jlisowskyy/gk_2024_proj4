@@ -7,6 +7,7 @@
 #include <libcgp/engine/light_mgr.hpp>
 #include <libcgp/engine/view.hpp>
 #include <libcgp/engine/word_time.hpp>
+#include <libcgp/primitives/quad.hpp>
 #include <libcgp/primitives/shader.hpp>
 
 #include <CxxUtils/static_singleton.hpp>
@@ -55,6 +56,8 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
     FAST_CALL void ButtonPressed(const int key) { ++keys_[key]; }
 
     void ReloadScene(const Scene &scene);
+
+    void OnFrameBufferResized();
 
     /* camera */
     NDSCRD FAST_CALL const CameraInfo &GetFreeCamera() const noexcept { return free_camera_; }
@@ -109,6 +112,9 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
     /* Shaders */
     std::shared_ptr<Shader> geometry_pass_shader_{};
     std::shared_ptr<Shader> lighting_pass_shader_{};
+
+    /* render pipeline */
+    Quad quad_{};
 };
 
 using Engine = CxxUtils::StaticSingleton<EngineBase>;
