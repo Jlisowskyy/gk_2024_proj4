@@ -46,7 +46,7 @@ void LibGcp::Mesh::Draw(Shader &shader) const
         name[name.size() - 2] = '0' + counter / 10;
         name[name.size() - 1] = '0' + counter % 10;
 
-        shader.SetGLfloatUnsafe(name.c_str(), static_cast<GLfloat>(idx));
+        shader.SetGLint(name.c_str(), idx);
         textures_[idx]->Bind(idx);
     }
     glActiveTexture(GL_TEXTURE0);

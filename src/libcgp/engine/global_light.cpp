@@ -107,6 +107,10 @@ void LibGcp::GlobalLights::LoadLights(const std::vector<GlobalLightSpec> &lights
 void LibGcp::GlobalLights::UpdatePosition(const uint64_t time)
 {
     for (auto &light : lights_) {
+        if (!light.spec_.is_moving) {
+            continue;
+        }
+
         light.UpdatePosition(WordTime::GetDayTimeSeconds(time));
     }
 }

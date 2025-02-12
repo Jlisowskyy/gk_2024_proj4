@@ -23,7 +23,7 @@ void main()
 
     vec3 T = normalize(normal_matrix * aTangent);
     vec3 N = normalize(normal_matrix * aNormal);
-    T = normalize(T - dot(T, N) * N); // For tangent space TODO
+    T = normalize(T - dot(T, N) * N);
     vec3 B = normalize(cross(N, T));
 
     vertex_out.frag_pos = vec3(model * vec4(aPos, 1.0));
