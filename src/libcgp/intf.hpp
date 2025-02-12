@@ -87,6 +87,22 @@ struct CameraInfo {
     void ConvertVectorToYawPitch();
 };
 
+enum class CameraType : std::uint8_t {
+    kStatic,
+    kFollow,
+    kFree,
+    kFirstPerson,
+    kThirdPerson,
+    kFollowObj,
+    kLast,
+};
+
+enum class ProjectionType : std::uint8_t {
+    kPerspective,
+    kOrthographic,
+    kLast,
+};
+
 // ------------------------------
 // Resources
 // ------------------------------
@@ -204,15 +220,8 @@ enum class Setting : std::uint16_t {
     kFov,
     kNear,
     kFar,
-    kLast,
-};
-
-enum class CameraType : std::uint8_t {
-    kStatic,
-    kFollow,
-    kFree,
-    kFirstPerson,
-    kThirdPerson,
+    kProjectionType,
+    kOrthoHeight,
     kLast,
 };
 
@@ -253,13 +262,23 @@ struct SettingContainer {
 using setting_t = std::vector<std::tuple<Setting, SettingContainer> >;
 
 template <size_t N>
-using SettingTypes =
-    CxxUtils::TypeList<N, CameraType, double, bool, double, uint64_t, double, bool, float, float, float>;
+using SettingTypes = CxxUtils::TypeList<
+    N, CameraType, double, bool, double, uint64_t, double, bool, float, float, float, ProjectionType, float>;
 static_assert(SettingTypes<0>::size == static_cast<size_t>(Setting::kLast), "Setting types list is incomplete");
 
 static constexpr std::array kSettingsDescriptions{
-    "Camera type",           "Mouse sensitivity",       "Is clock enabled", "Free camera speed", "Current word time",
-    "Word time coefficient", "Highlight light sources", "Field of view",    "Near plane",        "Far plane",
+    "Camera type",
+    "Mouse sensitivity",
+    "Is clock enabled",
+    "Free camera speed",
+    "Current word time",
+    "Word time coefficient",
+    "Highlight light sources",
+    "Field of view",
+    "Near plane",
+    "Far plane",
+    "Projection type",
+    "Ortho height",
 };
 static_assert(
     kSettingsDescriptions.size() == static_cast<size_t>(Setting::kLast), "Setting descriptions list is incomplete"

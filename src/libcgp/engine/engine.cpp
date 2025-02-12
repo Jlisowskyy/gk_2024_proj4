@@ -21,6 +21,7 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
     SettingsMgr::GetInstance().AddListener(Setting::kFov, OnPerspectiveChanged_);
     SettingsMgr::GetInstance().AddListener(Setting::kNear, OnPerspectiveChanged_);
     SettingsMgr::GetInstance().AddListener(Setting::kFar, OnPerspectiveChanged_);
+    SettingsMgr::GetInstance().AddListener(Setting::kProjectionType, OnPerspectiveChanged_);
 
     /* init flowing TEMP object */
     flowing_camera_.position = glm::vec3{};
@@ -162,7 +163,7 @@ void LibGcp::EngineBase::ReloadScene(const Scene &scene)
 void LibGcp::EngineBase::OnFrameBufferResized()
 {
     g_buffer_.RegenerateBuffers();
-    view_.SetWindowAspectRatio(Window::GetInstance().GetAspectRatio());
+    view_.SyncProjectionMatrixWithSettings();
 }
 
 void LibGcp::EngineBase::ProcessInput_(const uint64_t delta)

@@ -1,4 +1,5 @@
 #include <libcgp/engine/view.hpp>
+#include <libcgp/utils/macros.hpp>
 #include <libcgp/window/window.hpp>
 
 #include <glm/glm.hpp>
@@ -83,16 +84,37 @@ void LibGcp::View::UpdateCameraPosition()
     view_matrix_      = glm::lookAt(pos, center, up);
 }
 
-void LibGcp::View::SetWindowAspectRatio(const float aspect_ratio)
-{
-    projection_matrix_ = glm::perspective(glm::radians(45.0F), aspect_ratio, 0.1F, 1000000.0F);
-}
-
 void LibGcp::View::SyncProjectionMatrixWithSettings()
 {
-    projection_matrix_ = glm::perspective(
-        glm::radians(SettingsMgr::GetInstance().GetSetting<Setting::kFov, float>()),
-        Window::GetInstance().GetAspectRatio(), SettingsMgr::GetInstance().GetSetting<Setting::kNear, float>(),
-        SettingsMgr::GetInstance().GetSetting<Setting::kFar, float>()
-    );
+    if (SettingsMgr::GetInstance().GetSetting<Setting::kProjectionType, ProjectionType>() ==
+        ProjectionType::kOrthographic) {
+        const auto [w, h]  = Window::GetInstance().GetWindowSize();
+        const float aspect = static_cast<float>(w) / static_cast<float>(h);
+
+        const float orthoHeight = SettingsMgr::GetInstance().GetSetting<Setting::kOrthoHeight, float>();
+        const float orthoWidth  = orthoHeight * aspect;
+        projection_matrix_      = glm::ortho(
+            -orthoWidth / 2.0f, orthoWidth / 2.0f, -orthoHeight / 2.0f, orthoHeight / 2.0f,
+            SettingsMgr::GetInstance().GetSetting<Setting::kNear, float>(),
+            SettingsMgr::GetInstance().GetSetting<Setting::kFar, float>()
+        );
+    } else if (SettingsMgr::GetInstance().GetSetting<Setting::kProjectionType, ProjectionType>() ==
+               ProjectionType::kPerspective) {
+        projection_matrix_ = glm::perspective(
+            glm::radians(SettingsMgr::GetInstance().GetSetting<Setting::kFov, float>()),
+            Window::GetInstance().GetAspectRatio(), SettingsMgr::GetInstance().GetSetting<Setting::kNear, float>(),
+            SettingsMgr::GetInstance().GetSetting<Setting::kFar, float>()
+        );
+    } else {
+        /* clamp to known range and reset */
+        TRACE("Tried to set unknown projection type, resetting to clamped values");
+        const auto type = SettingsMgr::GetInstance().GetSetting<Setting::kProjectionType, ProjectionType>() ==
+                          ProjectionType::kPerspective;
+
+        const auto casted = static_cast<uint64_t>(type);
+        const auto clamped =
+            std::clamp(casted, static_cast<uint64_t>(0), static_cast<uint64_t>(ProjectionType::kLast) - 1);
+
+        SettingsMgr::GetInstance().SetSetting<Setting::kProjectionType>(static_cast<ProjectionType>(clamped));
+    }
 }

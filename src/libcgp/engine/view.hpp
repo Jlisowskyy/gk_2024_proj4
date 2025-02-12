@@ -50,8 +50,6 @@ class View
 
     void UpdateCameraPosition();
 
-    void SetWindowAspectRatio(float aspect_ratio);
-
     void SyncProjectionMatrixWithSettings();
 
     // ---------------------------------
