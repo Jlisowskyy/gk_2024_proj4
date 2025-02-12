@@ -45,6 +45,8 @@ struct Lightning {
     LightInfo global_lights[MAX_GLOBAL_LIGHTS];
 };
 
+#define SHININESS 32.0 // TODO: Change to material property
+
 uniform vec3 un_view_pos;
 uniform Lightning un_lightning;
 uniform GBuffer un_g_buffer;
@@ -83,7 +85,8 @@ void main()
         result += CalcSpotLight(un_lightning.spot_lights[i], normal, diffuse, specular, frag_pos, view_dir);
     }
 
-    FragColor = vec4(result, 1.0);
+//    FragColor = vec4(result, 1.0);
+    FragColor = vec4(diffuse, 1.0);
 }
 
 vec3 CalcGlobalLight(LightInfo light, vec3 normal, vec3 diffuse, float specular, vec3 view_dir)
@@ -92,13 +95,13 @@ vec3 CalcGlobalLight(LightInfo light, vec3 normal, vec3 diffuse, float specular,
     float diff = max(dot(normal, lightDir), 0.0);
 
     vec3 halfway_dir = normalize(lightDir + view_dir);
-    float spec = pow(max(dot(normal, halfway_dir), 0.0), material.shininess);
+    float spec = pow(max(dot(normal, halfway_dir), 0.0), SHININESS);
 
-    vec3 ambient = light.ambient * diffuse;
-    vec3 diffuse = light.diffuse * diff * diffuse;
-    vec3 specular = light.specular * spec * specular;
+    vec3 ambient_component = light.ambient * diffuse;
+    vec3 diffuse_component = light.diffuse * diff * diffuse;
+    vec3 specular_component = light.specular * spec * specular;
 
-    return (ambient + diffuse + specular) * light.intensity;
+    return (ambient_component + diffuse_component + specular_component) * light.intensity;
 }
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 diffuse, float specular, vec3 fragPos, vec3 view_dir)
@@ -107,20 +110,20 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 diffuse, float specular,
     float diff = max(dot(normal, lightDir), 0.0);
 
     vec3 halfway_dir = normalize(lightDir + view_dir);
-    float spec = pow(max(dot(normal, halfway_dir), 0.0), material.shininess);
+    float spec = pow(max(dot(normal, halfway_dir), 0.0), SHININESS);
 
     float distance = length(light.info.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
-    vec3 ambient = light.info.ambient * diffuse;
-    vec3 diffuse = light.info.diffuse * diff * diffuse;
-    vec3 specular = light.info.specular * spec * specular;
+    vec3 ambient_component = light.info.ambient * diffuse;
+    vec3 diffuse_component = light.info.diffuse * diff * diffuse;
+    vec3 specular_component = light.info.specular * spec * specular;
 
-    ambient *= attenuation;
-    diffuse *= attenuation;
-    specular *= attenuation;
+    ambient_component *= attenuation;
+    diffuse_component *= attenuation;
+    specular_component *= attenuation;
 
-    return ambient + (diffuse + specular) * light.info.intensity;
+    return ambient_component + (diffuse_component + specular_component) * light.info.intensity;
 }
 
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 diffuse, float specular, vec3 fragPos, vec3 view_dir)
@@ -129,7 +132,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 diffuse, float specular, v
     float diff = max(dot(normal, lightDir), 0.0);
 
     vec3 halfway_dir = normalize(lightDir + view_dir);
-    float spec = pow(max(dot(normal, halfway_dir), 0.0), material.shininess);
+    float spec = pow(max(dot(normal, halfway_dir), 0.0), SHININESS);
 
     float distance = length(light.info.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
@@ -138,13 +141,13 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 diffuse, float specular, v
     float epsilon = light.cut_off - light.outer_cut_off;
     float intensity = clamp((theta - light.outer_cut_off) / epsilon, 0.0, 1.0);
 
-    vec3 ambient = light.info.ambient * diffuse;
-    vec3 diffuse = light.info.diffuse * diff * diffuse;
-    vec3 specular = light.info.specular * spec * specular;
+    vec3 ambient_component = light.info.ambient * diffuse;
+    vec3 diffuse_component = light.info.diffuse * diff * diffuse;
+    vec3 specular_component = light.info.specular * spec * specular;
 
-    ambient *= attenuation * intensity;
-    diffuse *= attenuation * intensity;
-    specular *= attenuation * intensity;
+    ambient_component *= attenuation * intensity;
+    diffuse_component *= attenuation * intensity;
+    specular_component *= attenuation * intensity;
 
-    return ambient + (diffuse + specular) * light.info.intensity;
+    return ambient_component + (diffuse_component + specular_component) * light.info.intensity;
 }

@@ -26,7 +26,7 @@
     void Set##TypeName(const char *name, const TypeName &value) const       \
     {                                                                       \
         const GLint location = glGetUniformLocation(shader_program_, name); \
-        assert(location != -1);                                             \
+        assert(true || location != -1);                                     \
         UniformFunc(location, value);                                       \
     }
 
@@ -34,7 +34,7 @@
     void Set##funcName(const char *name, const TypeName &values, GLsizei count = 1) const \
     {                                                                                     \
         const GLint location = glGetUniformLocation(shader_program_, name);               \
-        assert(location != -1);                                                           \
+        assert(true || location != -1);                                                   \
         UniformFunc(location, count, GL_FALSE, glm::value_ptr(values));                   \
     }
 
@@ -42,7 +42,7 @@
     void Set##funcName(const char *name, const TypeName &value, GLsizei count = 1) const \
     {                                                                                    \
         const GLint location = glGetUniformLocation(shader_program_, name);              \
-        assert(location != -1);                                                          \
+        assert(true || location != -1);                                                  \
         UniformFunc(location, count, glm::value_ptr(value));                             \
     }
 

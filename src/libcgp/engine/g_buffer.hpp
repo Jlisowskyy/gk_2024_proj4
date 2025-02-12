@@ -19,15 +19,21 @@ class GBuffer
     // ------------------------------
 
     public:
+    ~GBuffer();
+
     // ------------------------------
     // Class interaction
     // ------------------------------
+
+    void DestroyBuffers();
 
     void PrepareBuffers();
 
     void BindForWriting();
 
-    void BindForReading(Shader& shader);
+    void BindTexturesForReading() const;
+
+    void BindShaderWithBuffers(Shader& shader);
 
     // ---------------------------------
     // Class implementation methods
@@ -42,6 +48,7 @@ class GBuffer
     uint32_t g_position_{};
     uint32_t g_normal_{};
     uint32_t g_albedo_spec_{};
+    uint32_t g_depth_{};
 };
 
 LIBGCP_DECL_END_

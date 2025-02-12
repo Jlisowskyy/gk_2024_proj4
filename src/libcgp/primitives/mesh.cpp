@@ -92,7 +92,7 @@ void LibGcp::Mesh::BindMaterial_(Shader &shader) const noexcept
     }
     glActiveTexture(GL_TEXTURE0);
 
-    shader.SetGLfloat("un_material.shininess", static_cast<GLfloat>(shininess_));
+    // shader.SetGLfloat("un_material.shininess", static_cast<GLfloat>(shininess_));
     // shader.SetGLfloat("material.opacity", static_cast<GLfloat>(opacity_));
 
     assert(counters[static_cast<size_t>(Texture::Type::kDiffuse)] > 0);

@@ -75,6 +75,10 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
         .load_type       = LoadType::kMemory,
         .is_serializable = false,
     });
+
+    /* prepare g_buffer uniforms */
+    lighting_pass_shader_->Activate();
+    g_buffer_.BindShaderWithBuffers(*lighting_pass_shader_);
 }
 
 void LibGcp::EngineBase::Draw()
@@ -84,13 +88,16 @@ void LibGcp::EngineBase::Draw()
     g_buffer_.BindForWriting();
     Engine::GetInstance().GetView().PrepareViewMatrices(*geometry_pass_shader_);
     ObjectMgr::GetInstance().DrawStaticObjects(*geometry_pass_shader_, RenderPass::kGeometry);
+
+    /* switch to default framebuffer */
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     /* lighting pass */
     lighting_pass_shader_->Activate();
-    g_buffer_.BindForReading(*lighting_pass_shader_);
+    g_buffer_.BindTexturesForReading();
 
-    lighting_pass_shader_->SetVec3Unsafe("un_view_pos", view_.GetBindObject().position);
+    lighting_pass_shader_->SetVec3("un_view_pos", view_.GetBindObject().position);
     light_mgr_.PrepareLights(*lighting_pass_shader_);
     global_light_.PrepareLights(*lighting_pass_shader_);
 

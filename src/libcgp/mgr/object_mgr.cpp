@@ -25,7 +25,10 @@ void LibGcp::ObjectMgrBase::LoadObjectsFromScene(const Scene &scene)
 void LibGcp::ObjectMgrBase::DrawStaticObjects(Shader &shader, const RenderPass pass) const
 {
     for (const auto &object : static_objects_) {
-        Engine::GetInstance().GetView().PrepareModelMatrices(shader, object.GetPosition());
+        if (pass != RenderPass::kLighting) {
+            Engine::GetInstance().GetView().PrepareModelMatrices(shader, object.GetPosition());
+        }
+
         object.Draw(shader, pass);
     }
 }
