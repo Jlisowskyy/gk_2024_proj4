@@ -645,6 +645,9 @@ void LibGcp::DebugOverlay::DrawStaticObjectsSection_()
     if (selected_static_object_idx_ == -1) {
         ImGui::Text("No object selected...");
     } else {
+        /* select if object is movable - bool */
+        ImGui::Checkbox("Is rotating", &static_object_->IsRotating());
+
         DrawSelectedObjectPositionEditor_();
 
         if (ImGui::BeginListBox("Meshes")) {

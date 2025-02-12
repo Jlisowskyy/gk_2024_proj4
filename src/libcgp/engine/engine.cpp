@@ -211,6 +211,12 @@ void LibGcp::EngineBase::ProcessDynamicObjects_(const uint64_t delta)
 
     flowing_camera_.position = glm::vec3(camX, 0.0f, camZ);
     flowing_camera_.front    = -flowing_camera_.position;
+
+    for (auto &object : ObjectMgr::GetInstance().GetStaticObjects()) {
+        if (object.IsRotating()) {
+            object.ProcessDelta(delta);
+        }
+    }
 }
 
 void LibGcp::EngineBase::OnCameraTypeChanged_(const uint64_t new_value)
