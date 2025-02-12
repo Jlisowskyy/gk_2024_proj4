@@ -91,8 +91,6 @@ enum class CameraType : std::uint8_t {
     kStatic,
     kFollow,
     kFree,
-    kFirstPerson,
-    kThirdPerson,
     kFollowObj,
     kLast,
 };

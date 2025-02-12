@@ -176,9 +176,7 @@ void LibGcp::EngineBase::ProcessInput_(const uint64_t delta)
     } else if (keys_[GLFW_KEY_F3]) {
         SettingsMgr::GetInstance().SetSetting<Setting::kCameraType>(CameraType::kFree);
     } else if (keys_[GLFW_KEY_F4]) {
-        SettingsMgr::GetInstance().SetSetting<Setting::kCameraType>(CameraType::kFirstPerson);
-    } else if (keys_[GLFW_KEY_F5]) {
-        SettingsMgr::GetInstance().SetSetting<Setting::kCameraType>(CameraType::kThirdPerson);
+        SettingsMgr::GetInstance().SetSetting<Setting::kCameraType>(CameraType::kFollowObj);
     }
 
     /* process overlay changes */
@@ -189,6 +187,33 @@ void LibGcp::EngineBase::ProcessInput_(const uint64_t delta)
     /* process movement */
     const long is_clock_enabled = SettingsMgr::GetInstance().GetSetting<Setting::kClockTicking, bool>();
     ProcessUserMovement_(is_clock_enabled * delta);
+
+    if (SettingsMgr::GetInstance().GetSetting<Setting::kCameraType, CameraType>() == CameraType::kFollowObj) {
+        ProcessFollowCamera_();
+    }
+}
+
+void LibGcp::EngineBase::ProcessFollowCamera_()
+{
+    /* find first rotating object */
+    StaticObject *obj = nullptr;
+    for (auto &object : ObjectMgr::GetInstance().GetStaticObjects()) {
+        if (object.IsRotating()) {
+            obj = &object;
+            break;
+        }
+    }
+
+    /* change camera to free if no object found */
+    if (obj == nullptr) {
+        TRACE("no rotating object found, switching to free camera");
+        SettingsMgr::GetInstance().SetSetting<Setting::kCameraType>(CameraType::kFree);
+        return;
+    }
+
+    follow_obj_camera_.position = glm::vec3(25.0f, 25.0f, 25.0f);
+    follow_obj_camera_.front    = glm::normalize(obj->GetPosition().position - follow_obj_camera_.position);
+    follow_obj_camera_.up       = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
 void LibGcp::EngineBase::ProcessUserMovement_(UNUSED const uint64_t delta) {}
@@ -246,12 +271,10 @@ void LibGcp::EngineBase::OnCameraTypeChanged_(const uint64_t new_value)
             /* bind camera to view */
             Engine::GetInstance().view_.BindCameraWithObjet(&Engine::GetInstance().free_camera_);
         } break;
-        case CameraType::kFirstPerson:
-            NOT_IMPLEMENTED;
-            break;
-        case CameraType::kThirdPerson:
-            NOT_IMPLEMENTED;
-            break;
+        case CameraType::kFollowObj: {
+            Window::GetInstance().GetMouse().BindCamera(nullptr);
+            Engine::GetInstance().view_.BindCameraWithObjet(&Engine::GetInstance().follow_obj_camera_);
+        } break;
         default:
             R_ASSERT(false && "Unknown camera type")
     }

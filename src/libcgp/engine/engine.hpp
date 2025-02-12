@@ -83,6 +83,8 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
 
     static void OnPerspectiveChanged_(uint64_t new_value);
 
+    void ProcessFollowCamera_();
+
     // ------------------------------
     // Class fields
     // ------------------------------
@@ -108,6 +110,7 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
         .front    = glm::vec3(0.0f, 0.0f, -1.0f),
         .up       = glm::vec3(0.0f, 1.0f, 0.0f),
     };
+    CameraInfo follow_obj_camera_{};
 
     /* Shaders */
     std::shared_ptr<Shader> geometry_pass_shader_{};
