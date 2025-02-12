@@ -2,6 +2,7 @@
 #define ENGINE_ENGINE_HPP_
 
 #include <libcgp/defines.hpp>
+#include <libcgp/engine/g_buffer.hpp>
 #include <libcgp/engine/global_light.hpp>
 #include <libcgp/engine/light_mgr.hpp>
 #include <libcgp/engine/view.hpp>
@@ -53,8 +54,6 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
 
     FAST_CALL void ButtonPressed(const int key) { ++keys_[key]; }
 
-    NDSCRD FAST_CALL std::shared_ptr<Shader> GetDefaultShader() const noexcept { return default_shader_; }
-
     void ReloadScene(const Scene &scene);
 
     /* camera */
@@ -77,22 +76,25 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
 
     static void OnCameraTypeChanged_(uint64_t new_value);
 
-    static void OnDefaultShaderChanged_(uint64_t new_value);
-
     static void OnWordTimeChanged_(uint64_t new_value);
 
     static void OnPerspectiveChanged_(uint64_t new_value);
-
-    static std::shared_ptr<Shader> FindShaderWithId(uint64_t id);
 
     // ------------------------------
     // Class fields
     // ------------------------------
 
+    /* Engine components */
     WordTime word_time_{};
     GlobalLights global_light_{};
     LightMgr light_mgr_{};
+    View view_{};
+    GBuffer g_buffer_{};
 
+    /* Input */
+    std::array<int, GLFW_KEY_LAST> keys_{};
+
+    /* Camera */
     // TODO: temp object
     CameraInfo flowing_camera_{};
     double flow_count_{};
@@ -104,10 +106,9 @@ class EngineBase final : public CxxUtils::StaticSingletonHelper
         .up       = glm::vec3(0.0f, 1.0f, 0.0f),
     };
 
-    std::array<int, GLFW_KEY_LAST> keys_{};
-    View view_{};
-
-    std::shared_ptr<Shader> default_shader_{};
+    /* Shaders */
+    std::shared_ptr<Shader> geometry_pass_shader_{};
+    std::shared_ptr<Shader> lighting_pass_shader_{};
 };
 
 using Engine = CxxUtils::StaticSingleton<EngineBase>;

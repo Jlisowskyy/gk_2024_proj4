@@ -597,7 +597,7 @@ void LibGcp::DebugOverlay::DrawDebugPoint(const glm::vec3 &position, const float
 
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    sphere_model->Draw(*shader_);
+    sphere_model->Draw(*shader_, RenderPass::kGeometry);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
 }
@@ -680,7 +680,7 @@ void LibGcp::DebugOverlay::HighlightedSelectedMesh_()
 
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    static_object_mesh_->Draw(*shader_);
+    static_object_mesh_->Draw(*shader_, RenderPass::kGeometry);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_DEPTH_TEST);
 }

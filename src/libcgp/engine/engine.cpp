@@ -17,9 +17,6 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
     /* Adjust camera type based on default settings - intentional cast */
     OnCameraTypeChanged_(SettingsMgr::GetInstance().GetSetting<uint64_t>(Setting::kCameraType));
 
-    /* Add reaction on shader change */
-    SettingsMgr::GetInstance().AddListener(Setting::kBaseShader, OnDefaultShaderChanged_);
-
     /* Add reaction on perspective change */
     SettingsMgr::GetInstance().AddListener(Setting::kFov, OnPerspectiveChanged_);
     SettingsMgr::GetInstance().AddListener(Setting::kNear, OnPerspectiveChanged_);
@@ -32,13 +29,6 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
 
     /* load initial scene */
     ReloadScene(scene);
-
-    /* load default shader */
-    const uint64_t default_id = SettingsMgr::GetInstance().GetSetting<uint64_t>(Setting::kBaseShader);
-    R_ASSERT(default_id < Shader::GetInstanceCount() && "Default shader not found");
-
-    default_shader_ = FindShaderWithId(default_id);
-    R_ASSERT(Engine::GetInstance().default_shader_ && "Default shader not found");
 
     /* TODO: load global lights from scene */
     global_light_.LoadLights({
@@ -67,17 +57,44 @@ void LibGcp::EngineBase::Init(const Scene &scene) noexcept
                         .angle     = 0.6,
                         }
     });
+
+    /* initialize g-buffer */
+    g_buffer_.PrepareBuffers();
+
+    /* load shaders */
+    geometry_pass_shader_ = ResourceMgr::GetInstance().GetShader({
+        .paths           = {"g_buffer", "g_buffer"},
+        .type            = ResourceType::kShader,
+        .load_type       = LoadType::kMemory,
+        .is_serializable = false,
+    });
+
+    lighting_pass_shader_ = ResourceMgr::GetInstance().GetShader({
+        .paths           = {"deferred_shading", "deferred_shading"},
+        .type            = ResourceType::kShader,
+        .load_type       = LoadType::kMemory,
+        .is_serializable = false,
+    });
 }
 
 void LibGcp::EngineBase::Draw()
 {
-    const auto shader = Engine::GetInstance().GetDefaultShader();
-    shader->Activate();
+    /* geometry pass */
+    geometry_pass_shader_->Activate();
+    g_buffer_.BindForWriting();
+    Engine::GetInstance().GetView().PrepareViewMatrices(*geometry_pass_shader_);
+    ObjectMgr::GetInstance().DrawStaticObjects(*geometry_pass_shader_, RenderPass::kGeometry);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    shader->SetVec3Unsafe("viewPos", view_.GetBindObject().position);
-    light_mgr_.PrepareLights(*shader);
-    global_light_.PrepareLights(*shader);
-    ObjectMgr::GetInstance().DrawStaticObjects(*shader);
+    /* lighting pass */
+    lighting_pass_shader_->Activate();
+    g_buffer_.BindForReading(*lighting_pass_shader_);
+
+    lighting_pass_shader_->SetVec3Unsafe("un_view_pos", view_.GetBindObject().position);
+    light_mgr_.PrepareLights(*lighting_pass_shader_);
+    global_light_.PrepareLights(*lighting_pass_shader_);
+
+    ObjectMgr::GetInstance().DrawStaticObjects(*lighting_pass_shader_, RenderPass::kLighting);
 }
 
 void LibGcp::EngineBase::ProcessProgress(const uint64_t delta)
@@ -213,22 +230,6 @@ void LibGcp::EngineBase::OnCameraTypeChanged_(const uint64_t new_value)
     }
 }
 
-void LibGcp::EngineBase::OnDefaultShaderChanged_(const uint64_t new_value)
-{
-    if (new_value == Engine::GetInstance().default_shader_->GetInstanceID()) {
-        return;
-    }
-
-    /* correct value if necessary */
-    if (new_value >= Shader::GetInstanceCount()) {
-        SettingsMgr::GetInstance().SetSetting<Setting::kBaseShader>(Shader::GetInstanceCount() - 1);
-        return;
-    }
-
-    Engine::GetInstance().default_shader_ = FindShaderWithId(new_value);
-    R_ASSERT(Engine::GetInstance().default_shader_ && "Default shader not found");
-}
-
 void LibGcp::EngineBase::OnWordTimeChanged_(const uint64_t new_value)
 {
     Engine::GetInstance().global_light_.UpdatePosition(new_value);
@@ -237,17 +238,4 @@ void LibGcp::EngineBase::OnWordTimeChanged_(const uint64_t new_value)
 void LibGcp::EngineBase::OnPerspectiveChanged_([[maybe_unused]] uint64_t new_value)
 {
     Engine::GetInstance().view_.SyncProjectionMatrixWithSettings();
-}
-
-std::shared_ptr<LibGcp::Shader> LibGcp::EngineBase::FindShaderWithId(const uint64_t id)
-{
-    std::lock_guard lock(ResourceMgr::GetInstance().GetShaders().GetMutex());
-
-    for (const auto &[_, shader] : ResourceMgr::GetInstance().GetShaders()) {
-        if (shader->GetInstanceID() == id) {
-            return shader;
-        }
-    }
-
-    return nullptr;
 }

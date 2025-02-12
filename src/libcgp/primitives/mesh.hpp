@@ -35,20 +35,31 @@ class Mesh
     ~Mesh() = default;
 
     Mesh(
-        std::vector<Vertex> &&vertices, std::vector<GLuint> &&indices, std::vector<std::shared_ptr<Texture>> &&textures
+        std::vector<Vertex> &&vertices, std::vector<GLuint> &&indices, std::vector<std::shared_ptr<Texture> > &&textures
     );
 
-    Mesh(const Mesh &)            = delete;
+    Mesh(const Mesh &) = delete;
+
     Mesh &operator=(const Mesh &) = delete;
 
-    Mesh(Mesh &&) noexcept            = default;
+    Mesh(Mesh &&) noexcept = default;
+
     Mesh &operator=(Mesh &&) noexcept = default;
 
     // ------------------------------
     // Class interaction
     // ------------------------------
 
-    void Draw(Shader &shader) const;
+    FAST_CALL void Draw(Shader &shader, const RenderPass pass) const
+    {
+        if (pass == RenderPass::kGeometry) {
+            BindMaterial_(shader);
+        }
+
+        glBindVertexArray(VAO_);
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices_.size()), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(0);
+    }
 
     NDSCRD double &GetOpacity() noexcept { return opacity_; }
     NDSCRD double &GetShininess() noexcept { return shininess_; }
@@ -60,6 +71,8 @@ class Mesh
     protected:
     void SetupMesh_();
 
+    void BindMaterial_(Shader &shader) const noexcept;
+
     // ------------------------------
     // Class fields
     // ------------------------------
@@ -69,7 +82,7 @@ class Mesh
 
     std::vector<Vertex> vertices_;
     std::vector<GLuint> indices_;
-    std::vector<std::shared_ptr<Texture>> textures_;
+    std::vector<std::shared_ptr<Texture> > textures_;
 
     GLuint VAO_{};
     GLuint VBO_{};

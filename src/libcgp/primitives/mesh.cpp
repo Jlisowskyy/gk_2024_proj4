@@ -22,46 +22,6 @@ LibGcp::Mesh::Mesh(
     SetupMesh_();
 }
 
-void LibGcp::Mesh::Draw(Shader &shader) const
-{
-    static constexpr uint8_t kMaxTextures = 16;
-
-    std::array<std::string, static_cast<size_t>(Texture::Type::kLast)> texture_names = {
-        "material.texture_diffuse00",
-        "material.texture_specular00",
-        "material.texture_normal00",
-    };  // leave space for numbers
-
-    std::array<uint8_t, static_cast<size_t>(Texture::Type::kLast)> counters{};
-
-    for (size_t idx = 0; idx < textures_.size(); ++idx) {
-        if (idx >= kMaxTextures) {
-            break;
-        }
-
-        const size_t type_idx = static_cast<size_t>(textures_[idx]->GetType());
-        const uint8_t counter = ++counters[type_idx];
-        std::string &name     = texture_names[type_idx];
-
-        name[name.size() - 2] = '0' + counter / 10;
-        name[name.size() - 1] = '0' + counter % 10;
-
-        shader.SetGLint(name.c_str(), idx);
-        textures_[idx]->Bind(idx);
-    }
-    glActiveTexture(GL_TEXTURE0);
-
-    shader.SetGLfloatUnsafe("material.shininess", static_cast<GLfloat>(shininess_));
-    // shader.SetGLfloat("material.opacity", static_cast<GLfloat>(opacity_));
-
-    glBindVertexArray(VAO_);
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices_.size()), GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
-
-    assert(counters[static_cast<size_t>(Texture::Type::kDiffuse)] > 0);
-    assert(counters[static_cast<size_t>(Texture::Type::kNormal)] > 0);
-}
-
 void LibGcp::Mesh::SetupMesh_()
 {
     glGenVertexArrays(1, &VAO_);
@@ -101,4 +61,40 @@ void LibGcp::Mesh::SetupMesh_()
     );
 
     glBindVertexArray(0);
+}
+
+void LibGcp::Mesh::BindMaterial_(Shader &shader) const noexcept
+{
+    static constexpr uint8_t kMaxTextures = 16;
+
+    std::array<std::string, static_cast<size_t>(Texture::Type::kLast)> texture_names = {
+        "un_material.texture_diffuse00",
+        "un_material.texture_specular00",
+        "un_material.texture_normal00",
+    };  // leave space for numbers
+
+    std::array<uint8_t, static_cast<size_t>(Texture::Type::kLast)> counters{};
+
+    for (size_t idx = 0; idx < textures_.size(); ++idx) {
+        if (idx >= kMaxTextures) {
+            break;
+        }
+
+        const size_t type_idx = static_cast<size_t>(textures_[idx]->GetType());
+        const uint8_t counter = ++counters[type_idx];
+        std::string &name     = texture_names[type_idx];
+
+        name[name.size() - 2] = '0' + counter / 10;
+        name[name.size() - 1] = '0' + counter % 10;
+
+        shader.SetGLint(name.c_str(), idx);
+        textures_[idx]->Bind(idx);
+    }
+    glActiveTexture(GL_TEXTURE0);
+
+    shader.SetGLfloat("un_material.shininess", static_cast<GLfloat>(shininess_));
+    // shader.SetGLfloat("material.opacity", static_cast<GLfloat>(opacity_));
+
+    assert(counters[static_cast<size_t>(Texture::Type::kDiffuse)] > 0);
+    assert(counters[static_cast<size_t>(Texture::Type::kNormal)] > 0);
 }

@@ -4,7 +4,6 @@
 #include <libcgp/defines.hpp>
 
 #include <libcgp/intf.hpp>
-#include <libcgp/primitives/shader.hpp>
 #include <libcgp/primitives/static_object.hpp>
 
 #include <CxxUtils/data_types/extended_vector.hpp>
@@ -37,7 +36,7 @@ class ObjectMgrBase : public CxxUtils::StaticSingletonHelper
 
     void LoadObjectsFromScene(const Scene &scene);
 
-    void DrawStaticObjects(Shader &shader);
+    void DrawStaticObjects(Shader &shader, RenderPass pass) const;
 
     void ProcessProgress(long delta_time_micros);
 

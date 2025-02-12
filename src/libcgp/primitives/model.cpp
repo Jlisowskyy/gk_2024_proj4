@@ -95,13 +95,6 @@ L_FAST_CALL void TraceMaterialInfo(aiMaterial *material)
 
 LibGcp::Model::Model(std::vector<std::shared_ptr<Mesh> > &&meshes) : meshes_(std::move(meshes)) {}
 
-void LibGcp::Model::Draw(Shader &shader) const
-{
-    for (const auto &mesh : meshes_) {
-        mesh->Draw(shader);
-    }
-}
-
 std::shared_ptr<LibGcp::Model> LibGcp::ModelSerializer::LoadModelFromExternalFormat(const std::string &path)
 {
     Timer timer{};

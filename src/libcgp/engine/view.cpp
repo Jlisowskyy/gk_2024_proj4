@@ -43,15 +43,15 @@ LibGcp::View::View() { SyncProjectionMatrixWithSettings(); }
 
 void LibGcp::View::PrepareViewMatrices(Shader &shader)
 {
-    shader.SetMat4("view", view_matrix_);
-    shader.SetMat4("projection", projection_matrix_);
+    shader.SetMat4("un_view", view_matrix_);
+    shader.SetMat4("un_projection", projection_matrix_);
 }
 
 void LibGcp::View::PrepareModelMatrices(Shader &shader, const ObjectPosition &position)
 {
     const auto model_matrix = PrepareModelMatrices(position);
 
-    shader.SetMat4("model", model_matrix);
+    shader.SetMat4("un_model", model_matrix);
 }
 
 glm::mat4 LibGcp::View::PrepareModelMatrices(const ObjectPosition &position)

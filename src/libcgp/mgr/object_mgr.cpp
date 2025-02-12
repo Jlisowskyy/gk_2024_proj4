@@ -22,13 +22,11 @@ void LibGcp::ObjectMgrBase::LoadObjectsFromScene(const Scene &scene)
     }
 }
 
-void LibGcp::ObjectMgrBase::DrawStaticObjects(Shader &shader)
+void LibGcp::ObjectMgrBase::DrawStaticObjects(Shader &shader, const RenderPass pass) const
 {
-    Engine::GetInstance().GetView().PrepareViewMatrices(shader);
-
     for (const auto &object : static_objects_) {
         Engine::GetInstance().GetView().PrepareModelMatrices(shader, object.GetPosition());
-        object.Draw(shader);
+        object.Draw(shader, pass);
     }
 }
 

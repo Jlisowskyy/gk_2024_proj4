@@ -85,7 +85,7 @@ double LibGcp::GlobalLights::GlobalLight::GetDayAngleAndUpdateIntensity(const ui
 
 void LibGcp::GlobalLights::GlobalLight::PrepareLight(Shader &shader, const size_t idx)
 {
-    const std::string prefix = "lightning.global_lights[" + std::to_string(idx) + "].";
+    const std::string prefix = "un_lightning.global_lights[" + std::to_string(idx) + "].";
 
     shader.SetVec3Unsafe((prefix + "position").c_str(), spec_.light_info.position);
     shader.SetVec3Unsafe((prefix + "ambient").c_str(), spec_.light_info.ambient);
@@ -117,7 +117,7 @@ void LibGcp::GlobalLights::UpdatePosition(const uint64_t time)
 
 void LibGcp::GlobalLights::PrepareLights(Shader &shader)
 {
-    shader.SetGLuintUnsafe("lightning.num_global_lights", static_cast<GLuint>(lights_.size()));
+    shader.SetGLuintUnsafe("un_lightning.num_global_lights", static_cast<GLuint>(lights_.size()));
 
     for (size_t idx = 0; idx < lights_.size(); ++idx) {
         lights_[idx].PrepareLight(shader, idx);

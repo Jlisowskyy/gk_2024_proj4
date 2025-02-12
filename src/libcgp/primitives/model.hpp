@@ -57,7 +57,12 @@ class Model : public Resource
     // Class interaction
     // ------------------------------
 
-    void Draw(Shader &shader) const;
+    FAST_CALL void Draw(Shader &shader, const RenderPass pass) const
+    {
+        for (const auto &mesh : meshes_) {
+            mesh->Draw(shader, pass);
+        }
+    }
 
     NDSCRD FAST_CALL size_t GetMeshesCount() const { return meshes_.size(); }
 

@@ -67,6 +67,17 @@ struct alignas(32) Vertex {
 };
 
 // ------------------------------
+// Rendering
+// ------------------------------
+
+enum class RenderPass : std::uint8_t {
+    kGeometry,
+    kLighting,
+    kPostProcessing,
+    kLast,
+};
+
+// ------------------------------
 // Engine
 // ------------------------------
 
@@ -198,7 +209,6 @@ enum class Setting : std::uint16_t {
     kMouseSensitivity,
     kClockTicking,
     kFreeCameraSpeed,
-    kBaseShader,
     kCurrentWordTime,
     kWordTimeCoef,
     kHighlightLightSources,
@@ -255,21 +265,12 @@ using setting_t = std::vector<std::tuple<Setting, SettingContainer> >;
 
 template <size_t N>
 using SettingTypes =
-    CxxUtils::TypeList<N, CameraType, double, bool, double, uint64_t, uint64_t, double, bool, float, float, float>;
+    CxxUtils::TypeList<N, CameraType, double, bool, double, uint64_t, double, bool, float, float, float>;
 static_assert(SettingTypes<0>::size == static_cast<size_t>(Setting::kLast), "Setting types list is incomplete");
 
 static constexpr std::array kSettingsDescriptions{
-    "Camera type",
-    "Mouse sensitivity",
-    "Is clock enabled",
-    "Free camera speed",
-    "ID of the base render shader",
-    "Current word time",
-    "Word time coefficient",
-    "Highlight light sources",
-    "Field of view",
-    "Near plane",
-    "Far plane",
+    "Camera type",           "Mouse sensitivity",       "Is clock enabled", "Free camera speed", "Current word time",
+    "Word time coefficient", "Highlight light sources", "Field of view",    "Near plane",        "Far plane",
 };
 static_assert(
     kSettingsDescriptions.size() == static_cast<size_t>(Setting::kLast), "Setting descriptions list is incomplete"
@@ -285,19 +286,15 @@ struct Scene {
 };
 
 static inline const Scene kEmptyScene{
-    {   },
+    {},
     {
      ResourceSpec{
-            .paths     = {"first_vertex_shader", "first_fragment_shader"},
-            .type      = ResourceType::kShader,
-            .load_type = LoadType::kMemory,
-        },ResourceSpec{
             .paths     = {"./models/sphere.glb", ""},
             .type      = ResourceType::kModel,
             .load_type = LoadType::kExternal,
         }, },
-    { },
-    {   },
+    {},
+    {},
     {},
     {},
 };
