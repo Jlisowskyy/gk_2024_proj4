@@ -220,6 +220,10 @@ enum class Setting : std::uint16_t {
     kFar,
     kProjectionType,
     kOrthoHeight,
+    kFogRed,
+    kFogGreen,
+    kFogBlue,
+    kFogDensity,
     kLast,
 };
 
@@ -261,7 +265,8 @@ using setting_t = std::vector<std::tuple<Setting, SettingContainer> >;
 
 template <size_t N>
 using SettingTypes = CxxUtils::TypeList<
-    N, CameraType, double, bool, double, uint64_t, double, bool, float, float, float, ProjectionType, float>;
+    N, CameraType, double, bool, double, uint64_t, double, bool, float, float, float, ProjectionType, float, float,
+    float, float, float>;
 static_assert(SettingTypes<0>::size == static_cast<size_t>(Setting::kLast), "Setting types list is incomplete");
 
 static constexpr std::array kSettingsDescriptions{
@@ -277,6 +282,10 @@ static constexpr std::array kSettingsDescriptions{
     "Far plane",
     "Projection type",
     "Ortho height",
+    "Fog red",
+    "Fog green",
+    "Fog blue",
+    "Fog density",
 };
 static_assert(
     kSettingsDescriptions.size() == static_cast<size_t>(Setting::kLast), "Setting descriptions list is incomplete"

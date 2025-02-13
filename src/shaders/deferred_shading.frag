@@ -50,6 +50,8 @@ struct Lightning {
 uniform vec3 un_view_pos;
 uniform Lightning un_lightning;
 uniform GBuffer un_g_buffer;
+uniform vec3 un_fog_color;
+uniform float un_fog_density;
 
 in vec2 out_tex_coords;
 
@@ -85,6 +87,10 @@ void main()
         result += CalcSpotLight(un_lightning.spot_lights[i], normal, diffuse, specular, frag_pos, view_dir);
     }
 
+    float fog_factor = exp(-pow(length(frag_pos - un_view_pos) * un_fog_density, 2.0));
+    fog_factor = clamp(fog_factor, 0.0, 1.0);
+
+    result = mix(un_fog_color, result, fog_factor);
     FragColor = vec4(result, 1.0);
 }
 

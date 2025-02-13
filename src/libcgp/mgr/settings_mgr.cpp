@@ -22,4 +22,8 @@ void LibGcp::SettingsMgrBase::LoadDefaultSettings()
     SetSetting<Setting::kFar, float>(10000.0f);
     SetSetting<Setting::kProjectionType, ProjectionType>(ProjectionType::kPerspective);
     SetSetting<Setting::kOrthoHeight, float>(10.0f);
+    SetSetting<Setting::kFogRed, float>(0.5f);
+    SetSetting<Setting::kFogGreen, float>(0.5f);
+    SetSetting<Setting::kFogBlue, float>(0.5f);
+    SetSetting<Setting::kFogDensity, float>(0.0f);
 }

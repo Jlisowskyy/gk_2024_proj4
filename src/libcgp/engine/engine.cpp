@@ -102,6 +102,18 @@ void LibGcp::EngineBase::Draw()
     lighting_pass_shader_->Activate();
     g_buffer_.BindTexturesForReading();
 
+    lighting_pass_shader_->SetGLfloat(
+        "un_fog_density", SettingsMgr::GetInstance().GetSetting<Setting::kFogDensity, float>()
+    );
+    lighting_pass_shader_->SetVec3(
+        "un_fog_color",
+        {
+            SettingsMgr::GetInstance().GetSetting<Setting::kFogRed, float>(),
+            SettingsMgr::GetInstance().GetSetting<Setting::kFogGreen, float>(),
+            SettingsMgr::GetInstance().GetSetting<Setting::kFogBlue, float>(),
+        }
+    );
+
     lighting_pass_shader_->SetVec3("un_view_pos", view_.GetBindObject().position);
     light_mgr_.PrepareLights(*lighting_pass_shader_);
     global_light_.PrepareLights(*lighting_pass_shader_);
