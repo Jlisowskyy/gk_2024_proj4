@@ -63,6 +63,5 @@ uniform vec3 un_color;
 
 void main()
 {
-    // pink color
     FragColor = vec4(un_color, 1.0);
 }
