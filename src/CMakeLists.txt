@@ -96,16 +96,6 @@ endif ()
 
 # copy exec to repo dir after build
 
-add_custom_command(TARGET ${EXEC_NAME}_debug POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${EXEC_NAME}_debug> ${REPO_DIR}/${EXEC_NAME}_debug
-        COMMENT "Copying ${EXEC_NAME}_debug to ${REPO_DIR}/${EXEC_NAME}_debug"
-)
-
-add_custom_command(TARGET ${EXEC_NAME}_game POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${EXEC_NAME}_game> ${REPO_DIR}/${EXEC_NAME}_game
-        COMMENT "Copying ${EXEC_NAME}_game to ${REPO_DIR}/${EXEC_NAME}_game"
-)
-
 add_custom_command(TARGET ${EXEC_NAME}_editor POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${EXEC_NAME}_editor> ${REPO_DIR}/${EXEC_NAME}_editor
         COMMENT "Copying ${EXEC_NAME}_editor to ${REPO_DIR}/${EXEC_NAME}_editor"
