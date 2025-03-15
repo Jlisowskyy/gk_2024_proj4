@@ -1,4 +1,4 @@
-# Advanced OpenGL Rendering Engine
+# OpenGL Rendering Engine
 
 A C++ application for visualizing and manipulating 3D models with a deferred shading pipeline, real-time lighting, and a user-friendly IMGUI interface for scene customization.
 
